@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block title %}MediaTracker - Upload{% endblock %}
+
+{% block content %}
+<h1>Upload CSV File and Media Details</h1>
+
+<!-- CSV Upload Section -->
+<section>
+    <h2>Upload CSV File</h2>
+    <form action="/upload" method="post" enctype="multipart/form-data">
+        <label for="csvFile">Choose a CSV file:</label>
+        <input type="file" id="csvFile" name="csvFile" accept=".csv" required>
+        <button type="submit">Upload</button>
+    </form>
+</section>
+
+<!-- Media Details Form -->
+<section>
+    <h2>Media Details Form</h2>
+    <form action="/submit" method="post">
+        <label for="mediaType">Media Type:</label>
+        <input type="text" id="mediaType" name="mediaType" required>
+
+        <label for="mediaName">Media Name:</label>
+        <input type="text" id="mediaName" name="mediaName" required>
+
+        <label for="duration">Duration:</label>
+        <input type="text" id="duration" name="duration" required>
+
+        <label for="date">Date:</label>
+        <input type="date" id="date" name="date" required>
+
+        <button type="submit">Submit</button>
+    </form>
+</section>
+{% endblock %}

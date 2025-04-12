@@ -9,14 +9,19 @@
     <h2>Statistics</h2>
     <p>Here you can view your media consumption statistics and insights.</p>
     <ul>
-        <li>Total time spent on media: <strong>XX hours</strong></li>
-        <li>Most consumed media type: <strong>Movies</strong></li>
-        <li>Average daily media consumption: <strong>YY hours</strong></li>
+        <li>Total time spent on media: <strong>{{ total_time }} hours</strong></li>
+        <li>Most consumed media type: <strong>{{ most_consumed_media }}</strong></li>
+        <li>Average daily media consumption: <strong>{{ daily_average_time }} hours</strong></li>
     </ul>
 </section>
 
 <section>
     <h2>Visualizations</h2>
     <p>Graphs and charts will be displayed here to help you analyze your media habits.</p>
+    {% if graph_url %}
+        <img src="data:image/png;base64,{{ graph_url }}" alt="Weekly Averages Graph">
+    {% else %}
+        <p>No data available to display the graph.</p>
+    {% endif %}
 </section>
 {% endblock %}

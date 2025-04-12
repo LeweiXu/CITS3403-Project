@@ -1,5 +1,7 @@
-from flask import render_template, request, redirect, url_for
+from flask import render_template, request, redirect, url_for, flash
 from app import app
+import os
+from backend.process_csv import parse_csv
 
 @app.route('/')
 def index():
@@ -7,10 +9,10 @@ def index():
 
 @app.route('/login', methods=['POST'])
 def login():
-    # Placeholder logic for login validation
     username = request.form.get('username')
     password = request.form.get('password')
-    if username == "testuser" and password == "password":  # Replace with real authentication
+    # In a real application, you would validate against a database
+    if username == "asd" and password == "asd":
         return redirect(url_for('overview'))
     return render_template('index.html', error="Invalid credentials")
 
@@ -18,6 +20,18 @@ def login():
 def overview():
     return render_template('overview.html')
 
-@app.route('/upload')
+@app.route('/upload', methods=['GET', 'POST'])
 def upload():
+    if request.method == 'POST':
+        # Define the absolute path to the uploads directory
+        upload_folder = os.path.join(app.root_path, 'uploads')
+        
+        file = request.files['csvFile']
+        file_path = os.path.join(upload_folder, file.filename)
+        file.save(file_path)
+        data = parse_csv(file_path)
+        
+        flash('File uploaded and processed successfully!')
+        return redirect(url_for('upload'))
+    
     return render_template('upload.html')

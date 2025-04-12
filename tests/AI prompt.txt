@@ -1,0 +1,1 @@
+fill in this csv file with test data simulating a person's media consumption. There are 4 columns: type of media (pick from video game, tv show, movie, book), name of media, duration (in minutes) and date. Fill in 300 lines spanning across 180 days.

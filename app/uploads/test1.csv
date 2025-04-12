@@ -1,0 +1,225 @@
+type of media,name of media,duration,date
+video game,The Legend of Zelda: Breath of the Wild,120,2024-10-01
+tv show,Stranger Things,45,2024-10-01
+movie,Inception,148,2024-10-02
+book,To Kill a Mockingbird,90,2024-10-02
+video game,Animal Crossing: New Horizons,60,2024-10-03
+tv show,The Office,22,2024-10-03
+movie,The Matrix,136,2024-10-04
+book,1984,120,2024-10-04
+video game,Minecraft,180,2024-10-05
+tv show,Breaking Bad,50,2024-10-05
+movie,Interstellar,169,2024-10-06
+book,The Great Gatsby,80,2024-10-06
+video game,Fortnite,90,2024-10-07
+tv show,Game of Thrones,60,2024-10-07
+movie,The Dark Knight,152,2024-10-08
+book,Harry Potter and the Sorcerer's Stone,100,2024-10-08
+video game,Call of Duty: Modern Warfare,120,2024-10-09
+tv show,Friends,25,2024-10-09
+movie,Avengers: Endgame,181,2024-10-10
+book,Pride and Prejudice,95,2024-10-10
+video game,League of Legends,150,2024-10-11
+tv show,The Crown,50,2024-10-11
+movie,Spider-Man: No Way Home,148,2024-10-12
+book,The Catcher in the Rye,85,2024-10-12
+video game,Overwatch,120,2024-10-13
+tv show,The Mandalorian,40,2024-10-13
+movie,Jurassic Park,127,2024-10-14
+book,The Hobbit,110,2024-10-14
+video game,World of Warcraft,200,2024-10-15
+tv show,The Simpsons,22,2024-10-15
+movie,Titanic,195,2024-10-16
+book,The Lord of the Rings: The Fellowship of the Ring,120,2024-10-16
+video game,Valorant,90,2024-10-17
+tv show,House of Cards,55,2024-10-17
+movie,The Lion King,88,2024-10-18
+book,The Alchemist,75,2024-10-18
+video game,Counter-Strike: Global Offensive,100,2024-10-19
+tv show,Black Mirror,60,2024-10-19
+movie,Forrest Gump,142,2024-10-20
+book,The Da Vinci Code,105,2024-10-20
+video game,Grand Theft Auto V,180,2024-10-21
+tv show,Westworld,57,2024-10-21
+movie,The Shawshank Redemption,142,2024-10-22
+book,The Hunger Games,90,2024-10-22
+video game,Red Dead Redemption 2,200,2024-10-23
+tv show,The Witcher,60,2024-10-23
+movie,The Godfather,175,2024-10-24
+book,The Maze Runner,85,2024-10-24
+video game,PUBG,120,2024-10-25
+tv show,Better Call Saul,50,2024-10-25
+movie,The Avengers,143,2024-10-26
+book,Dune,115,2024-10-26
+video game,Apex Legends,90,2024-10-27
+tv show,The Boys,60,2024-10-27
+movie,The Social Network,120,2024-10-28
+book,The Fault in Our Stars,95,2024-10-28
+video game,Halo Infinite,150,2024-10-29
+tv show,Peaky Blinders,55,2024-10-29
+movie,The Wolf of Wall Street,180,2024-10-30
+book,The Shining,100,2024-10-30
+video game,Among Us,60,2024-10-31
+tv show,The Big Bang Theory,22,2024-10-31
+movie,The Silence of the Lambs,118,2024-11-01
+book,The Road,90,2024-11-01
+video game,Stardew Valley,120,2024-11-02
+tv show,How I Met Your Mother,25,2024-11-02
+movie,The Grand Budapest Hotel,99,2024-11-03
+book,The Kite Runner,110,2024-11-03
+video game,The Sims 4,90,2024-11-04
+tv show,Arrested Development,22,2024-11-04
+movie,Whiplash,106,2024-11-05
+book,The Book Thief,120,2024-11-05
+video game,Portal 2,80,2024-11-06
+tv show,Modern Family,25,2024-11-06
+movie,La La Land,128,2024-11-07
+book,The Giver,90,2024-11-07
+video game,Dark Souls III,150,2024-11-08
+tv show,Schitt's Creek,22,2024-11-08
+movie,Parasite,132,2024-11-09
+book,The Secret Garden,85,2024-11-09
+video game,The Witcher 3: Wild Hunt,180,2024-11-10
+tv show,The Walking Dead,45,2024-11-10
+movie,The Irishman,209,2024-11-11
+book,The Outsiders,75,2024-11-11
+video game,Assassin's Creed Valhalla,120,2024-11-12
+tv show,Seinfeld,22,2024-11-12
+movie,The Truman Show,103,2024-11-13
+book,The Chronicles of Narnia,100,2024-11-13
+video game,Hades,90,2024-11-14
+tv show,Lost,42,2024-11-14
+movie,The Pursuit of Happyness,117,2024-11-15
+book,The Perks of Being a Wallflower,95,2024-11-15
+video game,Skyrim,200,2024-11-16
+tv show,Supernatural,45,2024-11-16
+movie,Good Will Hunting,126,2024-11-17
+book,The Girl with the Dragon Tattoo,120,2024-11-17
+video game,Bioshock Infinite,100,2024-11-18
+tv show,The Flash,42,2024-11-18
+movie,The Prestige,130,2024-11-19
+book,The Stand,150,2024-11-19
+video game,Destiny 2,120,2024-11-20
+tv show,Arrow,42,2024-11-20
+movie,The Departed,151,2024-11-21
+book,The Goldfinch,140,2024-11-21
+video game,Far Cry 5,90,2024-11-22
+tv show,The Vampire Diaries,43,2024-11-22
+movie,The Green Mile,189,2024-11-23
+book,The Catch-22,100,2024-11-23
+video game,Borderlands 3,120,2024-11-24
+tv show,Grey's Anatomy,44,2024-11-24
+movie,The Notebook,123,2024-11-25
+book,The Bell Jar,85,2024-11-25
+video game,Control,100,2024-11-26
+tv show,Lucifer,45,2024-11-26
+movie,The Revenant,156,2024-11-27
+book,The Night Circus,95,2024-11-27
+video game,Hitman 3,90,2024-11-28
+tv show,The Good Place,22,2024-11-28
+movie,The Blind Side,129,2024-11-29
+book,The Light We Lost,80,2024-11-29
+video game,No Man's Sky,150,2024-11-30
+tv show,The Originals,43,2024-11-30
+movie,The Theory of Everything,123,2024-12-01
+book,The Midnight Library,100,2024-12-01
+video game,Death Stranding,180,2024-12-02
+tv show,The Umbrella Academy,50,2024-12-02
+movie,The Big Short,130,2024-12-03
+book,The House of the Spirits,120,2024-12-03
+video game,Resident Evil Village,120,2024-12-04
+tv show,The Expanse,45,2024-12-04
+movie,The King's Speech,118,2024-12-05
+book,The Shadow of the Wind,110,2024-12-05
+video game,Final Fantasy XV,200,2024-12-06
+tv show,The Handmaid's Tale,50,2024-12-06
+movie,The Pianist,150,2024-12-07
+book,The Lovely Bones,90,2024-12-07
+video game,Dragon Age: Inquisition,120,2024-12-08
+tv show,The 100,43,2024-12-08
+movie,The Help,146,2024-12-09
+book,The Paper Palace,95,2024-12-09
+video game,Mass Effect 2,100,2024-12-10
+tv show,The Blacklist,43,2024-12-10
+movie,The Curious Case of Benjamin Button,166,2024-12-11
+book,The Paris Library,85,2024-12-11
+video game,The Outer Worlds,90,2024-12-12
+tv show,The Morning Show,50,2024-12-12
+movie,The Imitation Game,113,2024-12-13
+book,The Night Watchman,100,2024-12-13
+video game,The Last of Us Part II,180,2024-12-14
+tv show,The Crown,50,2024-12-14
+movie,The Social Dilemma,94,2024-12-15
+book,The Four Winds,120,2024-12-15
+video game,The Elder Scrolls Online,150,2024-12-16
+tv show,The Witcher: Blood Origin,45,2024-12-16
+movie,The Bourne Identity,119,2024-12-17
+book,The Silent Patient,95,2024-12-17
+video game,Star Wars Jedi: Fallen Order,120,2024-12-18
+tv show,The Sandman,50,2024-12-18
+movie,The Hunger Games: Catching Fire,146,2024-12-19
+book,The Water Dancer,100,2024-12-19
+video game,Diablo III,180,2024-12-20
+tv show,The Marvelous Mrs. Maisel,55,2024-12-20
+movie,The Dark Knight Rises,165,2024-12-21
+book,The Testaments,120,2024-12-21
+video game,The Division 2,120,2024-12-22
+tv show,The Good Doctor,44,2024-12-22
+movie,The Bourne Supremacy,108,2024-12-23
+book,The Institute,110,2024-12-23
+video game,The Legend of Zelda: Twilight Princess,90,2024-12-24
+tv show,The Rookie,43,2024-12-24
+movie,The Equalizer,132,2024-12-25
+book,The Chain,85,2024-12-25
+video game,The Witcher 2: Assassins of Kings,100,2024-12-26
+tv show,The Mentalist,42,2024-12-26
+movie,The Accountant,128,2024-12-27
+book,The Family Upstairs,95,2024-12-27
+video game,The Sims 3,120,2024-12-28
+tv show,The Resident,45,2024-12-28
+movie,The Equalizer 2,121,2024-12-29
+book,The Couple Next Door,90,2024-12-29
+video game,The Legend of Zelda: Skyward Sword,150,2024-12-30
+tv show,The Blacklist: Redemption,43,2024-12-30
+movie,The Girl on the Train,112,2024-12-31
+book,The Woman in the Window,100,2024-12-31
+video game,The Last Guardian,120,2025-01-01
+tv show,The Undoing,50,2025-01-01
+movie,The Maze Runner: The Scorch Trials,131,2025-01-02
+book,The Nightingale,120,2025-01-02
+video game,The Legend of Zelda: Majora's Mask,90,2025-01-03
+tv show,The Americans,44,2025-01-03
+movie,The Divergent Series: Insurgent,119,2025-01-04
+book,The Alice Network,95,2025-01-04
+video game,The Legend of Zelda: Ocarina of Time,100,2025-01-05
+tv show,The Sopranos,50,2025-01-05
+movie,The Divergent Series: Allegiant,120,2025-01-06
+book,The Huntress,110,2025-01-06
+video game,The Legend of Zelda: A Link to the Past,120,2025-01-07
+tv show,The Wire,55,2025-01-07
+movie,The Divergent Series: Divergent,139,2025-01-08
+book,The Tattooist of Auschwitz,100,2025-01-08
+video game,The Legend of Zelda: Wind Waker,150,2025-01-09
+tv show,The Pacific,60,2025-01-09
+movie,The Hobbit: An Unexpected Journey,169,2025-01-10
+book,The Book of Lost Names,120,2025-01-10
+video game,The Legend of Zelda: Phantom Hourglass,90,2025-01-11
+tv show,The Last Kingdom,50,2025-01-11
+movie,The Hobbit: The Desolation of Smaug,161,2025-01-12
+book,The Rose Code,110,2025-01-12
+video game,The Legend of Zelda: Spirit Tracks,120,2025-01-13
+tv show,The Crown: Season 5,55,2025-01-13
+movie,The Hobbit: The Battle of the Five Armies,144,2025-01-14
+book,The Midnight Library: Special Edition,100,2025-01-14
+video game,The Legend of Zelda: Breath of the Wild 2,180,2025-01-15
+tv show,The Mandalorian: Season 3,45,2025-01-15
+movie,The Lord of the Rings: The Two Towers,179,2025-01-16
+book,The Light We Lost: Anniversary Edition,120,2025-01-16
+video game,The Legend of Zelda: Oracle of Ages,90,2025-01-17
+tv show,The Boys: Season 4,60,2025-01-17
+movie,The Lord of the Rings: The Return of the King,201,2025-01-18
+book,The Paris Library: Collector's Edition,110,2025-01-18
+video game,The Legend of Zelda: Oracle of Seasons,120,2025-01-19
+tv show,The Umbrella Academy: Season 4,50,2025-01-19
+movie,The Lord of the Rings: The Fellowship of the Ring,178,2025-01-20
+book,The Shadow of the Wind: Deluxe Edition,120,2025-01-20

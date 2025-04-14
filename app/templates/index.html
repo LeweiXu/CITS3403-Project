@@ -3,62 +3,54 @@
 {% block title %}MediaTracker - Home{% endblock %}
 
 {% block content %}
-<div class="container">
-    <div class="intro">
-        <h2>Welcome to MediaTracker</h2>
-        <p>MediaTracker helps you keep track of the time you spend on different types of media — books, visual content (like movies, TV shows, or anime), and video games.</p>
-        <p>By logging your activity, you can view insights about your media consumption habits: Are you spending more time gaming or watching shows? Are you reading more than last month? Get clear answers with easy-to-understand visualizations.</p>
-    </div>
-
-    <div class="auth-section">
-        <div id="login-form">
-            <h2>Log In</h2>
-            <form class="login-form" action="/login" method="POST">
-                <label for="username">Username</label>
-                <input type="text" id="username" name="username" required />
-
-                <label for="password">Password</label>
-                <input type="password" id="password" name="password" required />
-
-                <button type="submit">Log In</button>
-                {% if error %}
-                    <p class="error-message">{{ error }}</p>
-                {% endif %}
-            </form>
-            <button onclick="showRegisterForm()">Register</button>
+<main>
+    <section class="hero-section">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-md-8">
+                    <h1 class="display-4 fw-bold mb-4">Track Your Media Consumption</h1>
+                    <p class="lead mb-5">Organise and manage your movies, TV shows, books and more!</p>
+                    <!-- Make link to login page -->
+                    <a href="/register" class="btn btn-primary bt-lg px-4 gap-3">Get Started</a>
+                </div>
+            </div>
         </div>
+    </section>
 
-        <div id="register-form" style="display: none;">
-            <h2>Register</h2>
-            <form class="register-form" action="/register" method="POST">
-                <label for="reg-username">Username</label>
-                <input type="text" id="reg-username" name="username" required />
-
-                <label for="reg-email">Email</label>
-                <input type="email" id="reg-email" name="email" required />
-
-                <label for="reg-password">Password</label>
-                <input type="password" id="reg-password" name="password" required />
-
-                <label for="reg-confirm-password">Confirm Password</label>
-                <input type="password" id="reg-confirm-password" name="confirm_password" required />
-
-                <button type="submit">Register</button>
-            </form>
-            <button onclick="showLoginForm()">Back to Login</button>
+    <section class="py-5">
+        <div class="container">
+            <h2 class="text-center mb-5">Why Should You Choose MediaTracker</h2>
+            <div class="row g-4">
+                <!-- Cool cards that hover -->
+                <div class="col-md-4">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                                <i class="fas fa-clipboard-list"></i>
+                        </div>
+                        <h3>Track Progress</h3>
+                        <p>Keep track of what you've watched, read, or listened to and what's next on your list.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <h3>Analyse Data</h3>
+                        <p>Discover new patterns about your consumption habits, manage time better.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <h3>Share Data</h3>
+                        <p>See how other people are doing, are you cooked??</p>
+                    </div>
+                </div>
+            </div>
         </div>
-    </div>
-</div>
-
-<script>
-    function showRegisterForm() {
-        document.getElementById('login-form').style.display = 'none';
-        document.getElementById('register-form').style.display = 'block';
-    }
-
-    function showLoginForm() {
-        document.getElementById('register-form').style.display = 'none';
-        document.getElementById('login-form').style.display = 'block';
-    }
-</script>
+    </section>
+</main>
 {% endblock %}

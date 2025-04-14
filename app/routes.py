@@ -11,14 +11,18 @@ from backend.process_csv import parse_csv, calc_total_time, find_highest_media_t
 def index():
     return render_template('index.html')
 
-@app.route('/login', methods=['POST'])
+@app.route('/login', methods=['GET', 'POST'])
 def login():
-    username = request.form.get('username')
-    password = request.form.get('password')
-    # In a real application, you would validate against a database
-    if username == "asd" and password == "asd":
-        return redirect(url_for('overview'))
-    return render_template('index.html', error="Invalid credentials")
+    if request.method == 'GET':
+        return render_template('login.html')
+    elif request.method == 'POST':
+        username = request.form.get('username')
+        password = request.form.get('password')
+        # In a real application, you would validate against a database
+        if username == "asd" and password == "asd":
+            return redirect(url_for('overview'))
+        else:
+            return render_template('login.html', error="Invalid credentials")
 
 @app.route('/overview')
 def overview():
@@ -88,3 +92,7 @@ def upload():
         return redirect(url_for('overview'))
 
     return render_template('upload.html')
+
+@app.route('/register')
+def register():
+    return render_template('register.html')

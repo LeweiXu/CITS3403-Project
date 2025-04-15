@@ -12,11 +12,11 @@
 </head>
 
 <body>
-    <header>
+    <header role ="banner">
         <div class="container">
             <div class="header-container">
                 <h1>MediaTracker</h1>
-                <nav>
+                <nav role="navigation" aria-label="Main navigation">
                     <ul>
                         <li><a href="/">Home</a></li>
                         <li><a href="/overview">Overview</a></li>
@@ -28,13 +28,13 @@
         </div>
     </header>
 
-    <main>
+    <main role = "main">
          <div class="content-container">
              {% block content %}{% endblock %}
          </div>
     </main>
 
-    <footer>
+    <footer role =  "contentinfo">
         <div class="footer-container">
             <div class="container">
                 <div class="row">

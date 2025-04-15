@@ -3,20 +3,49 @@
 {% block title %}MediaTracker - Overview{% endblock %}
 
 {% block content %}
-<h1>Welcome to Your Media Overview</h1>
-
-<section>
-    <h2>Statistics</h2>
+<h1 class = " text-center">Welcome to Your Media Overview</h1>
+<!-- Stats Overview Section-->
+<section class = "stats-overview"></section>
+    <h2 class = "section-title">Key Stats</h2>
     <p>Here you can view your media consumption statistics and insights.</p>
-    <ul>
-        <li>Total time spent on media: <strong>{{ total_time }} hours</strong></li>
-        <li>Most consumed media type: <strong>{{ most_consumed_media }}</strong></li>
-        <li>Average daily media consumption: <strong>{{ daily_average_time }} hours</strong></li>
-    </ul>
+    <div class = "stats-grid">
+        <!--Total time spent on media-->
+        <div class= "stats-metric-card">
+            <div class = "stats-icon">
+                <i class = "fas fa-clock"></i>
+            </div>
+            <div class = "stats-info">
+                <h3>Total Time Spent</h3>
+                <p>{{ total_time }} hours</p>
+            </div>
+        </div>
+        
+        <!--Most Consumed Media-->
+        <div class= "stats-metric-card">
+            <div class="stats-icon">
+                <i class="fas fa-film"></i>"
+            </div>
+            <div class="stats-info">
+                <h3>Most Consumed Media</h3>
+                <p>{{ most_consumed_media }}</p>
+            </div>
+        </div>
+        <!--Average Daily Media Consumption-->
+        <div class = "stats-metric-card">
+            <div class = "stats-icon">
+                <i class = "fas fa-chart-line"></i>
+            </div>
+            <div class = "stats-info">
+                <h3>Average Daily Consumption</h3>
+                <p>{{daily_average_time}} hours</p>
+            </div>
+        </div>
+    </div>
 </section>
 
-<section>
-    <h2>Visualizations</h2>
+<!--Visualizations Section-->
+<section class = "Visualizations">
+    <h2 class = "section-title">Visualizations</h2>
     <p>Graphs and charts will be displayed here to help you analyze your media habits.</p>
     {% if graph_url %}
         <img src="data:image/png;base64,{{ graph_url }}" alt="Weekly Averages Graph">

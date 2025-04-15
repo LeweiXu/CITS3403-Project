@@ -237,6 +237,23 @@ nav ul li a:hover {
     padding: 4rem 0;
 }
 
+/* Global layout for sticky footer */
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+}
+
+main {
+    flex: 1;
+}
+
+
 /* Footer Styles */
 .footer-container {
     background-color: var(--secondary-color);
@@ -283,4 +300,66 @@ footer a {
     font-size: 2.5rem;
     font-weight: 700;
     color: var(--primary-color);
+}
+
+.stats-overview {
+    padding: 2rem 1rem;
+    text-align: center;
+    background-color: #f0f4f8; /* A light background to make cards stand out */
+    margin-bottom: 2rem;
+}
+
+.stats-overview .section-title {
+    font-size: 2rem;
+    margin-bottom: 1.5rem;
+    color: var(--secondary-color);
+}
+
+.stats-grid {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 1.5rem; /* Space between cards */
+}
+
+.stats-metric-card {
+    background-color: #ffffff;
+    border-radius: 8px;
+    padding: 1.5rem;
+    flex: 0 1 280px; /* Each card is at least 280px wide; it wraps if smaller screens */
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    text-align: center;
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+/* Hover effect to give a more interactive feel */
+.stats-metric-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+}
+
+.stats-icon {
+    font-size: 2.5rem;
+    color: var(--primary-color);
+    margin-bottom: 1rem;
+}
+
+.stats-info h3 {
+    font-size: 1.2rem;
+    color: var(--secondary-color);
+    margin-bottom: 0.5rem;
+}
+
+.stats-info p {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin: 0;
+    color: #333333;
+}
+
+/* If you want sub-text or percentage changes below the main stat */
+.stats-sub {
+    margin-top: 0.5rem;
+    font-size: 0.9rem;
+    color: #777777;
 }

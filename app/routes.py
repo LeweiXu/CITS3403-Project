@@ -96,3 +96,7 @@ def upload():
 @app.route('/register')
 def register():
     return render_template('register.html')
+
+@app.route('/sharedata')
+def sharedata():
+    return render_template('sharedata.html')

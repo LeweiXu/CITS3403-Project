@@ -365,12 +365,12 @@ footer a {
 }
 
 /* Sharedata */
-/* ========== 通用布局 ========== */
+/* */
 body {
     background-color: #f4f4f4;
     font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
     margin: 0;
-    padding-bottom: 80px; /* 为底部导航栏留空间 */
+    padding-bottom: 80px;
 }
 
 .container {
@@ -378,7 +378,7 @@ body {
     margin: auto;
 }
 
-/* ========== 头像样式 ========== */
+/*  */
 .avatar {
     width: 40px;
     height: 40px;
@@ -386,7 +386,6 @@ body {
     margin-right: 10px;
 }
 
-/* ========== 朋友圈动态卡片 ========== */
 .moment-card {
     border: 1px solid #ddd;
     border-radius: 10px;
@@ -396,7 +395,7 @@ body {
     box-shadow: 0 2px 5px rgba(0,0,0,0.05);
 }
 
-/* ========== 圆形“发布动态”按钮 ========== */
+/* blue button post */
 .add-post-btn {
     position: fixed;
     bottom: 80px;
@@ -417,7 +416,7 @@ body {
     z-index: 1000;
 }
 
-/* ========== 私聊整体布局 ========== */
+/* chat */
 .chat-container {
     display: flex;
     height: 400px;
@@ -427,7 +426,6 @@ body {
     background-color: #fff;
 }
 
-/* 好友列表左侧 */
 .chat-users {
     width: 200px;
     border-right: 1px solid #ddd;
@@ -449,7 +447,6 @@ body {
     background-color: #eaeaea;
 }
 
-/* 聊天窗口右侧 */
 .chat-window {
     flex-grow: 1;
     display: flex;
@@ -484,19 +481,16 @@ body {
     background-color: #e2e3e5;
 }
 
-/* 聊天输入框区域 */
 .chat-input {
     border-top: 1px solid #ddd;
     background-color: #fff;
     padding: 10px;
 }
 
-/* ========== 顶部右上角按钮 ========== */
 .text-end {
     text-align: right;
 }
 
-/* ========== 底部固定导航栏 ========== */
 .bottom-nav {
     position: fixed;
     bottom: 0;
@@ -523,7 +517,6 @@ body {
     text-decoration: underline;
 }
 
-/* ========== 响应式优化 ========== */
 @media (max-width: 576px) {
     .chat-container {
         flex-direction: column;

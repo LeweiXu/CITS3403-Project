@@ -3,40 +3,38 @@
 {% block title %}Share Community Data{% endblock %}
 
 {% block content %}
-<!-- 右上角添加好友按钮 -->
+
 <div class="text-end me-3 mt-3">
-    <button class="btn btn-success btn-sm">添加好友</button>
+    <button class="btn btn-success btn-sm">Add Friend</button>
 </div>
 
 <div class="container mt-2 mb-5">
-    <h2 class="mb-4 text-center">Social Space</h2>
+    <h2 class="mb-4 text-center">Anything new among friends?</h2>
 
-    <!-- 朋友圈界面 -->
     <div id="moments-section">
         <div class="moment-card d-flex">
             <img src="https://avatars.dicebear.com/api/initials/Lily.svg" class="avatar">
             <div>
                 <strong>Lily</strong><br>
-                <p>我本周看了《Interstellar》，强烈推荐！🌌</p>
-                <small class="text-muted">2025年4月17日 10:45</small>
+                <p>I watched <em>Interstellar</em> this week. Highly recommended! 🌌</p>
+                <small class="text-muted">April 17, 2025 10:45 AM</small>
             </div>
         </div>
         <div class="moment-card d-flex">
             <img src="https://avatars.dicebear.com/api/initials/Jason.svg" class="avatar">
             <div>
                 <strong>Jason</strong><br>
-                <p>已经坚持每天听播客30分钟两周了！💪🎧</p>
-                <small class="text-muted">2025年4月16日 18:30</small>
+                <p>I've kept up with 30 minutes of podcast listening every day for 2 weeks now! 💪🎧</p>
+                <small class="text-muted">April 16, 2025 6:30 PM</small>
             </div>
         </div>
 
-        <!-- 发布动态圆形按钮 -->
-        <button class="btn btn-primary rounded-circle add-post-btn" title="发布动态">
+        <!--  Button -->
+        <button class="btn btn-primary rounded-circle add-post-btn" title="Create Post">
             <span style="font-size: 24px; line-height: 1;">+</span>
         </button>
     </div>
 
-    <!-- 私聊界面 -->
     <div id="chat-section" style="display: none;">
         <div class="chat-container">
             <div class="chat-users">
@@ -51,25 +49,25 @@
                 <div class="chat-messages flex-grow-1 overflow-auto">
                     <div id="chat-lily">
                         <div class="message you">
-                            <span class="message-content">最近看什么电影啦？</span>
+                            <span class="message-content">What movies have you seen lately?</span>
                         </div>
                         <div class="message">
-                            <span class="message-content them">刚看完《Interstellar》，超棒的！</span>
+                            <span class="message-content them">Just finished watching <em>Interstellar</em>, it's amazing!</span>
                         </div>
                     </div>
                     <div id="chat-jason" style="display: none;">
                         <div class="message you">
-                            <span class="message-content">播客听了哪些？</span>
+                            <span class="message-content">What podcasts are you listening to?</span>
                         </div>
                         <div class="message">
-                            <span class="message-content them">最近在听《The Daily》，内容不错！</span>
+                            <span class="message-content them">Currently listening to <em>The Daily</em>, it's quite good!</span>
                         </div>
                     </div>
                 </div>
                 <div class="chat-input p-2 border-top">
                     <div class="input-group">
-                        <input type="text" class="form-control" placeholder="输入消息..." disabled>
-                        <button class="btn btn-primary" type="button" disabled>发送</button>
+                        <input type="text" class="form-control" placeholder="Type a message..." disabled>
+                        <button class="btn btn-primary" type="button" disabled>Send</button>
                     </div>
                 </div>
             </div>
@@ -77,10 +75,9 @@
     </div>
 </div>
 
-<!-- 底部固定导航 -->
 <div class="bottom-nav d-flex justify-content-around">
-    <button class="nav-btn" onclick="showSection('moments')">朋友圈</button>
-    <button class="nav-btn" onclick="showSection('chat')">私聊</button>
+    <button class="nav-btn" onclick="showSection('moments')">Share Moment!</button>
+    <button class="nav-btn" onclick="showSection('chat')">Chat</button>
 </div>
 
 <style>

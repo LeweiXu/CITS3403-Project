@@ -12,16 +12,20 @@
 </head>
 
 <body>
-    <header role ="banner">
+    <header role="banner">
         <div class="container">
             <div class="header-container">
                 <h1>MediaTracker</h1>
                 <nav role="navigation" aria-label="Main navigation">
                     <ul>
                         <li><a href="/">Home</a></li>
-                        <li><a href="/overview">Overview</a></li>
-                        <li><a href="/upload">Upload</a></li>
-                        <li><a href="/login">Login</a></li>
+                        {% if session.get('username') %}
+                            <li><a href="/overview">Overview</a></li>
+                            <li><a href="/upload">Upload</a></li>
+                            <li><a href="/logout">Logout</a></li>
+                        {% else %}
+                            <li><a href="/login">Login</a></li>
+                        {% endif %}
                     </ul>
                 </nav>
             </div>

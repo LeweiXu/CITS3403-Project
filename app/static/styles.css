@@ -237,6 +237,23 @@ nav ul li a:hover {
     padding: 4rem 0;
 }
 
+/* Global layout for sticky footer */
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+}
+
+main {
+    flex: 1;
+}
+
+
 /* Footer Styles */
 .footer-container {
     background-color: var(--secondary-color);
@@ -283,4 +300,245 @@ footer a {
     font-size: 2.5rem;
     font-weight: 700;
     color: var(--primary-color);
+}
+
+.stats-overview {
+    padding: 2rem 1rem;
+    text-align: center;
+    background-color: #f0f4f8; /* A light background to make cards stand out */
+    margin-bottom: 2rem;
+}
+
+.stats-overview .section-title {
+    font-size: 2rem;
+    margin-bottom: 1.5rem;
+    color: var(--secondary-color);
+}
+
+.stats-grid {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 1.5rem; /* Space between cards */
+}
+
+.stats-metric-card {
+    background-color: #ffffff;
+    border-radius: 8px;
+    padding: 1.5rem;
+    flex: 0 1 280px; /* Each card is at least 280px wide; it wraps if smaller screens */
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    text-align: center;
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+/* Hover effect to give a more interactive feel */
+.stats-metric-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+}
+
+.stats-icon {
+    font-size: 2.5rem;
+    color: var(--primary-color);
+    margin-bottom: 1rem;
+}
+
+.stats-info h3 {
+    font-size: 1.2rem;
+    color: var(--secondary-color);
+    margin-bottom: 0.5rem;
+}
+
+.stats-info p {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin: 0;
+    color: #333333;
+}
+
+/* If you want sub-text or percentage changes below the main stat */
+.stats-sub {
+    margin-top: 0.5rem;
+    font-size: 0.9rem;
+    color: #777777;
+}
+
+/* Sharedata */
+/* */
+body {
+    background-color: #f4f4f4;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    margin: 0;
+    padding-bottom: 80px;
+}
+
+.container {
+    max-width: 1500px;
+    margin: auto;
+}
+
+/*  */
+.avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    margin-right: 10px;
+}
+
+.moment-card {
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    padding: 15px;
+    margin-bottom: 15px;
+    background-color: #fff;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+/* blue button post */
+.add-post-btn {
+    position: fixed;
+    bottom: 80px;
+    right: 30px;
+    width: 60px;
+    height: 60px;
+    font-size: 28px;
+    line-height: 0;
+    border-radius: 50%;
+    padding: 0;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    z-index: 1000;
+}
+
+/* chat */
+.chat-container {
+    display: flex;
+    height: 400px;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    overflow: hidden;
+    background-color: #fff;
+}
+
+.chat-users {
+    width: 200px;
+    border-right: 1px solid #ddd;
+    background-color: #f9f9f9;
+    padding: 10px;
+    overflow-y: auto;
+}
+
+.chat-users div {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: background 0.2s;
+}
+
+.chat-users div:hover {
+    background-color: #eaeaea;
+}
+
+.chat-window {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    background-color: #fafafa;
+}
+
+.chat-messages {
+    padding: 10px;
+    flex-grow: 1;
+    overflow-y: auto;
+}
+
+.message {
+    margin-bottom: 10px;
+}
+
+.message.you {
+    text-align: right;
+}
+
+.message-content {
+    display: inline-block;
+    padding: 8px 12px;
+    border-radius: 15px;
+    background-color: #d1e7dd;
+    max-width: 60%;
+    word-wrap: break-word;
+}
+
+.message-content.them {
+    background-color: #e2e3e5;
+}
+
+.chat-input {
+    border-top: 1px solid #ddd;
+    background-color: #fff;
+    padding: 10px;
+}
+
+.text-end {
+    text-align: right;
+}
+
+.bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background-color: white;
+    border-top: 1px solid #ddd;
+    padding: 10px 0;
+    z-index: 999;
+}
+
+.nav-btn {
+    background: none;
+    border: none;
+    font-size: 16px;
+    color: #007bff;
+    font-weight: 500;
+    padding: 5px 20px;
+}
+
+.nav-btn:focus,
+.nav-btn:hover {
+    color: #0056b3;
+    text-decoration: underline;
+}
+
+@media (max-width: 576px) {
+    .chat-container {
+        flex-direction: column;
+        height: auto;
+    }
+
+    .chat-users {
+        width: 100%;
+        border-right: none;
+        border-bottom: 1px solid #ddd;
+    }
+
+    .chat-window {
+        height: auto;
+    }
+
+    .bottom-nav {
+        flex-direction: column;
+        padding: 8px;
+    }
+
+    .nav-btn {
+        margin-bottom: 5px;
+    }
 }

@@ -12,77 +12,33 @@
 </head>
 
 <body>
-    <!-- Header stuff at the top -->
-    <header>
+    <header role="banner">
         <div class="container">
             <div class="header-container">
                 <h1>MediaTracker</h1>
-                <nav>
+                <nav role="navigation" aria-label="Main navigation">
                     <ul>
                         <li><a href="/">Home</a></li>
-                        <li><a href="/overview">Overview</a></li>
-                        <li><a href="/upload">Upload</a></li>
-                        <li><a href="/about">About</a></li>
+                        {% if session.get('username') %}
+                            <li><a href="/overview">Overview</a></li>
+                            <li><a href="/upload">Upload</a></li>
+                            <li><a href="/logout">Logout</a></li>
+                        {% else %}
+                            <li><a href="/login">Login</a></li>
+                        {% endif %}
                     </ul>
                 </nav>
             </div>
         </div>
     </header>
 
-    <main>
-        <section class="hero-section">
-            <div class="container">
-                <div class="row justify-content-center">
-                    <div class="col-md-8">
-                        <h1 class="display-4 fw-bold mb-4">Track Your Media Consumption</h1>
-                        <p class="lead mb-5">Organise and manage your movies, TV shows, books and more!</p>
-                        <!-- Make link to login page -->
-                        <a href="/register" class="btn btn-primary bt-lg px-4 gap-3">Get Started</a>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <section class="py-5">
-            <div class="container">
-                <h2 class="text-center mb-5">Why Should You Choose MediaTracker</h2>
-                <div class="row g-4">
-                    <!-- Cool cards that hover -->
-                    <div class="col-md-4">
-                        <div class="feature-card">
-                            <div class="feature-icon">
-                                 <i class="fas fa-clipboard-list"></i>
-                            </div>
-                            <h3>Track Progress</h3>
-                            <p>Keep track of what you've watched, read, or listened to and what's next on your list.</p>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="feature-card">
-                            <div class="feature-icon">
-                                <i class="fas fa-chart-line"></i>
-                            </div>
-                            <h3>Analyse Data</h3>
-                            <p>Discover new patterns about your consumption habits, manage time better.</p>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="feature-card">
-                            <div class="feature-icon">
-                                <i class="fas fa-users"></i>
-                            </div>
-                            <h3>Share Data</h3>
-                            <p>See how other people are doing, are you cooked??</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-
+    <main role = "main">
+         <div class="content-container">
+             {% block content %}{% endblock %}
+         </div>
     </main>
 
-    <footer>
+    <footer role =  "contentinfo">
         <div class="footer-container">
             <div class="container">
                 <div class="row">

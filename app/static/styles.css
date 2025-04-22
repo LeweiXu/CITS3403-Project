@@ -363,3 +363,117 @@ footer a {
     font-size: 0.9rem;
     color: #777777;
 }
+
+.upload-container {
+    max-width: 800px;
+    margin:  2rem auto;
+    padding: 0 1rem;
+}
+
+.upload-card{
+    background: #ffffff;
+    border-radius: 8px;
+    padding: 2rem;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+
+.upload-title{
+    color: var(--secondary-color);
+    font-size: 1.75rem;
+    text-align: center;
+    margin-bottom: 1.5rem;
+}
+
+.form-section + .form-section {
+    margin-top: 2rem;
+}
+
+.upload-form {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 2rem;
+    align-items: end;
+}
+
+.form-group{
+    display: flex;
+    flex-direction: column;
+}
+
+.form-group.full{
+    grid-column: 1 / -1;
+}
+
+.upload-form label{
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+    color: var(--secondary-color);
+}
+
+.upload-form input{
+    padding: 0.5rem 0.75rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 1rem;
+    width: 100%;
+    box-sizing:border-box;
+}
+
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    grid-column: 2 / 3; /* align to right column by default */
+}
+  
+.form-actions.full {
+    grid-column: 1 / -1;
+    justify-content: center;
+}
+  
+.form-actions button {
+    padding: 0.75rem 1.5rem;
+    background-color: var(--primary-color);
+    border: none;
+    border-radius: 5px;
+    color: #fff;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+  
+.form-actions button:hover {
+    background-color: #2980b9;
+}
+
+/* ——— Drag‑and‑Drop Zone ——— */
+#drop-zone {
+    border: 2px dashed var(--primary-color);
+    border-radius: 6px;
+    padding: 2rem;
+    text-align: center;
+    background: #fafafa;
+    transition: background 0.2s, border-color 0.2s;
+    cursor: pointer;
+}
+#drop-zone.hover {
+background: #eef6fc;
+border-color: #2980b9;
+}
+#drop-zone p {
+margin: 0;
+font-size: 1rem;
+color: var(--secondary-color);
+}
+#drop-zone button {
+margin-top: 0.5rem;
+}
+/* ── Upload button refinements ── */
+#csv-upload-form .form-actions button {
+    padding: 0.4rem 1rem;       /* slimmer vertical padding */
+    font-size: 0.875rem;        /* slightly smaller text */
+    border-radius: 4px;         /* tighter corners */
+} 
+#csv-upload-form .form-actions.full{
+    /* … */
+    margin-top: 2rem;
+}

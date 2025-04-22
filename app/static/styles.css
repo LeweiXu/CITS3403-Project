@@ -543,9 +543,6 @@ body {
     }
 }
 
-
-
-
 /* Better login form  */
 .login-section {
     background-color: white;
@@ -604,17 +601,6 @@ body {
     display: flex;
 }
 
-/* Responsive adjustments for small screens, mobile, etc. */
-@media (max-width: 576px) {
-    .login-section {
-        padding: 1.5rem;
-        margin: 1.5rem 1rem;
-    }
-    
-    .login-section h2 {
-        font-size: 1.8rem;
-    }
-}
 
 
 

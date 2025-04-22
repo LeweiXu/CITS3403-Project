@@ -364,243 +364,116 @@ footer a {
     color: #777777;
 }
 
-/* Sharedata */
-/* */
-body {
-    background-color: #f4f4f4;
-    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-    margin: 0;
-    padding-bottom: 80px;
+.upload-container {
+    max-width: 800px;
+    margin:  2rem auto;
+    padding: 0 1rem;
 }
 
-.container {
-    max-width: 1500px;
-    margin: auto;
+.upload-card{
+    background: #ffffff;
+    border-radius: 8px;
+    padding: 2rem;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
 }
 
-/*  */
-.avatar {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    margin-right: 10px;
+.upload-title{
+    color: var(--secondary-color);
+    font-size: 1.75rem;
+    text-align: center;
+    margin-bottom: 1.5rem;
 }
 
-.moment-card {
-    border: 1px solid #ddd;
-    border-radius: 10px;
-    padding: 15px;
-    margin-bottom: 15px;
-    background-color: #fff;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+.form-section + .form-section {
+    margin-top: 2rem;
 }
 
-/* blue button post */
-.add-post-btn {
-    position: fixed;
-    bottom: 80px;
-    right: 30px;
-    width: 60px;
-    height: 60px;
-    font-size: 28px;
-    line-height: 0;
-    border-radius: 50%;
-    padding: 0;
-    background-color: #007bff;
-    color: white;
-    border: none;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-    z-index: 1000;
+.upload-form {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 2rem;
+    align-items: end;
 }
 
-/* chat */
-.chat-container {
-    display: flex;
-    height: 400px;
-    border: 1px solid #ddd;
-    border-radius: 10px;
-    overflow: hidden;
-    background-color: #fff;
-}
-
-.chat-users {
-    width: 200px;
-    border-right: 1px solid #ddd;
-    background-color: #f9f9f9;
-    padding: 10px;
-    overflow-y: auto;
-}
-
-.chat-users div {
-    display: flex;
-    align-items: center;
-    padding: 10px;
-    cursor: pointer;
-    border-radius: 5px;
-    transition: background 0.2s;
-}
-
-.chat-users div:hover {
-    background-color: #eaeaea;
-}
-
-.chat-window {
-    flex-grow: 1;
+.form-group{
     display: flex;
     flex-direction: column;
-    background-color: #fafafa;
 }
 
-.chat-messages {
-    padding: 10px;
-    flex-grow: 1;
-    overflow-y: auto;
+.form-group.full{
+    grid-column: 1 / -1;
 }
 
-.message {
-    margin-bottom: 10px;
-}
-
-.message.you {
-    text-align: right;
-}
-
-.message-content {
-    display: inline-block;
-    padding: 8px 12px;
-    border-radius: 15px;
-    background-color: #d1e7dd;
-    max-width: 60%;
-    word-wrap: break-word;
-}
-
-.message-content.them {
-    background-color: #e2e3e5;
-}
-
-.chat-input {
-    border-top: 1px solid #ddd;
-    background-color: #fff;
-    padding: 10px;
-}
-
-.text-end {
-    text-align: right;
-}
-
-.bottom-nav {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    background-color: white;
-    border-top: 1px solid #ddd;
-    padding: 10px 0;
-    z-index: 999;
-}
-
-.nav-btn {
-    background: none;
-    border: none;
-    font-size: 16px;
-    color: #007bff;
-    font-weight: 500;
-    padding: 5px 20px;
-}
-
-.nav-btn:focus,
-.nav-btn:hover {
-    color: #0056b3;
-    text-decoration: underline;
-}
-
-@media (max-width: 576px) {
-    .chat-container {
-        flex-direction: column;
-        height: auto;
-    }
-
-    .chat-users {
-        width: 100%;
-        border-right: none;
-        border-bottom: 1px solid #ddd;
-    }
-
-    .chat-window {
-        height: auto;
-    }
-
-    .bottom-nav {
-        flex-direction: column;
-        padding: 8px;
-    }
-
-    .nav-btn {
-        margin-bottom: 5px;
-    }
-}
-
-/* Better login form  */
-.login-section {
-    background-color: white;
-    border-radius: 12px;
-    padding: 2.5rem;
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
-    max-width: 450px;
-    margin: 3rem auto;
-}
-
-.login-section h2 {
-    font-size: 2.2rem;
-    margin-bottom: 1rem;
-    color: var(--secondary-color);
+.upload-form label{
     font-weight: 600;
+    margin-bottom: 0.25rem;
+    color: var(--secondary-color);
 }
 
-.login-section p {
-    color: #6c757d;
-    margin-bottom: 2rem;
-    font-size: 1.1rem;
-}
-
-/* Form stuff */
-.form-control {
-    padding: 0.8rem 1rem;
-    border-radius: 8px;
-    border: 1px solid #dee2e6;
-    transition: all 0.3s ease;
+.upload-form input{
+    padding: 0.5rem 0.75rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
     font-size: 1rem;
+    width: 100%;
+    box-sizing:border-box;
 }
 
-.form-control:focus {
-    border-color: var(--primary-color);
-    box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25);
-    outline: none;
-}
-
-.form-label {
-    font-weight: 500;
-    margin-bottom: 0.5rem;
-    color: #495057;
-}
-
-/* Registration link styling */
-.login-section a {
-    color: var(--primary-color);
-    font-weight: 500;
-    text-decoration: none;
-    transition: color 0.2s ease;
-}
-
-/* Background for login page */
-.login-page {
-    background: linear-gradient(135deg,  var(--primary-color), var(--secondary-color));
+.form-actions {
     display: flex;
+    justify-content: flex-end;
+    grid-column: 2 / 3; /* align to right column by default */
+}
+  
+.form-actions.full {
+    grid-column: 1 / -1;
+    justify-content: center;
+}
+  
+.form-actions button {
+    padding: 0.75rem 1.5rem;
+    background-color: var(--primary-color);
+    border: none;
+    border-radius: 5px;
+    color: #fff;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+  
+.form-actions button:hover {
+    background-color: #2980b9;
 }
 
-
-
-
+/* ——— Drag‑and‑Drop Zone ——— */
+#drop-zone {
+    border: 2px dashed var(--primary-color);
+    border-radius: 6px;
+    padding: 2rem;
+    text-align: center;
+    background: #fafafa;
+    transition: background 0.2s, border-color 0.2s;
+    cursor: pointer;
+}
+#drop-zone.hover {
+background: #eef6fc;
+border-color: #2980b9;
+}
+#drop-zone p {
+margin: 0;
+font-size: 1rem;
+color: var(--secondary-color);
+}
+#drop-zone button {
+margin-top: 0.5rem;
+}
+/* ── Upload button refinements ── */
+#csv-upload-form .form-actions button {
+    padding: 0.4rem 1rem;       /* slimmer vertical padding */
+    font-size: 0.875rem;        /* slightly smaller text */
+    border-radius: 4px;         /* tighter corners */
+} 
+#csv-upload-form .form-actions.full{
+    /* … */
+    margin-top: 2rem;
+}

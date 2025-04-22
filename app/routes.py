@@ -1,11 +1,10 @@
-import matplotlib.pyplot as plt
-import pandas as pd
-import os
-from io import BytesIO
-import base64
 from flask import render_template, request, redirect, url_for, flash, session
 from app import app
-from backend.process_csv import parse_csv, calc_total_time, find_highest_media_type, calc_average_daily_consumption, calc_weekly_durations
+from app.models import User
+from app import db
+from app.helpers.upload_handler import handle_upload
+from app.helpers.dashboard_handler import get_user_statistics
+from app.models import MediaEntry
 
 @app.route('/')
 def index():
@@ -18,81 +17,114 @@ def login():
     elif request.method == 'POST':
         username = request.form.get('username')
         password = request.form.get('password')
-        # In a real application, you would validate against a database
-        if username == "asd" and password == "asd":
-            return redirect(url_for('overview'))
+
+        # Query the database for the user
+        user = User.query.filter_by(username=username).first()
+
+        if user and user.password == password:  # Replace with hashed password check in production
+            session['username'] = username  # Store username in session
+            flash('Login successful!', 'success')
+            return redirect(url_for('dashboard'))
         else:
+            flash('Invalid username or password.', 'danger')
             return render_template('login.html', error="Invalid credentials")
 
-@app.route('/overview')
-def overview():
-    # Retrieve statistics from the session
-    total_time = session.get('total_time', 0)
-    most_consumed_media = session.get('most_consumed_media', 'N/A')
-    daily_average_time = session.get('daily_average_time', 0)
-    weekly_averages = session.get('weekly_averages', {})
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    if request.method == 'POST':
+        username = request.form.get('username')
+        email = request.form.get('email')
+        password = request.form.get('password')
 
-    # Generate the graph for the last 10 weeks
-    if weekly_averages:
-        df = pd.DataFrame(list(weekly_averages.items()), columns=['week_start', 'daily_average'])
-        df['week_start'] = pd.to_datetime(df['week_start'])
-        df = df.sort_values('week_start', ascending=False).head(10).sort_values('week_start')
+        # Check if user already exists
+        if User.query.filter_by(username=username).first():
+            flash('Username already exists!', 'danger')
+            return redirect(url_for('register'))
 
-        # Plot the graph
-        plt.figure(figsize=(10, 6))
-        plt.plot(df['week_start'], df['daily_average'], marker='o', linestyle='-', color='b')
-        plt.title('Daily Average Media Consumption (Last 10 Weeks)')
-        plt.xlabel('Week Starting')
-        plt.ylabel('Daily Average (Hours)')
-        plt.grid(True)
+        # Create new user
+        try:
+            new_user = User(username=username, email=email, password=password)
+            db.session.add(new_user)
+            db.session.commit()
+            flash('Registration successful! Please log in.', 'success')
+            return redirect(url_for('login'))
+        except Exception as e:
+            flash('An error occurred during registration.', 'danger')
+            print(f"Error: {e}")  # Debugging output
+            return redirect(url_for('register'))
 
-        # Save the graph to a BytesIO object
-        img = BytesIO()
-        plt.savefig(img, format='png')
-        img.seek(0)
-        graph_url = base64.b64encode(img.getvalue()).decode()
-        plt.close()
-    else:
-        graph_url = None
+    return render_template('register.html')
+
+@app.route('/dashboard')
+def dashboard():
+    if 'username' not in session:
+        flash('Please log in to view your dashboard.', 'danger')
+        return redirect(url_for('login'))
+
+    username = session['username']
+    stats = get_user_statistics(username)
 
     return render_template(
-        'overview.html',
-        total_time=total_time,
-        most_consumed_media=most_consumed_media,
-        daily_average_time=daily_average_time,
-        graph_url=graph_url
+        'dashboard.html',
+        total_time=stats['total_time'],
+        most_consumed_media=stats['most_consumed_media'],
+        daily_average_time=stats['daily_average_time']
     )
 
 @app.route('/upload', methods=['GET', 'POST'])
 def upload():
     if request.method == 'POST':
-        # Define the absolute path to the uploads directory
-        upload_folder = os.path.join(app.root_path, 'uploads')
-        if not os.path.exists(upload_folder):
-            os.makedirs(upload_folder)
-
-        file = request.files['csvFile']
-        file_path = os.path.join(upload_folder, file.filename)
-        file.save(file_path)
-
-        # Process the uploaded CSV file
-        data = parse_csv(file_path)
-        total_time = calc_total_time(data)
-        most_consumed_media, most_consumed_duration = find_highest_media_type(data)
-        daily_average_time = calc_average_daily_consumption(data)
-        weekly_averages = calc_weekly_durations(data)
-
-        # Store the statistics in the session
-        session['total_time'] = round(total_time / 60, 2)  # Convert to hours
-        session['most_consumed_media'] = f"{most_consumed_media} ({round(most_consumed_duration / 60, 2)} hours)"
-        session['daily_average_time'] = round(daily_average_time / 60, 2)  # Convert to hours
-        session['weekly_averages'] = weekly_averages
-
-        flash('File uploaded and processed successfully!')
-        return redirect(url_for('overview'))
-
+        result = handle_upload(request, app)
+        if result:  # If the function returns a redirect or flash message
+            return result
     return render_template('upload.html')
 
-@app.route('/register')
-def register():
-    return render_template('register.html')
+@app.route('/viewdata')
+def viewdata():
+    if 'username' not in session:
+        flash('Please log in to view your data.', 'danger')
+        return redirect(url_for('login'))
+
+    username = session['username']
+    entries = MediaEntry.query.filter_by(username=username).order_by(MediaEntry.date.desc()).all()
+
+    return render_template('viewdata.html', entries=entries)
+
+@app.route('/delete_entry/<int:entry_id>')
+def delete_entry(entry_id):
+    entry = MediaEntry.query.get(entry_id)
+    if entry and entry.username == session.get('username'):
+        db.session.delete(entry)
+        db.session.commit()
+        flash('Entry deleted successfully.', 'success')
+    else:
+        flash('Entry not found or unauthorized.', 'danger')
+    return redirect(url_for('viewdata'))
+
+# @app.route('/edit_entry/<int:entry_id>', methods=['GET', 'POST'])
+# def edit_entry(entry_id):
+#     entry = MediaEntry.query.get(entry_id)
+#     if not entry or entry.username != session.get('username'):
+#         flash('Entry not found or unauthorized.', 'danger')
+#         return redirect(url_for('viewdata'))
+
+#     if request.method == 'POST':
+#         entry.date = request.form.get('date')
+#         entry.media_type = request.form.get('media_type')
+#         entry.media_name = request.form.get('media_name')
+#         entry.duration = request.form.get('duration')
+#         db.session.commit()
+#         flash('Entry updated successfully.', 'success')
+#         return redirect(url_for('viewdata'))
+
+#     return render_template('edit_entry.html', entry=entry)
+
+@app.route('/sharedata')
+def sharedata():
+    return render_template('sharedata.html')
+
+@app.route('/logout')
+def logout():
+    session.clear()  # Clear all session data
+    flash('You have been logged out successfully.', 'success')
+    return redirect(url_for('login'))  # Redirect to the login page

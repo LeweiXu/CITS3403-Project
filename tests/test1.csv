@@ -1,4 +1,4 @@
-type of media,name of media,duration,date
+media_type,media_name,duration,date
 video game,The Legend of Zelda: Breath of the Wild,120,2024-10-01
 tv show,Stranger Things,45,2024-10-01
 movie,Inception,148,2024-10-02

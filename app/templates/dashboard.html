@@ -8,7 +8,6 @@
     <!-- Stats Overview Section -->
     <section class="stats-overview">
         <h2 class="section-title">Key Stats</h2>
-        <p class="intro">Here you can view your media consumption statistics and insights.</p>
         <div class="stats-grid">
             <!-- Total time spent on media -->
             <div class="stats-metric-card">
@@ -94,13 +93,13 @@
                 <label for="media_name" class="form-label">Media Name</label>
                 <input type="text" id="media_name" name="media_name" class="form-control" placeholder="e.g., Inception, 1984" required>
             </div>
-            <button type="submit" name="add_new_entry" class="btn btn-primary">Add New Entry</button>
+            <div class="mb-3">
+                <label for="duration" class="form-label">Duration (minutes)</label>
+                <input type="number" id="duration" name="duration" class="form-control" placeholder="e.g., 120" required>
+            </div>
+            <button type="submit" name="add_new_entry" class="btn btn-primary">Add New Activity</button>
         </form>
     </section>
 
-    <!-- Button to View Data -->
-    <div class="text-center mt-4">
-        <a href="{{ url_for('viewdata') }}" class="btn btn-secondary">View All Media Entries</a>
-    </div>
 </div>
 {% endblock %}

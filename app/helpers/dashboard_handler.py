@@ -101,6 +101,26 @@ def get_current_activities(username):
 
     return activities
 
+def handle_add_new_entry(username, media_type, media_name, duration):
+    # Add a new media entry with the specified duration
+    new_entry = MediaEntry(
+        username=username,
+        media_type=media_type,
+        media_name=media_name,
+        duration=duration,
+        date=datetime.now().date()
+    )
+    db.session.add(new_entry)
+    db.session.commit()
+
+    # Add a corresponding entry in CurrentActivities
+    new_activity = CurrentActivities(
+        start_entry_id=new_entry.id,
+        end_entry_id=None
+    )
+    db.session.add(new_activity)
+    db.session.commit()
+
 def handle_end_activity(activity_id, username):
     # Fetch the activity
     activity = CurrentActivities.query.get(activity_id)
@@ -109,21 +129,19 @@ def handle_end_activity(activity_id, username):
 
     # Fetch the MediaEntry object for the start_entry_id
     start_entry = MediaEntry.query.get(activity.start_entry_id)
-    if not start_entry:
+    if not start_entry or start_entry.username != username:
         return False
 
-    # Add a new entry to MediaEntry for the end date
-    end_entry = MediaEntry(
+    # Find the newest entry with the same media_name for the user
+    newest_entry = MediaEntry.query.filter_by(
         username=username,
-        media_name=start_entry.media_name,
-        media_type=start_entry.media_type,
-        duration=0,
-        date=datetime.now().date()
-    )
-    db.session.add(end_entry)
-    db.session.commit()
+        media_name=start_entry.media_name
+    ).order_by(MediaEntry.id.desc()).first()
 
-    # Update the CurrentActivities table with the end_entry_id
-    activity.end_entry_id = end_entry.id
+    if not newest_entry:
+        return False
+
+    # Update the CurrentActivities table with the newest entry's ID
+    activity.end_entry_id = newest_entry.id
     db.session.commit()
     return True

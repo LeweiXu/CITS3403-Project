@@ -75,8 +75,9 @@ def dashboard():
         elif 'add_new_entry' in request.form:  # Add a new media entry
             media_type = request.form.get('media_type')
             media_name = request.form.get('media_name')
-            if media_type and media_name:
-                handle_add_new_entry(username, media_type, media_name)
+            duration = request.form.get('duration')
+            if media_type and media_name and duration:
+                handle_add_new_entry(username, media_type, media_name, duration)
                 flash(f'New media entry "{media_name}" added.', 'success')
         elif 'end_activity' in request.form:  # End an activity
             activity_id = request.form.get('activity_id')

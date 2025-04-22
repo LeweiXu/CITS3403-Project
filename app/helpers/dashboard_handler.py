@@ -1,4 +1,4 @@
-from app.models import MediaEntry
+from app.models import MediaEntry, CurrentActivities
 from app import db
 from sqlalchemy import func
 from datetime import datetime
@@ -66,3 +66,64 @@ def handle_add_new_entry(username, media_type, media_name):
     )
     db.session.add(new_entry)
     db.session.commit()
+
+    # Add a corresponding entry in CurrentActivities
+    new_activity = CurrentActivities(
+        start_entry_id=new_entry.id,
+        end_entry_id=None
+    )
+    db.session.add(new_activity)
+    db.session.commit()
+
+def get_current_activities(username):
+    # Fetch all current activities (where end_entry_id is NULL)
+    current_activities = CurrentActivities.query.filter_by(end_entry_id=None).all()
+
+    activities = []
+    for activity in current_activities:
+        # Fetch the MediaEntry corresponding to the start_entry_id
+        start_entry = MediaEntry.query.get(activity.start_entry_id)
+        if not start_entry or start_entry.username != username:
+            continue
+
+        # Calculate the total duration for the media_name for the given user
+        total_duration = db.session.query(
+            func.sum(MediaEntry.duration)
+        ).filter_by(username=username, media_name=start_entry.media_name).scalar()
+
+        # Append the activity details to the list
+        activities.append({
+            "media_name": start_entry.media_name,
+            "media_type": start_entry.media_type,
+            "total_duration": total_duration or 0,
+            "activity_id": activity.id
+        })
+
+    return activities
+
+def handle_end_activity(activity_id, username):
+    # Fetch the activity
+    activity = CurrentActivities.query.get(activity_id)
+    if not activity:
+        return False
+
+    # Fetch the MediaEntry object for the start_entry_id
+    start_entry = MediaEntry.query.get(activity.start_entry_id)
+    if not start_entry:
+        return False
+
+    # Add a new entry to MediaEntry for the end date
+    end_entry = MediaEntry(
+        username=username,
+        media_name=start_entry.media_name,
+        media_type=start_entry.media_type,
+        duration=0,
+        date=datetime.now().date()
+    )
+    db.session.add(end_entry)
+    db.session.commit()
+
+    # Update the CurrentActivities table with the end_entry_id
+    activity.end_entry_id = end_entry.id
+    db.session.commit()
+    return True

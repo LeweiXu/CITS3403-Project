@@ -3,12 +3,7 @@ from app import app
 from app.models import User
 from app import db
 from app.helpers.upload_handler import handle_upload
-from app.helpers.dashboard_handler import (
-    get_user_statistics,
-    get_current_media,
-    handle_add_duration,
-    handle_add_new_entry
-)
+from app.helpers.dashboard_handler import *
 from app.models import MediaEntry
 
 @app.route('/')
@@ -83,19 +78,27 @@ def dashboard():
             if media_type and media_name:
                 handle_add_new_entry(username, media_type, media_name)
                 flash(f'New media entry "{media_name}" added.', 'success')
+        elif 'end_activity' in request.form:  # End an activity
+            activity_id = request.form.get('activity_id')
+            if activity_id:
+                success = handle_end_activity(activity_id, username)
+                if success:
+                    flash('Activity ended successfully.', 'success')
+                else:
+                    flash('Failed to end activity.', 'danger')
 
         return redirect(url_for('dashboard'))
 
-    # Fetch statistics and current media entries
+    # Fetch statistics and current activities
     stats = get_user_statistics(username)
-    current_media = get_current_media(username)
+    current_activities = get_current_activities(username)
 
     return render_template(
         'dashboard.html',
         total_time=stats['total_time'],
         most_consumed_media=stats['most_consumed_media'],
         daily_average_time=stats['daily_average_time'],
-        current_media=current_media
+        current_activities=current_activities
     )
 
 @app.route('/upload', methods=['GET', 'POST'])

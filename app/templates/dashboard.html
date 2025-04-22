@@ -52,23 +52,28 @@
             <thead>
                 <tr>
                     <th>Media Name</th>
-                    <th>Media Type</th>
                     <th>Total Duration (minutes)</th>
                     <th>Add Duration</th>
+                    <th>Actions</th>
                 </tr>
             </thead>
             <tbody>
-                {% for media in current_media %}
+                {% for activity in current_activities %}
                 <tr>
-                    <td>{{ media.media_name }}</td>
-                    <td>{{ media.media_type }}</td>
-                    <td>{{ media.total_duration }}</td>
+                    <td>{{ activity.media_name }}</td>
+                    <td>{{ activity.total_duration }}</td>
                     <td>
                         <form action="{{ url_for('dashboard') }}" method="POST" class="d-inline">
-                            <input type="hidden" name="media_name" value="{{ media.media_name }}">
-                            <input type="hidden" name="media_type" value="{{ media.media_type }}">
+                            <input type="hidden" name="media_name" value="{{ activity.media_name }}">
+                            <input type="hidden" name="media_type" value="{{ activity.media_type }}">
                             <input type="number" name="duration" class="form-control d-inline w-50" placeholder="Minutes" required>
                             <button type="submit" name="add_duration" class="btn btn-success btn-sm">Add</button>
+                        </form>
+                    </td>
+                    <td>
+                        <form action="{{ url_for('dashboard') }}" method="POST" class="d-inline">
+                            <input type="hidden" name="activity_id" value="{{ activity.activity_id }}">
+                            <button type="submit" name="end_activity" class="btn btn-danger btn-sm">End Activity</button>
                         </form>
                     </td>
                 </tr>
@@ -92,5 +97,10 @@
             <button type="submit" name="add_new_entry" class="btn btn-primary">Add New Entry</button>
         </form>
     </section>
+
+    <!-- Button to View Data -->
+    <div class="text-center mt-4">
+        <a href="{{ url_for('viewdata') }}" class="btn btn-secondary">View All Media Entries</a>
+    </div>
 </div>
 {% endblock %}

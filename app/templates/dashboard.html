@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block title %}MediaTracker - Dashboard{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1 class="text-center section-title">Dashboard</h1>
+    <!-- Stats Overview Section -->
+    <section class="stats-overview">
+        <h2 class="section-title">Key Stats</h2>
+        <p class="intro">Here you can view your media consumption statistics and insights.</p>
+        <div class="stats-grid">
+            <!-- Total time spent on media -->
+            <div class="stats-metric-card">
+                <div class="stats-icon">
+                    <i class="fas fa-clock"></i>
+                </div>
+                <div class="stats-info">
+                    <h3>Total Time Spent</h3>
+                    <p class="stats-value">{{ total_time }} hours</p>
+                </div>
+            </div>
+
+            <!-- Most Consumed Media -->
+            <div class="stats-metric-card">
+                <div class="stats-icon">
+                    <i class="fas fa-film"></i>
+                </div>
+                <div class="stats-info">
+                    <h3>Most Consumed Media</h3>
+                    <p class="stats-value">{{ most_consumed_media }}</p>
+                </div>
+            </div>
+
+            <!-- Average Daily Media Consumption -->
+            <div class="stats-metric-card">
+                <div class="stats-icon">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <div class="stats-info">
+                    <h3>Average Daily Consumption</h3>
+                    <p class="stats-value">{{ daily_average_time }} hours</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Button to View Data -->
+    <div class="text-center mt-4">
+        <a href="{{ url_for('viewdata') }}" class="btn btn-primary">View Your Media Entries</a>
+    </div>
+</div>
+{% endblock %}

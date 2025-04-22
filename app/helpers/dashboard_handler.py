@@ -1,5 +1,7 @@
 from app.models import MediaEntry
+from app import db
 from sqlalchemy import func
+from datetime import datetime
 
 def get_user_statistics(username):
     # Query all media entries for the current user
@@ -32,3 +34,35 @@ def get_user_statistics(username):
         "most_consumed_media": most_consumed_media,
         "daily_average_time": round(daily_average_time / 60, 2)  # Convert minutes to hours
     }
+
+def get_current_media(username):
+    # Fetch current media entries grouped by media_name and media_type
+    return db.session.query(
+        MediaEntry.media_name,
+        MediaEntry.media_type,
+        func.sum(MediaEntry.duration).label('total_duration')
+    ).filter_by(username=username).group_by(MediaEntry.media_name, MediaEntry.media_type).all()
+
+def handle_add_duration(username, media_name, media_type, duration):
+    # Add a new entry with the given duration
+    new_entry = MediaEntry(
+        username=username,
+        media_name=media_name,
+        media_type=media_type,
+        duration=duration,
+        date=datetime.now().date()
+    )
+    db.session.add(new_entry)
+    db.session.commit()
+
+def handle_add_new_entry(username, media_type, media_name):
+    # Add a new media entry with duration set to 0
+    new_entry = MediaEntry(
+        username=username,
+        media_type=media_type,
+        media_name=media_name,
+        duration=0,
+        date=datetime.now().date()
+    )
+    db.session.add(new_entry)
+    db.session.commit()

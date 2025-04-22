@@ -3,7 +3,12 @@ from app import app
 from app.models import User
 from app import db
 from app.helpers.upload_handler import handle_upload
-from app.helpers.dashboard_handler import get_user_statistics
+from app.helpers.dashboard_handler import (
+    get_user_statistics,
+    get_current_media,
+    handle_add_duration,
+    handle_add_new_entry
+)
 from app.models import MediaEntry
 
 @app.route('/')
@@ -55,20 +60,42 @@ def register():
 
     return render_template('register.html')
 
-@app.route('/dashboard')
+@app.route('/dashboard', methods=['GET', 'POST'])
 def dashboard():
     if 'username' not in session:
         flash('Please log in to view your dashboard.', 'danger')
         return redirect(url_for('login'))
 
     username = session['username']
+
+    # Handle form submissions
+    if request.method == 'POST':
+        if 'add_duration' in request.form:  # Add duration to an existing media
+            media_name = request.form.get('media_name')
+            media_type = request.form.get('media_type')
+            duration = request.form.get('duration')
+            if media_name and duration:
+                handle_add_duration(username, media_name, media_type, duration)
+                flash(f'Duration added to {media_name}.', 'success')
+        elif 'add_new_entry' in request.form:  # Add a new media entry
+            media_type = request.form.get('media_type')
+            media_name = request.form.get('media_name')
+            if media_type and media_name:
+                handle_add_new_entry(username, media_type, media_name)
+                flash(f'New media entry "{media_name}" added.', 'success')
+
+        return redirect(url_for('dashboard'))
+
+    # Fetch statistics and current media entries
     stats = get_user_statistics(username)
+    current_media = get_current_media(username)
 
     return render_template(
         'dashboard.html',
         total_time=stats['total_time'],
         most_consumed_media=stats['most_consumed_media'],
-        daily_average_time=stats['daily_average_time']
+        daily_average_time=stats['daily_average_time'],
+        current_media=current_media
     )
 
 @app.route('/upload', methods=['GET', 'POST'])

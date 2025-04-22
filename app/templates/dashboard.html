@@ -45,9 +45,52 @@
         </div>
     </section>
 
-    <!-- Button to View Data -->
-    <div class="text-center mt-4">
-        <a href="{{ url_for('viewdata') }}" class="btn btn-primary">View Your Media Entries</a>
-    </div>
+    <!-- Current Media Section -->
+    <section class="current-media mt-5">
+        <h2 class="section-title">Current Activities</h2>
+        <table class="table table-striped mt-4">
+            <thead>
+                <tr>
+                    <th>Media Name</th>
+                    <th>Media Type</th>
+                    <th>Total Duration (minutes)</th>
+                    <th>Add Duration</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for media in current_media %}
+                <tr>
+                    <td>{{ media.media_name }}</td>
+                    <td>{{ media.media_type }}</td>
+                    <td>{{ media.total_duration }}</td>
+                    <td>
+                        <form action="{{ url_for('dashboard') }}" method="POST" class="d-inline">
+                            <input type="hidden" name="media_name" value="{{ media.media_name }}">
+                            <input type="hidden" name="media_type" value="{{ media.media_type }}">
+                            <input type="number" name="duration" class="form-control d-inline w-50" placeholder="Minutes" required>
+                            <button type="submit" name="add_duration" class="btn btn-success btn-sm">Add</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </section>
+
+    <!-- Add New Media Entry Section -->
+    <section class="add-new-entry mt-5">
+        <h2 class="section-title">Add New</h2>
+        <form action="{{ url_for('dashboard') }}" method="POST">
+            <div class="mb-3">
+                <label for="media_type" class="form-label">Media Type</label>
+                <input type="text" id="media_type" name="media_type" class="form-control" placeholder="e.g., Movie, Book" required>
+            </div>
+            <div class="mb-3">
+                <label for="media_name" class="form-label">Media Name</label>
+                <input type="text" id="media_name" name="media_name" class="form-control" placeholder="e.g., Inception, 1984" required>
+            </div>
+            <button type="submit" name="add_new_entry" class="btn btn-primary">Add New Entry</button>
+        </form>
+    </section>
 </div>
 {% endblock %}

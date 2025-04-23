@@ -2,14 +2,17 @@
 :root {
     --primary-color: #3498db;
     --secondary-color: #2c3e50;
+    --background-color:#f1f5f9;
+    --light-border: #e2e8f0;
 }
 
 /* Body Styles */
 
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: #f8f9fa;
+    background-color: var(--background-color);
 }
+/* f8f9fa previoius background colour */
 
 /* Header Styles */
 
@@ -50,7 +53,7 @@ nav ul li {
 }
 
 nav ul li a {
-    color: #ffffff;
+    color: white;
     text-decoration: none;
     font-weight: 500;
     transition: color 0.3s;
@@ -93,11 +96,6 @@ nav ul li a:hover {
     box-shadow: 0 10px 20px rgba(0,0,0,0.15);
 }
 
-/* CTA Section */
-.cta-section {
-    background-color: #f0f4f8;
-    padding: 4rem 0;
-}
 
 /* Global layout for sticky footer */
 html, body {
@@ -119,7 +117,7 @@ main {
 /* Footer Styles */
 .footer-container {
     background-color: var(--secondary-color);
-    color: #ffffff;
+    color: white;
     padding: 2rem 0;
     text-align: center;
 }
@@ -164,24 +162,37 @@ footer a {
     color: var(--primary-color);
 }
 
-.stats-overview {
-    padding: 2rem 1rem;
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.25rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid var(--light-border);
+}
+
+.section {                  /* Renamed from "stats-overview" for reusability */
+    /* padding: 2rem 1rem;
     text-align: center;
-    background-color: #f0f4f8; /* A light background to make cards stand out */
+    background-color: #f0f4f8; 
+    margin-bottom: 2rem; */
+    background: white;  /* A white background to make cards stand out */
+    border-radius: 0.75rem;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    padding: 1.5rem;
     margin-bottom: 2rem;
 }
 
-.stats-overview .section-title {
+.section .section-title {
     font-size: 2rem;
     margin-bottom: 1.5rem;
     color: var(--secondary-color);
 }
 
 .stats-grid {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 1.5rem; /* Space between cards */
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
 }
 
 .stats-metric-card {
@@ -191,7 +202,8 @@ footer a {
     flex: 0 1 280px; /* Each card is at least 280px wide; it wraps if smaller screens */
     box-shadow: 0 4px 8px rgba(0,0,0,0.1);
     text-align: center;
-    transition: transform 0.3s, box-shadow 0.3s;
+    transition: transform 0.3s, box-shadow 0.3s; 
+    border: 1px solid #e2e8f0;
 }
 
 /* Hover effect to give a more interactive feel */
@@ -221,9 +233,12 @@ footer a {
 
 /* If you want sub-text or percentage changes below the main stat */
 .stats-sub {
-    margin-top: 0.5rem;
+    /* margin-top: 0.5rem;
     font-size: 0.9rem;
-    color: #777777;
+    color: #777777; */
+    font-size: 0.75rem;
+    color: #5f6b7c;
+    margin-top: 0.25rem;
 }
 
 .upload-container {
@@ -375,7 +390,7 @@ margin-top: 0.5rem;
 .form-control {
     padding: 0.8rem 1rem;
     border-radius: 8px;
-    border: 1px solid #dee2e6;
+    border: 1px solid var(--light-border);
     transition: all 0.3s ease;
     font-size: 1rem;
 }
@@ -402,6 +417,37 @@ margin-top: 0.5rem;
 .register-page {
     background: linear-gradient(135deg,  var(--secondary-color), var(--primary-color));
     display: flex;
+}
+
+/* Table */
+.table-container {
+    overflow-x: auto;
+    margin-top: 1rem;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th {
+    background-color: #f8fafc;
+    padding: 0.75rem 1rem;
+    text-align: left;
+    font-weight: 500;
+    color: #495057;
+    border-bottom: 1px solid var(--light-border);
+    font-size: 1.2rem;
+    }
+
+td {
+padding: 0.75rem;
+border-bottom: 1px solid var(--light-border);
+vertical-align: middle;
+}
+
+thead {
+    padding: 0.75rem 1rem;
 }
 
 .hidden {

@@ -5,49 +5,94 @@
 {% block content %}
 <div class="container">
     <h1 class="text-center section-title">Dashboard</h1>
+
+     <!-- Stats Section -->
+     <section class="section">
+        <div class="section-header">
+            <h2 class="section-title">Key Stats</h2>
+        </div>
+        <div class="stats-grid">
+            <div class="stats-metric-card">
+                <div class="stats-icon clock">
+                    <i class="fas fa-clock"></i>
+                </div>
+                <div class="container">
+                    <div class="stats-info"><h3>Total Time Spent</h3></div>
+                    <div class="stats-info"><p>{{ total_time }} hours</p></div>
+                    <div class="stats-sub">Since Jan 2025</div>   
+                </div>
+            </div>
+            
+            <div class="stats-metric-card">
+                <div class="stats-icon film">
+                    <i class="fas fa-film"></i>
+                </div>
+                <div class="container">
+                    <div class="stats-info"><h3>Most Consumed Media</h3></div>
+                    <div class="stats-info"><p>{{ most_consumed_media }}</p></div>
+                    <div class="stats-sub">52% of total time</div>     
+                </div>
+            </div>
+            
+            <div class="stats-metric-card">
+                <div class="stats-icon chart">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <div class="container">
+                    <div class="stats-info"><h3>Daily Consumption</h3></div>
+                    <div class="stats-info"><p>{{ daily_average_time }} hours</p></div>
+                    <div class="stats-sub">Last 30 days</div>       
+                </div>
+            </div>
+        </div>
+    </section>
+
     <!-- Stats Overview Section -->
-    <section class="stats-overview">
+    <!-- <section class="stats-overview">
         <h2 class="section-title">Key Stats</h2>
         <div class="stats-grid">
-            <!-- Total time spent on media -->
+
             <div class="stats-metric-card">
                 <div class="stats-icon">
                     <i class="fas fa-clock"></i>
                 </div>
                 <div class="stats-info">
                     <h3>Total Time Spent</h3>
-                    <p class="stats-value">{{ total_time }} hours</p>
+                    <p class="stats-info">{{ total_time }} hours</p>
                 </div>
             </div>
 
-            <!-- Most Consumed Media -->
+
             <div class="stats-metric-card">
                 <div class="stats-icon">
                     <i class="fas fa-film"></i>
                 </div>
                 <div class="stats-info">
                     <h3>Most Consumed Media</h3>
-                    <p class="stats-value">{{ most_consumed_media }}</p>
+                    <p class="stats-info">{{ most_consumed_media }}</p>
                 </div>
             </div>
 
-            <!-- Average Daily Media Consumption -->
+
             <div class="stats-metric-card">
                 <div class="stats-icon">
                     <i class="fas fa-chart-line"></i>
                 </div>
                 <div class="stats-info">
                     <h3>Average Daily Consumption</h3>
-                    <p class="stats-value">{{ daily_average_time }} hours</p>
+                    <p class="stats-info">{{ daily_average_time }} hours</p>
                 </div>
             </div>
         </div>
-    </section>
+    </section> -->
 
     <!-- Current Media Section -->
-    <section class="current-media mt-5">
-        <h2 class="section-title">Current Activities</h2>
-        <table class="table table-striped mt-4">
+    <section class="section mt-5">
+        <div class="section-header" style="margin-bottom: 0;">
+            <h2 class="section-title">Current Activities</h2>
+        </div>
+        <div  class="table-container">
+        <table>
             <thead>
                 <tr>
                     <th>Media Name</th>
@@ -79,10 +124,11 @@
                 {% endfor %}
             </tbody>
         </table>
+        </div>
     </section>
 
     <!-- Add New Media Entry Section -->
-    <section class="add-new-entry mt-5">
+    <section class="section mt-5">
         <h2 class="section-title">Add New</h2>
         <form action="{{ url_for('dashboard') }}" method="POST">
             <div class="mb-3">

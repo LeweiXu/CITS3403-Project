@@ -365,15 +365,13 @@ margin-top: 0.5rem;
 
 /* Form stuff */
 .form-control {
-    background-color: #e6e4e45a;
     padding: 0.8rem 1rem;
-    border-radius: 8px; 
+    border-radius: 8px;
     border: 1px solid #dee2e6;
     transition: all 0.3s ease;
     font-size: 1rem;
 }
 
-/* super suble, can be removed */
 .form-control:focus {
     border-color: var(--primary-color);
     box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25);
@@ -426,5 +424,4 @@ margin-top: 0.5rem;
 
 .hidden {
     display: none;
-
-
+}

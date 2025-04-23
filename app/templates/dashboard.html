@@ -8,7 +8,6 @@
     <!-- Stats Overview Section -->
     <section class="stats-overview">
         <h2 class="section-title">Key Stats</h2>
-        <p class="intro">Here you can view your media consumption statistics and insights.</p>
         <div class="stats-grid">
             <!-- Total time spent on media -->
             <div class="stats-metric-card">
@@ -45,9 +44,62 @@
         </div>
     </section>
 
-    <!-- Button to View Data -->
-    <div class="text-center mt-4">
-        <a href="{{ url_for('viewdata') }}" class="btn btn-primary">View Your Media Entries</a>
-    </div>
+    <!-- Current Media Section -->
+    <section class="current-media mt-5">
+        <h2 class="section-title">Current Activities</h2>
+        <table class="table table-striped mt-4">
+            <thead>
+                <tr>
+                    <th>Media Name</th>
+                    <th>Total Duration (minutes)</th>
+                    <th>Add Duration</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for activity in current_activities %}
+                <tr>
+                    <td>{{ activity.media_name }}</td>
+                    <td>{{ activity.total_duration }}</td>
+                    <td>
+                        <form action="{{ url_for('dashboard') }}" method="POST" class="d-inline">
+                            <input type="hidden" name="media_name" value="{{ activity.media_name }}">
+                            <input type="hidden" name="media_type" value="{{ activity.media_type }}">
+                            <input type="number" name="duration" class="form-control d-inline w-50" placeholder="Minutes" required>
+                            <button type="submit" name="add_duration" class="btn btn-success btn-sm">Add</button>
+                        </form>
+                    </td>
+                    <td>
+                        <form action="{{ url_for('dashboard') }}" method="POST" class="d-inline">
+                            <input type="hidden" name="activity_id" value="{{ activity.activity_id }}">
+                            <button type="submit" name="end_activity" class="btn btn-danger btn-sm">End Activity</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </section>
+
+    <!-- Add New Media Entry Section -->
+    <section class="add-new-entry mt-5">
+        <h2 class="section-title">Add New</h2>
+        <form action="{{ url_for('dashboard') }}" method="POST">
+            <div class="mb-3">
+                <label for="media_type" class="form-label">Media Type</label>
+                <input type="text" id="media_type" name="media_type" class="form-control" placeholder="e.g., Movie, Book" required>
+            </div>
+            <div class="mb-3">
+                <label for="media_name" class="form-label">Media Name</label>
+                <input type="text" id="media_name" name="media_name" class="form-control" placeholder="e.g., Inception, 1984" required>
+            </div>
+            <div class="mb-3">
+                <label for="duration" class="form-label">Duration (minutes)</label>
+                <input type="number" id="duration" name="duration" class="form-control" placeholder="e.g., 120" required>
+            </div>
+            <button type="submit" name="add_new_entry" class="btn btn-primary">Add New Activity</button>
+        </form>
+    </section>
+
 </div>
 {% endblock %}

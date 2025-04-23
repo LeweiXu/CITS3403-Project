@@ -393,6 +393,7 @@ margin-top: 0.5rem;
     border: 1px solid var(--light-border);
     transition: all 0.3s ease;
     font-size: 1rem;
+    background-color: #f2f3f4aa;
 }
 
 .form-control:focus {

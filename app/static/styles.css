@@ -340,8 +340,8 @@ margin-top: 0.5rem;
     margin-top: 2rem;
 }
 
-/* Better login form  */
-.login-section {
+/* Better login and registration form, works with both pages*/
+.form-box-section {
     background-color: white;
     border-radius: 12px;
     padding: 2.5rem;
@@ -350,17 +350,25 @@ margin-top: 0.5rem;
     margin: 3rem auto;
 }
 
-.login-section h2 {
+.form-box-section h2 {
     font-size: 2.2rem;
     margin-bottom: 1rem;
     color: var(--secondary-color);
     font-weight: 600;
 }
 
-.login-section p {
+.form-box-section p {
     color: #6c757d;
     margin-bottom: 2rem;
     font-size: 1.1rem;
+}
+
+/* Link styling */
+.form-box-section a {
+    color: var(--primary-color);
+    font-weight: 500;
+    text-decoration: none;
+    transition: color 0.2s ease;
 }
 
 /* Form stuff */
@@ -384,36 +392,10 @@ margin-top: 0.5rem;
     color: #495057;
 }
 
-/* Registration link styling */
-.login-section a {
-    color: var(--primary-color);
-    font-weight: 500;
-    text-decoration: none;
-    transition: color 0.2s ease;
-}
-
 /* Background for login page */
 .login-page {
     background: linear-gradient(135deg,  var(--primary-color), var(--secondary-color));
     display: flex;
-}
-
-/* Better register */
-.register-section {
-    background-color: white;
-    border-radius: 12px;
-    padding: 2.5rem;
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
-    max-width: 450px;
-    margin: 3rem auto;
-}
-
-/* Login link style */
-.register-section a {
-    color: var(--primary-color);
-    font-weight: 500;
-    text-decoration: none;
-    transition: color 0.2s ease;
 }
 
 /* Background for register page */

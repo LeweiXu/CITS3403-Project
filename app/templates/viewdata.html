@@ -57,6 +57,14 @@
                     </div>
                 </form>
             </section>
+
+            <!-- Export CSV Section -->
+            <section class="form-section mt-4">
+                <h3>Export Media Entries</h3>
+                <form action="{{ url_for('export_csv') }}" method="GET">
+                    <button type="submit" class="btn btn-success btn-sm">Export as CSV</button>
+                </form>
+            </section>
         </div>
     </div>
     <table class="table table-striped mt-4">

@@ -1,10 +1,11 @@
-from flask import render_template, request, redirect, url_for, flash, session
+from flask import render_template, request, redirect, url_for, flash, session, Response
 from app import app
 from app.models import User
 from app import db
 from app.helpers.upload_handler import handle_upload
 from app.helpers.dashboard_handler import *
 from app.models import MediaEntry
+from app.helpers.export_csv_handler import generate_csv
 
 @app.route('/')
 def index():
@@ -132,24 +133,6 @@ def delete_entry(entry_id):
         flash('Entry not found or unauthorized.', 'danger')
     return redirect(url_for('viewdata'))
 
-# @app.route('/edit_entry/<int:entry_id>', methods=['GET', 'POST'])
-# def edit_entry(entry_id):
-#     entry = MediaEntry.query.get(entry_id)
-#     if not entry or entry.username != session.get('username'):
-#         flash('Entry not found or unauthorized.', 'danger')
-#         return redirect(url_for('viewdata'))
-
-#     if request.method == 'POST':
-#         entry.date = request.form.get('date')
-#         entry.media_type = request.form.get('media_type')
-#         entry.media_name = request.form.get('media_name')
-#         entry.duration = request.form.get('duration')
-#         db.session.commit()
-#         flash('Entry updated successfully.', 'success')
-#         return redirect(url_for('viewdata'))
-
-#     return render_template('edit_entry.html', entry=entry)
-
 @app.route('/sharedata')
 def sharedata():
     return render_template('sharedata.html')
@@ -159,3 +142,16 @@ def logout():
     session.clear()  # Clear all session data
     flash('You have been logged out successfully.', 'success')
     return redirect(url_for('login'))  # Redirect to the login page
+
+@app.route('/export_csv', methods=['GET'])
+def export_csv():
+    if 'username' not in session:
+        flash('Please log in to export your data.', 'danger')
+        return redirect(url_for('login'))
+    
+    entries = MediaEntry.query.filter_by(username=session['username']).all()
+    return Response(
+        generate_csv(entries),
+        mimetype='text/csv',
+        headers={'Content-Disposition': 'attachment;filename=media_entries.csv'}
+    )

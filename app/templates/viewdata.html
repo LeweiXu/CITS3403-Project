@@ -67,6 +67,41 @@
             </section>
         </div>
     </div>
+    <!-- Search Bar -->
+    <form action="{{ url_for('viewdata') }}" method="GET" class="mb-4">
+        <div class="row">
+            <div class="col-md-2">
+                <label for="start_date" class="form-label">Start Date</label>
+                <input type="date" id="start_date" name="start_date" class="form-control" value="{{ request.args.get('start_date', '') }}">
+            </div>
+            <div class="col-md-2">
+                <label for="end_date" class="form-label">End Date</label>
+                <input type="date" id="end_date" name="end_date" class="form-control" value="{{ request.args.get('end_date', '') }}">
+            </div>
+            <div class="col-md-2">
+                <label for="media_name" class="form-label">Media Name</label>
+                <input type="text" id="media_name" name="media_name" class="form-control" placeholder="e.g., Inception" value="{{ request.args.get('media_name', '') }}">
+            </div>
+            <div class="col-md-2">
+                <label for="media_type" class="form-label">Media Type</label>
+                <input type="text" id="media_type" name="media_type" class="form-control" placeholder="e.g., Movie" value="{{ request.args.get('media_type', '') }}">
+            </div>
+            <div class="col-md-2">
+                <label for="min_duration" class="form-label">Min Duration</label>
+                <input type="number" id="min_duration" name="min_duration" class="form-control" placeholder="e.g., 30" value="{{ request.args.get('min_duration', '') }}">
+            </div>
+            <div class="col-md-2">
+                <label for="max_duration" class="form-label">Max Duration</label>
+                <input type="number" id="max_duration" name="max_duration" class="form-control" placeholder="e.g., 120" value="{{ request.args.get('max_duration', '') }}">
+            </div>
+        </div>
+        <div class="row mt-3">
+            <div class="col-md-12 text-center">
+                <button type="submit" class="btn btn-primary">Search</button>
+                <a href="{{ url_for('viewdata') }}" class="btn btn-secondary">Reset</a>
+            </div>
+        </div>
+    </form>
     <table class="table table-striped mt-4">
         <thead>
             <tr>

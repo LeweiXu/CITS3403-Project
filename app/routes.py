@@ -6,6 +6,7 @@ from app.helpers.upload_handler import handle_upload
 from app.helpers.dashboard_handler import *
 from app.models import MediaEntry
 from app.helpers.export_csv_handler import generate_csv
+from app.helpers.viewdata_handler import get_filtered_entries
 
 @app.route('/')
 def index():
@@ -111,14 +112,26 @@ def upload():
             return result
     return render_template('upload.html')
 
-@app.route('/viewdata')
+@app.route('/viewdata', methods=['GET'])
 def viewdata():
     if 'username' not in session:
         flash('Please log in to view your data.', 'danger')
         return redirect(url_for('login'))
 
     username = session['username']
-    entries = MediaEntry.query.filter_by(username=username).order_by(MediaEntry.date.desc()).all()
+
+    # Pass query parameters to the helper function
+    filters = {
+        'start_date': request.args.get('start_date'),
+        'end_date': request.args.get('end_date'),
+        'media_name': request.args.get('media_name'),
+        'media_type': request.args.get('media_type'),
+        'min_duration': request.args.get('min_duration'),
+        'max_duration': request.args.get('max_duration')
+    }
+
+    # Get filtered entries
+    entries = get_filtered_entries(username, filters)
 
     return render_template('viewdata.html', entries=entries)
 

@@ -7,6 +7,7 @@ from app.helpers.dashboard_handler import *
 from app.models import Entries
 from app.helpers.export_csv_handler import generate_csv
 from app.helpers.viewdata_handler import get_filtered_entries
+from app.helpers.activities_handler import get_uncompleted_activities, get_completed_activities
 
 @app.route('/')
 def index():
@@ -189,4 +190,32 @@ def export_csv():
         generate_csv(entries),
         mimetype='text/csv',
         headers={'Content-Disposition': 'attachment;filename=media_entries.csv'}
+    )
+
+@app.route('/past_activities', methods=['GET'])
+def past_activities():
+    if 'username' not in session:
+        flash('Please log in to view your activities.', 'danger')
+        return redirect(url_for('login'))
+
+    username = session['username']
+
+    # Get filter criteria from query parameters
+    filters = {
+        'start_date': request.args.get('start_date'),
+        'end_date': request.args.get('end_date'),
+        'media_name': request.args.get('media_name'),
+        'media_type': request.args.get('media_type'),
+        'min_duration': request.args.get('min_duration'),
+        'max_duration': request.args.get('max_duration')
+    }
+
+    # Fetch uncompleted and completed activities
+    uncompleted_activities = get_uncompleted_activities(username, filters)
+    completed_activities = get_completed_activities(username, filters)
+
+    return render_template(
+        'past_activities.html',
+        uncompleted_activities=uncompleted_activities,
+        completed_activities=completed_activities
     )

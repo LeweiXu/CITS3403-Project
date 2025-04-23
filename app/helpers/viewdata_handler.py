@@ -1,4 +1,4 @@
-from app.models import MediaEntry
+from app.models import Entries
 from sqlalchemy import cast, Integer
 
 def get_filtered_entries(username, filters):
@@ -14,20 +14,20 @@ def get_filtered_entries(username, filters):
     max_duration = filters.get('max_duration')
 
     # Build the query
-    query = MediaEntry.query.filter_by(username=username)
+    query = Entries.query.filter_by(username=username)
 
     if start_date:
-        query = query.filter(MediaEntry.date >= start_date)
+        query = query.filter(Entries.date >= start_date)
     if end_date:
-        query = query.filter(MediaEntry.date <= end_date)
+        query = query.filter(Entries.date <= end_date)
     if media_name:
-        query = query.filter(MediaEntry.media_name.ilike(f"%{media_name}%"))
+        query = query.filter(Entries.media_name.ilike(f"%{media_name}%"))
     if media_type:
-        query = query.filter(MediaEntry.media_type.ilike(f"%{media_type}%"))
+        query = query.filter(Entries.media_type.ilike(f"%{media_type}%"))
     if min_duration:
-        query = query.filter(cast(MediaEntry.duration, Integer) >= int(min_duration))
+        query = query.filter(cast(Entries.duration, Integer) >= int(min_duration))
     if max_duration:
-        query = query.filter(cast(MediaEntry.duration, Integer) <= int(max_duration))
+        query = query.filter(cast(Entries.duration, Integer) <= int(max_duration))
 
     # Execute the query and return the results
-    return query.order_by(MediaEntry.date.desc()).all()
+    return query.order_by(Entries.date.desc()).all()

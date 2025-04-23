@@ -70,16 +70,43 @@
                         </form>
                     </td>
                     <td>
-                        <form action="{{ url_for('dashboard') }}" method="POST" class="d-inline">
-                            <input type="hidden" name="activity_id" value="{{ activity.activity_id }}">
-                            <button type="submit" name="end_activity" class="btn btn-danger btn-sm">End Activity</button>
-                        </form>
+                        <!-- End Activity Button -->
+                        <button class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#endActivityModal" data-activity-id="{{ activity.activity_id }}">End Activity</button>
                     </td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
     </section>
+
+    <!-- End Activity Modal -->
+    <div class="modal" id="endActivityModal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form action="{{ url_for('end_activity') }}" method="POST">
+                    <div class="modal-header">
+                        <h5 class="modal-title">End Activity</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <input type="hidden" id="modal-activity-id" name="activity_id" value="">
+                        <div class="mb-3">
+                            <label for="rating" class="form-label">Rating (1-5)</label>
+                            <input type="number" id="rating" name="rating" class="form-control" min="1" max="5">
+                        </div>
+                        <div class="mb-3">
+                            <label for="comment" class="form-label">Comment</label>
+                            <textarea id="comment" name="comment" class="form-control"></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary">Submit</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 
     <!-- Add New Media Entry Section -->
     <section class="add-new-entry mt-5">
@@ -100,6 +127,19 @@
             <button type="submit" name="add_new_entry" class="btn btn-primary">Add New Activity</button>
         </form>
     </section>
-
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const endActivityButtons = document.querySelectorAll('[data-bs-target="#endActivityModal"]');
+        const activityIdInput = document.getElementById('modal-activity-id');
+
+        endActivityButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const activityId = button.getAttribute('data-activity-id');
+                activityIdInput.value = activityId;
+            });
+        });
+    });
+</script>
 {% endblock %}

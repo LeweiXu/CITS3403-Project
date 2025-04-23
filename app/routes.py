@@ -1,10 +1,10 @@
 from flask import render_template, request, redirect, url_for, flash, session, Response
 from app import app
-from app.models import User
+from app.models import Users
 from app import db
 from app.helpers.upload_handler import handle_upload
 from app.helpers.dashboard_handler import *
-from app.models import MediaEntry
+from app.models import Entries
 from app.helpers.export_csv_handler import generate_csv
 from app.helpers.viewdata_handler import get_filtered_entries
 
@@ -21,7 +21,7 @@ def login():
         password = request.form.get('password')
 
         # Query the database for the user
-        user = User.query.filter_by(username=username).first()
+        user = Users.query.filter_by(username=username).first()
 
         if user and user.password == password:  # Replace with hashed password check in production
             session['username'] = username  # Store username in session
@@ -39,13 +39,13 @@ def register():
         password = request.form.get('password')
 
         # Check if user already exists
-        if User.query.filter_by(username=username).first():
+        if Users.query.filter_by(username=username).first():
             flash('Username already exists!', 'danger')
             return redirect(url_for('register'))
 
         # Create new user
         try:
-            new_user = User(username=username, email=email, password=password)
+            new_user = Users(username=username, email=email, password=password)
             db.session.add(new_user)
             db.session.commit()
             flash('Registration successful! Please log in.', 'success')
@@ -83,8 +83,10 @@ def dashboard():
                 flash(f'New media entry "{media_name}" added.', 'success')
         elif 'end_activity' in request.form:  # End an activity
             activity_id = request.form.get('activity_id')
+            rating = request.form.get('rating')  # Get the rating from the form
+            comment = request.form.get('comment')  # Get the comment from the form
             if activity_id:
-                success = handle_end_activity(activity_id, username)
+                success = handle_end_activity(activity_id, username, rating=rating, comment=comment)
                 if success:
                     flash('Activity ended successfully.', 'success')
                 else:
@@ -103,6 +105,26 @@ def dashboard():
         daily_average_time=stats['daily_average_time'],
         current_activities=current_activities
     )
+
+@app.route('/end_activity', methods=['POST'])
+def end_activity():
+    if 'username' not in session:
+        flash('Please log in to perform this action.', 'danger')
+        return redirect(url_for('login'))
+
+    username = session['username']
+    activity_id = request.form.get('activity_id')
+    rating = request.form.get('rating')  # Get the rating from the form
+    comment = request.form.get('comment')  # Get the comment from the form
+
+    if activity_id:
+        success = handle_end_activity(activity_id, username, rating=rating, comment=comment)
+        if success:
+            flash('Activity ended successfully.', 'success')
+        else:
+            flash('Failed to end activity.', 'danger')
+
+    return redirect(url_for('dashboard'))
 
 @app.route('/upload', methods=['GET', 'POST'])
 def upload():
@@ -137,7 +159,7 @@ def viewdata():
 
 @app.route('/delete_entry/<int:entry_id>')
 def delete_entry(entry_id):
-    entry = MediaEntry.query.get(entry_id)
+    entry = Entries.query.get(entry_id)
     if entry and entry.username == session.get('username'):
         db.session.delete(entry)
         db.session.commit()
@@ -162,7 +184,7 @@ def export_csv():
         flash('Please log in to export your data.', 'danger')
         return redirect(url_for('login'))
     
-    entries = MediaEntry.query.filter_by(username=session['username']).all()
+    entries = Entries.query.filter_by(username=session['username']).all()
     return Response(
         generate_csv(entries),
         mimetype='text/csv',

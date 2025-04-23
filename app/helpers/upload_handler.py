@@ -1,7 +1,7 @@
 import os
 import csv
 from flask import session, flash, redirect, url_for
-from app.models import MediaEntry
+from app.models import Entries
 from app import db
 from datetime import datetime  # Import datetime for date conversion
 
@@ -32,8 +32,8 @@ def handle_upload(request, app):
                     flash(f"Invalid date format in row: {row}", 'danger')
                     return redirect(url_for('upload'))
 
-                # Create a new MediaEntry object
-                new_entry = MediaEntry(
+                # Create a new Entries object
+                new_entry = Entries(
                     username=username,
                     date=date,  # Use the converted date object
                     media_type=row['media_type'],
@@ -64,7 +64,7 @@ def handle_upload(request, app):
         media_name = request.form.get('mediaName')
         duration = request.form.get('duration')
 
-        new_entry = MediaEntry(username=username, date=date, media_type=media_type, media_name=media_name, duration=duration)
+        new_entry = Entries(username=username, date=date, media_type=media_type, media_name=media_name, duration=duration)
         db.session.add(new_entry)
         db.session.commit()
 

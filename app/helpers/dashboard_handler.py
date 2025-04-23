@@ -1,11 +1,11 @@
-from app.models import MediaEntry, CurrentActivities
+from app.models import Entries, Activities
 from app import db
 from sqlalchemy import func
 from datetime import datetime
 
 def get_user_statistics(username):
     # Query all media entries for the current user
-    media_entries = MediaEntry.query.filter_by(username=username).all()
+    media_entries = Entries.query.filter_by(username=username).all()
 
     if not media_entries:
         return {
@@ -38,14 +38,14 @@ def get_user_statistics(username):
 def get_current_media(username):
     # Fetch current media entries grouped by media_name and media_type
     return db.session.query(
-        MediaEntry.media_name,
-        MediaEntry.media_type,
-        func.sum(MediaEntry.duration).label('total_duration')
-    ).filter_by(username=username).group_by(MediaEntry.media_name, MediaEntry.media_type).all()
+        Entries.media_name,
+        Entries.media_type,
+        func.sum(Entries.duration).label('total_duration')
+    ).filter_by(username=username).group_by(Entries.media_name, Entries.media_type).all()
 
 def handle_add_duration(username, media_name, media_type, duration):
     # Add a new entry with the given duration
-    new_entry = MediaEntry(
+    new_entry = Entries(
         username=username,
         media_name=media_name,
         media_type=media_type,
@@ -57,7 +57,7 @@ def handle_add_duration(username, media_name, media_type, duration):
 
 def handle_add_new_entry(username, media_type, media_name):
     # Add a new media entry with duration set to 0
-    new_entry = MediaEntry(
+    new_entry = Entries(
         username=username,
         media_type=media_type,
         media_name=media_name,
@@ -67,8 +67,8 @@ def handle_add_new_entry(username, media_type, media_name):
     db.session.add(new_entry)
     db.session.commit()
 
-    # Add a corresponding entry in CurrentActivities
-    new_activity = CurrentActivities(
+    # Add a corresponding entry in Activities
+    new_activity = Activities(
         start_entry_id=new_entry.id,
         end_entry_id=None
     )
@@ -77,18 +77,18 @@ def handle_add_new_entry(username, media_type, media_name):
 
 def get_current_activities(username):
     # Fetch all current activities (where end_entry_id is NULL)
-    current_activities = CurrentActivities.query.filter_by(end_entry_id=None).all()
+    current_activities = Activities.query.filter_by(end_entry_id=None).all()
 
     activities = []
     for activity in current_activities:
-        # Fetch the MediaEntry corresponding to the start_entry_id
-        start_entry = MediaEntry.query.get(activity.start_entry_id)
+        # Fetch the Entries corresponding to the start_entry_id
+        start_entry = Entries.query.get(activity.start_entry_id)
         if not start_entry or start_entry.username != username:
             continue
 
         # Calculate the total duration for the media_name for the given user
         total_duration = db.session.query(
-            func.sum(MediaEntry.duration)
+            func.sum(Entries.duration)
         ).filter_by(username=username, media_name=start_entry.media_name).scalar()
 
         # Append the activity details to the list
@@ -103,7 +103,7 @@ def get_current_activities(username):
 
 def handle_add_new_entry(username, media_type, media_name, duration):
     # Add a new media entry with the specified duration
-    new_entry = MediaEntry(
+    new_entry = Entries(
         username=username,
         media_type=media_type,
         media_name=media_name,
@@ -113,35 +113,42 @@ def handle_add_new_entry(username, media_type, media_name, duration):
     db.session.add(new_entry)
     db.session.commit()
 
-    # Add a corresponding entry in CurrentActivities
-    new_activity = CurrentActivities(
+    # Add a corresponding entry in Activities
+    new_activity = Activities(
         start_entry_id=new_entry.id,
         end_entry_id=None
     )
     db.session.add(new_activity)
     db.session.commit()
 
-def handle_end_activity(activity_id, username):
+def handle_end_activity(activity_id, username, rating=None, comment=None):
     # Fetch the activity
-    activity = CurrentActivities.query.get(activity_id)
+    activity = Activities.query.get(activity_id)
     if not activity:
         return False
 
     # Fetch the MediaEntry object for the start_entry_id
-    start_entry = MediaEntry.query.get(activity.start_entry_id)
+    start_entry = Entries.query.get(activity.start_entry_id)
     if not start_entry or start_entry.username != username:
         return False
 
     # Find the newest entry with the same media_name for the user
-    newest_entry = MediaEntry.query.filter_by(
+    newest_entry = Entries.query.filter_by(
         username=username,
         media_name=start_entry.media_name
-    ).order_by(MediaEntry.id.desc()).first()
+    ).order_by(Entries.id.desc()).first()
 
     if not newest_entry:
         return False
 
     # Update the CurrentActivities table with the newest entry's ID
     activity.end_entry_id = newest_entry.id
+
+    # Add rating and comment if provided
+    if rating:
+        activity.rating = rating
+    if comment:
+        activity.comment = comment
+
     db.session.commit()
     return True

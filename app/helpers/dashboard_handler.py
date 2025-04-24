@@ -2,6 +2,8 @@ from app.models import Entries, Activities
 from app import db
 from sqlalchemy import func
 from datetime import datetime
+from flask import flash
+from app.helpers.activities_handler import handle_add_new_activity
 
 def get_user_statistics(username):
     # Query all media entries for the current user
@@ -43,6 +45,25 @@ def get_current_media(username):
         func.sum(Entries.duration).label('total_duration')
     ).join(Activities).filter(Activities.username == username).group_by(Entries.media_name, Entries.media_type).all()
 
+def handle_dashboard_form(username, form):
+    """
+    Handle form submissions for the dashboard route.
+    """
+    if 'add_duration' in form:  # Add duration to an existing media
+        media_name = form.get('media_name')
+        media_type = form.get('media_type')
+        duration = form.get('duration')
+        if media_name and duration:
+            handle_add_duration(username, media_name, media_type, duration)
+            flash(f'Duration added to {media_name}.', 'success')
+    elif 'add_new_entry' in form:  # Add a new media entry
+        media_type = form.get('media_type')
+        media_name = form.get('media_name')
+        duration = form.get('duration')
+        if media_type and media_name and duration:
+            handle_add_new_activity(username, media_type, media_name, duration)
+            flash(f'New media entry "{media_name}" added.', 'success')
+
 def handle_add_duration(username, media_name, media_type, duration):
     # Add a new entry with the given duration
     activity = Activities.query.filter_by(username=username).join(Entries).filter(Entries.media_name == media_name).first()
@@ -59,31 +80,12 @@ def handle_add_duration(username, media_name, media_type, duration):
     db.session.add(new_entry)
     db.session.commit()
 
-def handle_add_new_entry(username, media_type, media_name, duration):
-    # Add a new activity and its first media entry
-    new_activity = Activities(
-        username=username,
-        rating=None,
-        comment=None
-    )
-    db.session.add(new_activity)
-
-    new_entry = Entries(
-        activity_id=new_activity.id,
-        media_type=media_type,
-        media_name=media_name,
-        duration=duration,
-        date=datetime.now().date()
-    )
-    db.session.add(new_entry)
-
-    # Update the activity's start_entry_id to the new entry's id
-    new_activity.start_entry_id = new_entry.id
-    db.session.commit()
-
 def get_current_activities(username):
-    # Fetch all current activities (where there are entries but no end date)
-    current_activities = Activities.query.filter_by(username=username).all()
+    """
+    Fetch all current activities (where status = 'in_progress') for the given user.
+    """
+    # Query activities with status = 'in_progress'
+    current_activities = Activities.query.filter_by(username=username, status='in_progress').all()
 
     activities = []
     for activity in current_activities:
@@ -106,18 +108,3 @@ def get_current_activities(username):
         })
 
     return activities
-
-def handle_end_activity(activity_id, username, rating=None, comment=None):
-    # Fetch the activity
-    activity = Activities.query.filter_by(id=activity_id, username=username).first()
-    if not activity:
-        return False
-
-    # Add rating and comment if provided
-    if rating:
-        activity.rating = rating
-    if comment:
-        activity.comment = comment
-
-    db.session.commit()
-    return True

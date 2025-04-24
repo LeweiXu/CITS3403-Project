@@ -57,22 +57,22 @@
             <!-- Uncompleted Activities -->
             {% for activity in uncompleted_activities %}
             <tr>
-                <td>{{ activity.media_type }}</td>
                 <td>{{ activity.media_name }}</td>
                 <td>{{ activity.total_duration }}</td>
                 <td>{{ activity.start_date }}</td>
                 <td>Ongoing</td>
+                <td>Rating: N/A</td>
             </tr>
             {% endfor %}
 
             <!-- Completed Activities -->
             {% for activity in completed_activities %}
             <tr>
-                <td>{{ activity.media_type }}</td>
                 <td>{{ activity.media_name }}</td>
                 <td>{{ activity.total_duration }}</td>
                 <td>{{ activity.start_date }}</td>
                 <td>{{ activity.end_date }}</td>
+                <td>{{ activity.rating }}</td>
             </tr>
             {% endfor %}
         </tbody>

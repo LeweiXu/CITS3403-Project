@@ -16,12 +16,11 @@ class Activities(db.Model):
     __tablename__ = 'Activities'
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(80), db.ForeignKey('Users.username'), nullable=False)
-    start_entry_id = db.Column(db.Integer, nullable=True)
-    end_entry_id = db.Column(db.Integer, nullable=True)
     status = db.Column(db.String(20), nullable=False, default='in_progress')
+    start_date = db.Column(db.Date, nullable=True)
+    end_date = db.Column(db.Date, nullable=True)
     rating = db.Column(db.Float, nullable=True)
     comment = db.Column(db.Text, nullable=True)
-
     media_entries = db.relationship('Entries', backref='activity', lazy=True)
 
 # Media entries table, stores all media entries

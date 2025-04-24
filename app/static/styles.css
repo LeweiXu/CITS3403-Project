@@ -5,6 +5,7 @@
     --background-color:#f1f5f9;
     --light-border: #e2e8f0;
 }
+/* f8f9fa previoius background colour */
 
 /* Body Styles */
 
@@ -12,7 +13,7 @@ body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     background-color: var(--background-color);
 }
-/* f8f9fa previoius background colour */
+
 
 /* Header Styles */
 
@@ -131,6 +132,38 @@ footer a {
     color: var(--primary-color);
 }
 
+/* Mainly for the dashboard table */
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th {
+    background-color: #f8fafc;
+    padding: 0.75rem 1rem;
+    text-align: left;
+    font-weight: 500;
+    color: #495057;
+    border-bottom: 1px solid var(--light-border);
+    font-size: 1.2rem;
+    }
+
+td {
+padding: 0.75rem;
+border-bottom: 1px solid var(--light-border);
+vertical-align: middle;
+}
+
+thead {
+    padding: 0.75rem 1rem;
+}
+
+.table-container {
+    overflow-x: auto;
+    margin-top: 1rem;
+}
+
+/* Icons for social media, for footer */
 .social-icons {
     margin-top: 1rem;
 }
@@ -176,12 +209,9 @@ footer a {
     border-bottom: 1px solid var(--light-border);
 }
 
-.section {                  /* Renamed from "stats-overview" for reusability */
-    /* padding: 2rem 1rem;
-    text-align: center;
-    background-color: #f0f4f8; 
-    margin-bottom: 2rem; */
-    background: white;  /* A white background to make cards stand out */
+/* Renamed from "stats-overview" for reusability, also edited some attributes */
+.section {                  
+    background: white;  /* A light background to make cards stand out */
     border-radius: 0.75rem;
     box-shadow: 0 4px 8px rgba(0,0,0,0.1);
     padding: 1.5rem;
@@ -238,9 +268,6 @@ footer a {
 
 /* If you want sub-text or percentage changes below the main stat */
 .stats-sub {
-    /* margin-top: 0.5rem;
-    font-size: 0.9rem;
-    color: #777777; */
     font-size: 0.75rem;
     color: #5f6b7c;
     margin-top: 0.25rem;
@@ -360,7 +387,8 @@ margin-top: 0.5rem;
     margin-top: 2rem;
 }
 
-/* Better login and registration form, works with both pages*/
+/* "form-box-section" is for both login and registration */
+/* Makes it look better */
 .form-box-section {
     background-color: white;
     border-radius: 12px;
@@ -383,7 +411,7 @@ margin-top: 0.5rem;
     font-size: 1.1rem;
 }
 
-/* Link styling */
+/* Link styling, link to go to register or login from the other */
 .form-box-section a {
     color: var(--primary-color);
     font-weight: 500;
@@ -425,36 +453,6 @@ margin-top: 0.5rem;
     display: flex;
 }
 
-/* Table */
-.table-container {
-    overflow-x: auto;
-    margin-top: 1rem;
-}
-
-table {
-    width: 100%;
-    border-collapse: collapse;
-}
-
-th {
-    background-color: #f8fafc;
-    padding: 0.75rem 1rem;
-    text-align: left;
-    font-weight: 500;
-    color: #495057;
-    border-bottom: 1px solid var(--light-border);
-    font-size: 1.2rem;
-    }
-
-td {
-padding: 0.75rem;
-border-bottom: 1px solid var(--light-border);
-vertical-align: middle;
-}
-
-thead {
-    padding: 0.75rem 1rem;
-}
 
 .hidden {
     display: none;

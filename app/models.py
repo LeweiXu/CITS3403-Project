@@ -9,18 +9,6 @@ class Users(db.Model):
 
     media_entries = db.relationship('Activities', backref='user', lazy=True)
 
-# Media entries table, stores all media entries
-# Each entry is associated an Activity (Activities.id)
-# The idea is that each activity is made up of multiple media entries
-class Entries(db.Model):
-    __tablename__ = 'Entries'
-    id = db.Column(db.Integer, primary_key=True)
-    activity_id = db.Column(db.Integer, db.ForeignKey('Activities.id'), nullable=True)
-    date = db.Column(db.Date, nullable=False)
-    media_type = db.Column(db.String(50), nullable=False)
-    media_name = db.Column(db.String(120), nullable=False)
-    duration = db.Column(db.Integer, nullable=False)
-
 # Activities table, each Activity is associated with a user (Users.username)
 # Each activity has a start and end entry, rating and comment
 # The idea is that a user can start an activity, add multiple media entries to it, then finally end an activity (by setting the end entry_id)
@@ -35,3 +23,16 @@ class Activities(db.Model):
     comment = db.Column(db.Text, nullable=True)
 
     media_entries = db.relationship('Entries', backref='activity', lazy=True)
+
+# Media entries table, stores all media entries
+# Each entry is associated an Activity (Activities.id)
+# The idea is that each activity is made up of multiple media entries
+class Entries(db.Model):
+    __tablename__ = 'Entries'
+    id = db.Column(db.Integer, primary_key=True)
+    activity_id = db.Column(db.Integer, db.ForeignKey('Activities.id'), nullable=True)
+    date = db.Column(db.Date, nullable=False)
+    media_type = db.Column(db.String(50), nullable=False)
+    media_name = db.Column(db.String(120), nullable=False)
+    duration = db.Column(db.Integer, nullable=False)
+    comment = db.Column(db.Text, nullable=True)

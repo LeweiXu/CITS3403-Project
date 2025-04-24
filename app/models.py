@@ -28,8 +28,9 @@ class Activities(db.Model):
     __tablename__ = 'Activities'
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(80), db.ForeignKey('Users.username'), nullable=False)
-    start_entry_id = db.Column(db.Integer, nullable=False)
+    start_entry_id = db.Column(db.Integer, nullable=True)
     end_entry_id = db.Column(db.Integer, nullable=True)
+    status = db.Column(db.String(20), nullable=False, default='in_progress')
     rating = db.Column(db.Float, nullable=True)
     comment = db.Column(db.Text, nullable=True)
 

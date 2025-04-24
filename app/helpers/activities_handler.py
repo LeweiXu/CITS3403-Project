@@ -2,6 +2,7 @@ from app.models import Entries, Activities
 from app import db
 from flask import flash
 from datetime import datetime
+from sqlalchemy.sql import func
 
 def fetch_past_activities(username, request):
     """
@@ -42,12 +43,13 @@ def get_uncompleted_activities(username, filters):
     # Fetch required attributes
     return query.with_entities(
         Activities.id.label('activity_id'),
-        Activities.status,
         Entries.media_type,
         Entries.media_name,
-        Entries.duration.label('total_duration'),
-        Entries.date.label('start_date')
-    ).join(Entries, Activities.id == Entries.activity_id).order_by(Activities.id.desc()).all()
+        func.sum(Entries.duration).label('total_duration'),
+        func.min(Entries.date).label('start_date')  # Get the earliest date for the activity
+    ).join(Entries, Activities.id == Entries.activity_id).group_by(
+        Activities.id, Entries.media_type, Entries.media_name
+    ).order_by(Activities.id.desc()).all()
 
 
 def get_completed_activities(username, filters):
@@ -66,12 +68,15 @@ def get_completed_activities(username, filters):
     # Fetch required attributes
     return query.with_entities(
         Activities.id.label('activity_id'),
-        Activities.status,
         Entries.media_type,
         Entries.media_name,
-        Entries.duration.label('total_duration'),
-        Entries.date.label('start_date')
-    ).join(Entries, Activities.id == Entries.activity_id).order_by(Activities.id.desc()).all()
+        func.sum(Entries.duration).label('total_duration'),
+        func.min(Entries.date).label('start_date'),  # Get the earliest date for the activity
+        func.max(Entries.date).label('end_date'),  # Get the latest date for the activity
+        Activities.rating
+    ).join(Entries, Activities.id == Entries.activity_id).group_by(
+        Activities.id, Entries.media_type, Entries.media_name, Activities.rating
+    ).order_by(Activities.id.desc()).all()
 
 def apply_activity_filters(query, filters):
     # Apply filters to the query

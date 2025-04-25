@@ -23,7 +23,6 @@ def upgrade():
     sa.Column('end_entry_id', sa.Integer(), nullable=True),
     sa.Column('rating', sa.Float(), nullable=True),
     sa.Column('comment', sa.Text(), nullable=True),
-    sa.ForeignKeyConstraint(['username'], ['Users.username'], ),
     sa.PrimaryKeyConstraint('id')
     )
 

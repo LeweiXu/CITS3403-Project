@@ -15,25 +15,6 @@ down_revision = None
 branch_labels = None
 depends_on = None
 
-
-"""initial migration
-
-Revision ID: a68b26254119
-Revises: 
-Create Date: 2025-04-23 19:31:37.996779
-
-"""
-from alembic import op
-import sqlalchemy as sa
-
-
-# revision identifiers, used by Alembic.
-revision = 'a68b26254119'
-down_revision = None
-branch_labels = None
-depends_on = None
-
-
 def upgrade():
     op.create_table('users',
     sa.Column('username', sa.String(length=80), nullable=False),

@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+
+{% block title %}MediaTracker - Analysis{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1>Analysis</h1>
+
+    <!-- Numeric Summaries -->
+    <div class="row mt-4">
+        <div class="col-md-4">
+            <h3>Total Time Spent</h3>
+            <p>{{ analysis_data.total_duration }} hours</p>
+        </div>
+        <div class="col-md-4">
+            <h3>Time Spent Reading Twilight</h3>
+            <p>{{ analysis_data.twilight_duration }} hours</p>
+        </div>
+        <div class="col-md-4">
+            <h3>Time Spent Playing Valorant</h3>
+            <p>{{ analysis_data.valorant_duration }} hours</p>
+        </div>
+        <div class="col-md-4">
+            <h3>Days to Read 1984</h3>
+            <p>{{ analysis_data.days_to_read_1984 }} days</p>
+        </div>
+    </div>
+
+    <!-- Graphs -->
+    <div class="row mt-4">
+        <div class="col-md-12">
+            <h3>Weekly Reading Time (Last 10 Weeks)</h3>
+            <canvas id="weeklyReadingChart"></canvas>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // Weekly Reading Chart
+        const ctx = document.getElementById('weeklyReadingChart').getContext('2d');
+        const weeklyReadingChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: {{ analysis_data.weekly_labels | tojson }},
+                datasets: [{
+                    label: 'Weekly Reading Time (hours)',
+                    data: {{ analysis_data.weekly_durations | tojson }},
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    });
+</script>
+{% endblock %}

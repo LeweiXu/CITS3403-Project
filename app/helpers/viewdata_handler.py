@@ -1,5 +1,24 @@
-from app.models import Entries
+from app.models import Entries, Activities
 from sqlalchemy import cast, Integer
+
+def handle_viewdata(username, request):
+    """
+    Fetch filtered entries for the given user based on query parameters.
+    """
+    # Get filter criteria from query parameters
+    filters = {
+        'start_date': request.args.get('start_date'),
+        'end_date': request.args.get('end_date'),
+        'media_name': request.args.get('media_name'),
+        'media_type': request.args.get('media_type'),
+        'min_duration': request.args.get('min_duration'),
+        'max_duration': request.args.get('max_duration')
+    }
+
+    # Get filtered entries
+    entries = get_filtered_entries(username, filters)
+
+    return entries
 
 def get_filtered_entries(username, filters):
     """
@@ -14,7 +33,7 @@ def get_filtered_entries(username, filters):
     max_duration = filters.get('max_duration')
 
     # Build the query
-    query = Entries.query.filter_by(username=username)
+    query = Entries.query.join(Activities).filter(Activities.username == username)
 
     if start_date:
         query = query.filter(Entries.date >= start_date)

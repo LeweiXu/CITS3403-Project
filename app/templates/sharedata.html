@@ -5,7 +5,9 @@
 {% block content %}
 
 <div class="text-end me-3 mt-3">
-    <button class="btn btn-success btn-sm">Add Friend</button>
+    <button class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#addFriendModal">
+        Add Friend
+    </button>
 </div>
 
 <div class="container mt-2 mb-5">
@@ -13,7 +15,7 @@
 
     <div id="moments-section">
         <div class="moment-card d-flex">
-            <img src="https://avatars.dicebear.com/api/initials/Lily.svg" class="avatar">
+            <img src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" class="avatar">
             <div>
                 <strong>Lily</strong><br>
                 <p>I watched <em>Interstellar</em> this week. Highly recommended! 🌌</p>
@@ -21,7 +23,7 @@
             </div>
         </div>
         <div class="moment-card d-flex">
-            <img src="https://avatars.dicebear.com/api/initials/Jason.svg" class="avatar">
+            <img src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" class="avatar">
             <div>
                 <strong>Jason</strong><br>
                 <p>I've kept up with 30 minutes of podcast listening every day for 2 weeks now! 💪🎧</p>
@@ -29,8 +31,9 @@
             </div>
         </div>
 
-        <!--  Button -->
-        <button class="btn btn-primary rounded-circle add-post-btn" title="Create Post">
+        <!-- Button -->
+        <button class="btn btn-primary rounded-circle add-post-btn" title="Create Post"
+            data-bs-toggle="modal" data-bs-target="#createPostModal">
             <span style="font-size: 24px; line-height: 1;">+</span>
         </button>
     </div>
@@ -39,10 +42,10 @@
         <div class="chat-container">
             <div class="chat-users">
                 <div onclick="switchChat('lily')">
-                    <img src="https://avatars.dicebear.com/api/initials/Lily.svg" class="avatar"> Lily
+                    <img src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" class="avatar"> Lily
                 </div>
                 <div onclick="switchChat('jason')">
-                    <img src="https://avatars.dicebear.com/api/initials/Jason.svg" class="avatar"> Jason
+                    <img src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" class="avatar"> Jason
                 </div>
             </div>
             <div class="chat-window d-flex flex-column">
@@ -98,4 +101,43 @@
         document.getElementById('chat-jason').style.display = (friend === 'jason') ? 'block' : 'none';
     }
 </script>
+
+<!-- Add Friend Modal -->
+<div class="modal fade" id="addFriendModal" tabindex="-1" aria-labelledby="addFriendModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addFriendModalLabel">Add New Friend</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <input type="text" class="form-control" placeholder="Enter friend's name...">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-success" disabled>Add</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Create Post Modal -->
+<div class="modal fade" id="createPostModal" tabindex="-1" aria-labelledby="createPostModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="createPostModalLabel">Create New Post</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <textarea class="form-control" rows="3" placeholder="Share what you've spend on ..."></textarea>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" disabled>Post</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 {% endblock %}

@@ -6,6 +6,7 @@ from app.helpers.dashboard_handler import *
 from app.helpers.export_csv_handler import generate_csv
 from app.helpers.viewdata_handler import handle_viewdata
 from app.helpers.activities_handler import fetch_past_activities, handle_end_activity
+from app.helpers.analysis_handler import get_analysis_data
 
 @app.route('/')
 def index():
@@ -152,3 +153,16 @@ def past_activities():
         uncompleted_activities=activities["uncompleted_activities"],
         completed_activities=activities["completed_activities"]
     )
+
+@app.route('/analysis', methods=['GET'])
+def analysis():
+    if 'username' not in session:
+        flash('Please log in to view the analysis page.', 'danger')
+        return redirect(url_for('login'))
+
+    username = session['username']
+
+    # Fetch analysis data
+    analysis_data = get_analysis_data(username)
+
+    return render_template('analysis.html', analysis_data=analysis_data)

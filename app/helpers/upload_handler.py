@@ -15,6 +15,7 @@ def handle_upload(request, app):
         with open(csv_path, 'r') as file:
             reader = csv.DictReader(file)
             headers = reader.fieldnames
+            id_offset = 0
 
             if 'id' in headers and 'status' in headers and 'start_date' in headers:
                 # Activities dataset

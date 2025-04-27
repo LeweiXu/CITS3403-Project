@@ -1,4 +1,4 @@
-"""empty message
+"""Fix where start_entry_id is nullable and add status column
 
 Revision ID: b876127cee6d
 Revises: a68b26254119

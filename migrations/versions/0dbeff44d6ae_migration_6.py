@@ -1,4 +1,4 @@
-"""empty message
+"""Added start_date and end_date columns to Activities tables
 
 Revision ID: 0dbeff44d6ae
 Revises: 670ff9806bc5

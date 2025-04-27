@@ -161,8 +161,7 @@ def analysis():
         return redirect(url_for('login'))
 
     username = session['username']
-
-    # Fetch analysis data
     analysis_data = get_analysis_data(username)
+    print(analysis_data)
 
     return render_template('analysis.html', analysis_data=analysis_data)

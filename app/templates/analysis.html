@@ -12,20 +12,20 @@
         <div class="row">
             <div class="col-md-4">
                 <h4>Total Time Spent</h4>
-                <p>Books: <span id="total-books">0</span> hours</p>
-                <p>Visual Media: <span id="total-visual-media">0</span> hours</p>
-                <p>Games: <span id="total-games">0</span> hours</p>
+                <p>Books: <span id="total-books">{{ analysis_data.statistics.total_books }} hours</span></p>
+                <p>Visual Media: <span id="total-visual-media">{{ analysis_data.statistics.total_visual_media }} hours</span></p>
+                <p>Games: <span id="total-games">{{ analysis_data.statistics.total_games }} hours</span></p>
             </div>
             <div class="col-md-4">
                 <h4>Time Spent in the Past Week</h4>
-                <p>Books: <span id="week-books">0</span> hours</p>
-                <p>Visual Media: <span id="week-visual-media">0</span> hours</p>
-                <p>Games: <span id="week-games">0</span> hours</p>
+                <p>Books: <span id="week-books">{{ analysis_data.statistics.week_books }} hours</span></p>
+                <p>Visual Media: <span id="week-visual-media">{{ analysis_data.statistics.week_visual_media }} hours</span></p>
+                <p>Games: <span id="week-games">{{ analysis_data.statistics.week_games }} hours</span></p>
             </div>
             <div class="col-md-4">
                 <h4>Longest Activity</h4>
-                <p>Media Name: <span id="longest-activity-name">N/A</span></p>
-                <p>Duration: <span id="longest-activity-duration">0</span> hours</p>
+                <p>Media Name: <span id="longest-activity-name">{{ analysis_data.statistics.longest_activity.media_name }}</span></p>
+                <p>Duration: <span id="longest-activity-duration">{{ analysis_data.statistics.longest_activity.duration }} hours</span></p>
             </div>
         </div>
     </div>
@@ -43,7 +43,29 @@
             </select>
         </div>
         <div id="ranking-view">
-            <!-- Rankings content will be dynamically inserted here -->
+            <h4>Activities Ranked by Duration</h4>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Media Name</th>
+                        <th>Type</th>
+                        <th>Duration</th>
+                        <th>Start Date</th>
+                        <th>End Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for activity in analysis_data.rankings.activities_by_duration %}
+                    <tr>
+                        <td>{{ activity.media_name }}</td>
+                        <td>{{ activity.media_type }}</td>
+                        <td>{{ activity.duration }}</td>
+                        <td>{{ activity.start_date }}</td>
+                        <td>{{ activity.end_date }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
         </div>
     </div>
 
@@ -66,7 +88,6 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', () => {
-        // Rankings Section
         const rankingSelect = document.getElementById('ranking-select');
         const rankingView = document.getElementById('ranking-view');
 
@@ -87,8 +108,16 @@
                                 <th>End Date</th>
                             </tr>
                         </thead>
-                        <tbody id="activities-duration-table">
-                            <!-- Data will be dynamically inserted here -->
+                        <tbody>
+                            {% for activity in analysis_data.rankings.activities_by_duration %}
+                            <tr>
+                                <td>{{ activity.media_name }}</td>
+                                <td>{{ activity.media_type }}</td>
+                                <td>{{ activity.duration }}</td>
+                                <td>{{ activity.start_date }}</td>
+                                <td>{{ activity.end_date }}</td>
+                            </tr>
+                            {% endfor %}
                         </tbody>
                     </table>
                 `;
@@ -103,8 +132,14 @@
                                 <th>Duration</th>
                             </tr>
                         </thead>
-                        <tbody id="entries-duration-table">
-                            <!-- Data will be dynamically inserted here -->
+                        <tbody>
+                            {% for entry in analysis_data.rankings.entries_by_duration %}
+                            <tr>
+                                <td>{{ entry.media_name }}</td>
+                                <td>{{ entry.media_type }}</td>
+                                <td>{{ entry.duration }}</td>
+                            </tr>
+                            {% endfor %}
                         </tbody>
                     </table>
                 `;
@@ -120,8 +155,15 @@
                                 <th>Duration</th>
                             </tr>
                         </thead>
-                        <tbody id="activities-start-date-table">
-                            <!-- Data will be dynamically inserted here -->
+                        <tbody>
+                            {% for activity in analysis_data.rankings.activities_by_start_date %}
+                            <tr>
+                                <td>{{ activity.media_name }}</td>
+                                <td>{{ activity.media_type }}</td>
+                                <td>{{ activity.start_date }}</td>
+                                <td>{{ activity.duration }}</td>
+                            </tr>
+                            {% endfor %}
                         </tbody>
                     </table>
                 `;
@@ -131,13 +173,17 @@
                     <table class="table">
                         <thead>
                             <tr>
-                                <th>Media Name</th>
-                                <th>Type</th>
-                                <th>Duration</th>
+                                <th>Media Type</th>
+                                <th>Total Duration</th>
                             </tr>
                         </thead>
-                        <tbody id="entries-media-type-table">
-                            <!-- Data will be dynamically inserted here -->
+                        <tbody>
+                            {% for entry in analysis_data.rankings.entries_by_media_type %}
+                            <tr>
+                                <td>{{ entry.media_type }}</td>
+                                <td>{{ entry.total_duration }}</td>
+                            </tr>
+                            {% endfor %}
                         </tbody>
                     </table>
                 `;

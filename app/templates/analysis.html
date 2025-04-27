@@ -6,59 +6,239 @@
 <div class="container mt-4">
     <h1>Analysis</h1>
 
-    <!-- Numeric Summaries -->
-    <div class="row mt-4">
-        <div class="col-md-4">
-            <h3>Total Time Spent</h3>
-            <p>{{ analysis_data.total_duration }} hours</p>
-        </div>
-        <div class="col-md-4">
-            <h3>Time Spent Reading Twilight</h3>
-            <p>{{ analysis_data.twilight_duration }} hours</p>
-        </div>
-        <div class="col-md-4">
-            <h3>Time Spent Playing Valorant</h3>
-            <p>{{ analysis_data.valorant_duration }} hours</p>
-        </div>
-        <div class="col-md-4">
-            <h3>Days to Read 1984</h3>
-            <p>{{ analysis_data.days_to_read_1984 }} days</p>
+    <!-- Overall Statistics Section -->
+    <div class="mt-4">
+        <h2>Overall Statistics</h2>
+        <div class="row">
+            <div class="col-md-4">
+                <h4>Total Time Spent</h4>
+                <p>Books: <span id="total-books">0</span> hours</p>
+                <p>Visual Media: <span id="total-visual-media">0</span> hours</p>
+                <p>Games: <span id="total-games">0</span> hours</p>
+            </div>
+            <div class="col-md-4">
+                <h4>Time Spent in the Past Week</h4>
+                <p>Books: <span id="week-books">0</span> hours</p>
+                <p>Visual Media: <span id="week-visual-media">0</span> hours</p>
+                <p>Games: <span id="week-games">0</span> hours</p>
+            </div>
+            <div class="col-md-4">
+                <h4>Longest Activity</h4>
+                <p>Media Name: <span id="longest-activity-name">N/A</span></p>
+                <p>Duration: <span id="longest-activity-duration">0</span> hours</p>
+            </div>
         </div>
     </div>
 
-    <!-- Graphs -->
-    <div class="row mt-4">
-        <div class="col-md-12">
-            <h3>Weekly Reading Time (Last 10 Weeks)</h3>
-            <canvas id="weeklyReadingChart"></canvas>
+    <!-- Rankings Section -->
+    <div class="mt-4">
+        <h2>Rankings</h2>
+        <div class="mb-3">
+            <label for="ranking-select" class="form-label">Select Ranking:</label>
+            <select id="ranking-select" class="form-select">
+                <option value="activities-duration">Activities by Duration</option>
+                <option value="entries-duration">Entries by Duration</option>
+                <option value="activities-start-date">Activities by Start Date</option>
+                <option value="entries-media-type">Entries by Media Type</option>
+            </select>
+        </div>
+        <div id="ranking-view">
+            <!-- Rankings content will be dynamically inserted here -->
+        </div>
+    </div>
+
+    <!-- Graphs Section -->
+    <div class="mt-4">
+        <h2>Graphs</h2>
+        <div class="mb-3">
+            <label for="graph-select" class="form-label">Select Graph:</label>
+            <select id="graph-select" class="form-select">
+                <option value="daily-time">Total Time Spent Daily (Past Week)</option>
+                <option value="weekly-average">Weekly Average Time (Past 10 Weeks)</option>
+                <option value="daily-category">Daily Time by Category (Past Week)</option>
+            </select>
+        </div>
+        <div id="graph-view">
+            <canvas id="graph-canvas" width="400" height="200"></canvas>
         </div>
     </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
     document.addEventListener('DOMContentLoaded', () => {
-        // Weekly Reading Chart
-        const ctx = document.getElementById('weeklyReadingChart').getContext('2d');
-        const weeklyReadingChart = new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: {{ analysis_data.weekly_labels | tojson }},
-                datasets: [{
-                    label: 'Weekly Reading Time (hours)',
-                    data: {{ analysis_data.weekly_durations | tojson }},
-                    borderColor: 'rgba(75, 192, 192, 1)',
-                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                responsive: true,
-                scales: {
-                    y: {
-                        beginAtZero: true
+        // Rankings Section
+        const rankingSelect = document.getElementById('ranking-select');
+        const rankingView = document.getElementById('ranking-view');
+
+        rankingSelect.addEventListener('change', () => {
+            const selectedRanking = rankingSelect.value;
+            rankingView.innerHTML = ''; // Clear previous content
+
+            if (selectedRanking === 'activities-duration') {
+                rankingView.innerHTML = `
+                    <h4>Activities Ranked by Duration</h4>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Media Name</th>
+                                <th>Type</th>
+                                <th>Duration</th>
+                                <th>Start Date</th>
+                                <th>End Date</th>
+                            </tr>
+                        </thead>
+                        <tbody id="activities-duration-table">
+                            <!-- Data will be dynamically inserted here -->
+                        </tbody>
+                    </table>
+                `;
+            } else if (selectedRanking === 'entries-duration') {
+                rankingView.innerHTML = `
+                    <h4>Entries Ranked by Duration</h4>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Media Name</th>
+                                <th>Type</th>
+                                <th>Duration</th>
+                            </tr>
+                        </thead>
+                        <tbody id="entries-duration-table">
+                            <!-- Data will be dynamically inserted here -->
+                        </tbody>
+                    </table>
+                `;
+            } else if (selectedRanking === 'activities-start-date') {
+                rankingView.innerHTML = `
+                    <h4>Activities Ranked by Start Date</h4>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Media Name</th>
+                                <th>Type</th>
+                                <th>Start Date</th>
+                                <th>Duration</th>
+                            </tr>
+                        </thead>
+                        <tbody id="activities-start-date-table">
+                            <!-- Data will be dynamically inserted here -->
+                        </tbody>
+                    </table>
+                `;
+            } else if (selectedRanking === 'entries-media-type') {
+                rankingView.innerHTML = `
+                    <h4>Entries Ranked by Media Type</h4>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Media Name</th>
+                                <th>Type</th>
+                                <th>Duration</th>
+                            </tr>
+                        </thead>
+                        <tbody id="entries-media-type-table">
+                            <!-- Data will be dynamically inserted here -->
+                        </tbody>
+                    </table>
+                `;
+            }
+        });
+
+        // Graphs Section
+        const graphSelect = document.getElementById('graph-select');
+        const graphCanvas = document.getElementById('graph-canvas').getContext('2d');
+        let currentChart;
+
+        graphSelect.addEventListener('change', () => {
+            const selectedGraph = graphSelect.value;
+
+            // Destroy the previous chart if it exists
+            if (currentChart) {
+                currentChart.destroy();
+            }
+
+            if (selectedGraph === 'daily-time') {
+                currentChart = new Chart(graphCanvas, {
+                    type: 'bar',
+                    data: {
+                        labels: [], // Populate dynamically
+                        datasets: [{
+                            label: 'Total Time Spent Daily (Hours)',
+                            data: [], // Populate dynamically
+                            backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                            borderColor: 'rgba(75, 192, 192, 1)',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        scales: {
+                            y: {
+                                beginAtZero: true
+                            }
+                        }
                     }
-                }
+                });
+            } else if (selectedGraph === 'weekly-average') {
+                currentChart = new Chart(graphCanvas, {
+                    type: 'line',
+                    data: {
+                        labels: [], // Populate dynamically
+                        datasets: [{
+                            label: 'Weekly Average Time (Hours)',
+                            data: [], // Populate dynamically
+                            borderColor: 'rgba(54, 162, 235, 1)',
+                            backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        scales: {
+                            y: {
+                                beginAtZero: true
+                            }
+                        }
+                    }
+                });
+            } else if (selectedGraph === 'daily-category') {
+                currentChart = new Chart(graphCanvas, {
+                    type: 'line',
+                    data: {
+                        labels: [], // Populate dynamically
+                        datasets: [
+                            {
+                                label: 'Reading',
+                                data: [], // Populate dynamically
+                                borderColor: 'rgba(255, 99, 132, 1)',
+                                backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                                borderWidth: 1
+                            },
+                            {
+                                label: 'Gaming',
+                                data: [], // Populate dynamically
+                                borderColor: 'rgba(54, 162, 235, 1)',
+                                backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                                borderWidth: 1
+                            },
+                            {
+                                label: 'Visual Media',
+                                data: [], // Populate dynamically
+                                borderColor: 'rgba(75, 192, 192, 1)',
+                                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                                borderWidth: 1
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        scales: {
+                            y: {
+                                beginAtZero: true
+                            }
+                        }
+                    }
+                });
             }
         });
     });

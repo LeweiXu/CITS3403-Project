@@ -8,6 +8,26 @@
     <div class="row justify-content-center">
         <p>The idea is that on this page you can view all the users that shared their stats with you, and we can simply pass their username as an argument to the analysis page and view their data analysis.</p>
         <!-- User 1 -->
+        <div class="container mt-3">
+            <div class="row justify-content-center">
+                <div class="col-md-6">
+                    <form method="POST" action="/search_user">
+                        <div class="input-group mb-3">
+                            <input type="text" class="form-control" placeholder="Search for a user" name="username" required>
+                            <button class="btn btn-outline-primary" type="submit">Search</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="row justify-content-center">
+                <div class="col-md-6 text-center">
+                    <form method="POST" action="/share_data">
+                        <input type="hidden" name="target_user" value="searched_user">
+                        <button class="btn btn-success" type="submit">Share My Data</button>
+                    </form>
+                </div>
+            </div>
+        </div>
         <div class="col-md-4">
             <div class="card text-center">
                 <div class="card-body">

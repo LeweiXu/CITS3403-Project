@@ -15,17 +15,14 @@ def handle_upload(request, app):
         with open(csv_path, 'r') as file:
             reader = csv.DictReader(file)
             headers = reader.fieldnames
-            id_offset = 0
-
-            if 'id' in headers and 'status' in headers and 'start_date' in headers:
-                # Activities dataset
-                latest_activity = Activities.query.order_by(Activities.id.desc()).first()
-                id_offset = latest_activity.id + 1 if latest_activity else 1
-
+            print(headers)
+            if 'id' in headers and 'status' in headers and 'start_date' in headers and 'media_type' in headers and 'media_name' in headers:
                 for row in reader:
                     new_activity = Activities(
-                        id=int(row['id']) + id_offset,
+                        id=int(row['id']),
                         username=session['username'],
+                        media_type=row['media_type'],
+                        media_name=row['media_name'],
                         status=row['status'],
                         start_date=datetime.strptime(row['start_date'], '%Y-%m-%d').date() if row['start_date'] else None,
                         end_date=datetime.strptime(row['end_date'], '%Y-%m-%d').date() if row['end_date'] else None,
@@ -34,14 +31,12 @@ def handle_upload(request, app):
                     )
                     db.session.add(new_activity)
 
-            elif 'activity_id' in headers and 'media_type' in headers and 'media_name' in headers:
+            elif 'activity_id' in headers and 'date' in headers and 'duration' in headers:
                 # Entries dataset
                 for row in reader:
                     new_entry = Entries(
                         activity_id=int(row['activity_id']),
                         date=datetime.strptime(row['date'], '%Y-%m-%d').date(),
-                        media_type=row['media_type'],
-                        media_name=row['media_name'],
                         duration=int(row['duration']),
                         comment=row['comment']
                     )

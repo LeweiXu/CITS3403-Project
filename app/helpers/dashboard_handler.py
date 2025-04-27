@@ -3,13 +3,12 @@ from app import db
 from sqlalchemy import func
 from datetime import datetime
 from flask import flash
-from app.helpers.activities_handler import handle_add_new_activity
 
 def get_user_statistics(username):
-    # Query all media entries for the current user
-    media_entries = db.session.query(Entries).join(Activities).filter(Activities.username == username).all()
+    # Query all activities for the current user
+    activities = db.session.query(Activities).filter(Activities.username == username).all()
 
-    if not media_entries:
+    if not activities:
         return {
             "total_time": 0,
             "most_consumed_media": None,
@@ -17,18 +16,25 @@ def get_user_statistics(username):
         }
 
     # Calculate total time spent (in hours)
-    total_duration = sum(int(entry.duration) for entry in media_entries)
+    total_duration = sum(
+        db.session.query(func.sum(Entries.duration)).filter(Entries.activity_id == activity.id).scalar() or 0
+        for activity in activities
+    )
     total_time = total_duration / 60  # Convert minutes to hours
 
     # Find the most consumed media type
     media_type_counts = {}
-    for entry in media_entries:
-        media_type_counts[entry.media_type] = media_type_counts.get(entry.media_type, 0) + int(entry.duration)
+    for activity in activities:
+        total_activity_duration = db.session.query(func.sum(Entries.duration)).filter(Entries.activity_id == activity.id).scalar() or 0
+        media_type_counts[activity.media_type] = media_type_counts.get(activity.media_type, 0) + total_activity_duration
 
-    most_consumed_media = max(media_type_counts, key=media_type_counts.get)
+    most_consumed_media = max(media_type_counts, key=media_type_counts.get) if media_type_counts else None
 
     # Calculate the daily average time
-    unique_dates = {entry.date for entry in media_entries}
+    unique_dates = {
+        entry.date for activity in activities
+        for entry in db.session.query(Entries).filter(Entries.activity_id == activity.id).all()
+    }
     daily_average_time = total_duration / len(unique_dates) if unique_dates else 0
 
     return {
@@ -37,55 +43,76 @@ def get_user_statistics(username):
         "daily_average_time": round(daily_average_time / 60, 2)  # Convert minutes to hours
     }
 
-def get_current_media(username):
-    # Fetch current media entries grouped by media_name and media_type
+def get_current_activities(username):
+    # Fetch current activities grouped by media_name and media_type
     return db.session.query(
-        Entries.media_name,
-        Entries.media_type,
+        Activities.media_name,
+        Activities.media_type,
+        Activities.activity_id,
         func.sum(Entries.duration).label('total_duration')
-    ).join(Activities).filter(Activities.username == username).group_by(Entries.media_name, Entries.media_type).all()
+    ).join(Entries).filter(Activities.username == username).group_by(Activities.media_name, Activities.media_type).all()
 
 def handle_dashboard_form(username, form):
     """
     Handle form submissions for the dashboard route.
     """
     if 'add_duration' in form:  # Add duration to an existing media
-        media_name = form.get('media_name')
-        media_type = form.get('media_type')
+        activity_id = form.get('activity_id')
         duration = form.get('duration')
-        if media_name and duration:
-            handle_add_duration(username, media_name, media_type, duration)
-            flash(f'Duration added to {media_name}.', 'success')
+        if activity_id and duration:
+            handle_add_duration(username, activity_id, duration)
+            flash(f'Duration added to activity ID {activity_id}.', 'success')
     elif 'add_new_entry' in form:  # Add a new media entry
         media_type = form.get('media_type')
         media_name = form.get('media_name')
-        duration = form.get('duration')
-        if media_type and media_name and duration:
-            handle_add_new_activity(username, media_type, media_name, duration)
+        if media_type and media_name:
+            # Add a new activity and its first media entry
+            new_activity = Activities(
+                username=username,
+                media_type=media_type,
+                media_name=media_name,
+                start_date=datetime.now().date(),
+                rating=None,
+                comment=None
+            )
+            db.session.add(new_activity)
+            db.session.commit()
             flash(f'New media entry "{media_name}" added.', 'success')
 
-def handle_add_duration(username, media_name, media_type, duration):
-    # Add a new entry with the given duration
-    activity = Activities.query.filter_by(username=username).join(Entries).filter(Entries.media_name == media_name).first()
+def handle_add_duration(username, activity_id, duration, comment=None):
+    """
+    Add a new media entry (duration and optional comment) to an existing activity.
+    """
+    # Fetch the activity
+    activity = Activities.query.filter_by(id=activity_id, username=username).first()
     if not activity:
+        flash(f"Activity with id {activity_id} not found or unauthorized.", "danger")
         return False
 
+    # Create a new entry
     new_entry = Entries(
         activity_id=activity.id,
-        media_name=media_name,
-        media_type=media_type,
+        date=datetime.now().date(),
         duration=duration,
-        date=datetime.now().date()
+        comment=comment
     )
     db.session.add(new_entry)
-    db.session.commit()
+
+    try:
+        db.session.commit()
+        flash(f"Duration added to activity '{activity.media_name}' successfully.", "success")
+        return True
+    except Exception as e:
+        db.session.rollback()
+        flash(f"An error occurred while adding the duration: {e}", "danger")
+        return False
 
 def get_current_activities(username):
     """
     Fetch all current activities (where status = 'in_progress') for the given user.
     """
     # Query activities with status = 'in_progress'
-    current_activities = Activities.query.filter_by(username=username, status='in_progress').all()
+    current_activities = Activities.query.filter_by(username=username, status='ongoing').all()
 
     activities = []
     for activity in current_activities:
@@ -93,16 +120,10 @@ def get_current_activities(username):
         total_duration = db.session.query(
             func.sum(Entries.duration)
         ).filter_by(activity_id=activity.id).scalar()
-
-        # Fetch the media name and type from the first entry
-        first_entry = Entries.query.filter_by(activity_id=activity.id).first()
-        if not first_entry:
-            continue
-
         # Append the activity details to the list
         activities.append({
-            "media_name": first_entry.media_name,
-            "media_type": first_entry.media_type,
+            "media_name": activity.media_name,
+            "media_type": activity.media_type,
             "total_duration": total_duration or 0,
             "activity_id": activity.id
         })

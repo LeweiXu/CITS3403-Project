@@ -97,7 +97,6 @@ def viewdata():
 
     # Delegate the logic to the handler
     entries = handle_viewdata(username, request)
-
     return render_template('viewdata.html', entries=entries)
 
 @app.route('/delete_entry/<int:entry_id>')

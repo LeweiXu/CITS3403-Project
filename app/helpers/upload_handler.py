@@ -1,49 +1,53 @@
 import os
 import csv
 from flask import session, flash, redirect, url_for
-from app.models import Entries
+from app.models import Entries, Activities
 from app import db
-from datetime import datetime  # Import datetime for date conversion
+from datetime import datetime
 
 def handle_upload(request, app):
     if 'csvFile' in request.files and request.files['csvFile'].filename != '':
-        # Handle CSV file upload
         csv_file = request.files['csvFile']
-        upload_folder = os.path.join(app.root_path, 'uploads')
-        if not os.path.exists(upload_folder):
-            os.makedirs(upload_folder)
+        csv_path = os.path.join(app.instance_path, 'uploads', csv_file.filename)
+        os.makedirs(os.path.dirname(csv_path), exist_ok=True)
+        csv_file.save(csv_path)
 
-        file_path = os.path.join(upload_folder, csv_file.filename)
-        csv_file.save(file_path)
+        with open(csv_path, 'r') as file:
+            reader = csv.DictReader(file)
+            headers = reader.fieldnames
+            print(headers)
+            if 'id' in headers and 'status' in headers and 'start_date' in headers and 'media_type' in headers and 'media_name' in headers:
+                for row in reader:
+                    new_activity = Activities(
+                        id=int(row['id']),
+                        username=session['username'],
+                        media_type=row['media_type'],
+                        media_name=row['media_name'],
+                        status=row['status'],
+                        start_date=datetime.strptime(row['start_date'], '%Y-%m-%d').date() if row['start_date'] else None,
+                        end_date=datetime.strptime(row['end_date'], '%Y-%m-%d').date() if row['end_date'] else None,
+                        rating=float(row['rating']) if row['rating'] else None,
+                        comment=row['comment']
+                    )
+                    db.session.add(new_activity)
 
-        # Parse CSV file and add entries to the database
-        with open(file_path, 'r') as file:
-            csv_reader = csv.DictReader(file)
-            for row in csv_reader:
-                username = session.get('username')
-                if not username:
-                    flash('Please log in to upload media entries.', 'danger')
-                    return redirect(url_for('login'))
+            elif 'activity_id' in headers and 'date' in headers and 'duration' in headers:
+                # Entries dataset
+                for row in reader:
+                    new_entry = Entries(
+                        activity_id=int(row['activity_id']),
+                        date=datetime.strptime(row['date'], '%Y-%m-%d').date(),
+                        duration=int(row['duration']),
+                        comment=row['comment']
+                    )
+                    db.session.add(new_entry)
 
-                # Convert date string to Python date object
-                try:
-                    date = datetime.strptime(row['date'], '%Y-%m-%d').date()
-                except ValueError:
-                    flash(f"Invalid date format in row: {row}", 'danger')
-                    return redirect(url_for('upload'))
+            else:
+                flash('Invalid CSV format.', 'danger')
+                return redirect(url_for('upload'))
 
-                # Create a new Entries object
-                new_entry = Entries(
-                    username=username,
-                    date=date,  # Use the converted date object
-                    media_type=row['media_type'],
-                    media_name=row['media_name'],
-                    duration=row['duration']
-                )
-                db.session.add(new_entry)
-            db.session.commit()
-
-        flash('CSV file uploaded and processed successfully!', 'success')
+        db.session.commit()
+        flash('CSV data uploaded successfully!', 'success')
         return redirect(url_for('viewdata'))
 
     elif 'mediaType' in request.form:

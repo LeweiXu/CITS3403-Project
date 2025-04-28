@@ -1,4 +1,4 @@
-"""empty message
+"""Remove start_entry_id and end_entry_id columns from Activities table (redundant columns)
 
 Revision ID: 670ff9806bc5
 Revises: 7fd7fc347bc5

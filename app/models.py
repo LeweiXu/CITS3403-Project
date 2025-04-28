@@ -7,7 +7,7 @@ class Users(db.Model):
     email = db.Column(db.String(120), unique=True, nullable=False)
     password = db.Column(db.String(128), nullable=False)
 
-    media_entries = db.relationship('Activities', backref='user', lazy=True)
+    media_entries = db.relationship('Activities', backref='user')
 
 # Activities table, each Activity is associated with a user (Users.username)
 # Each activity has a start and end entry, rating and comment
@@ -16,12 +16,15 @@ class Activities(db.Model):
     __tablename__ = 'Activities'
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(80), db.ForeignKey('Users.username'), nullable=False)
-    status = db.Column(db.String(20), nullable=False, default='in_progress')
+    media_type = db.Column(db.String(50), nullable=False)
+    media_name = db.Column(db.String(120), nullable=False)
+    status = db.Column(db.String(20), nullable=False, default='ongoing')
     start_date = db.Column(db.Date, nullable=True)
     end_date = db.Column(db.Date, nullable=True)
     rating = db.Column(db.Float, nullable=True)
     comment = db.Column(db.Text, nullable=True)
-    media_entries = db.relationship('Entries', backref='activity', lazy=True)
+
+    media_entries = db.relationship('Entries', backref='activity')
 
 # Media entries table, stores all media entries
 # Each entry is associated an Activity (Activities.id)
@@ -31,7 +34,14 @@ class Entries(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     activity_id = db.Column(db.Integer, db.ForeignKey('Activities.id'), nullable=True)
     date = db.Column(db.Date, nullable=False)
-    media_type = db.Column(db.String(50), nullable=False)
-    media_name = db.Column(db.String(120), nullable=False)
     duration = db.Column(db.Integer, nullable=False)
     comment = db.Column(db.Text, nullable=True)
+
+class SharedUsers(db.Model):
+    __tablename__ = 'SharedUsers'
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(80), db.ForeignKey('Users.username'), nullable=False)
+    shared_username = db.Column(db.String(80), db.ForeignKey('Users.username'), nullable=False)
+
+    user = db.relationship('Users', foreign_keys=[username], backref='shared_by')
+    shared_user = db.relationship('Users', foreign_keys=[shared_username], backref='shared_with')

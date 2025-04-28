@@ -30,6 +30,7 @@ def fetch_past_activities(username, request):
 def get_uncompleted_activities(username, filters):
     """
     Fetch uncompleted activities (status = 'in_progress') for the given user.
+    Include activities even if there are no corresponding entries.
     """
     # Query uncompleted activities
     query = Activities.query.filter(
@@ -40,26 +41,29 @@ def get_uncompleted_activities(username, filters):
     # Apply filters
     query = apply_activity_filters(query, filters)
 
-    # Fetch required attributes
-    return query.with_entities(
+    # Fetch required attributes, using outer join to include activities without entries
+    return db.session.query(
         Activities.id.label('activity_id'),
-        Entries.media_type,
-        Entries.media_name,
-        func.sum(Entries.duration).label('total_duration'),
-        func.min(Entries.date).label('start_date')  # Get the earliest date for the activity
-    ).join(Entries, Activities.id == Entries.activity_id).group_by(
-        Activities.id, Entries.media_type, Entries.media_name
+        Activities.media_type,
+        Activities.media_name,
+        func.coalesce(func.sum(Entries.duration), 0).label('total_duration'),
+        func.min(Entries.date).label('start_date')
+    ).outerjoin(Entries, Activities.id == Entries.activity_id).filter(
+        Activities.username == username,
+        Activities.status == 'ongoing'
+    ).group_by(
+        Activities.id, Activities.media_type, Activities.media_name
     ).order_by(Activities.id.desc()).all()
 
 
 def get_completed_activities(username, filters):
     """
-    Fetch completed activities (status != 'in_progress') for the given user.
+    Fetch completed activities (status != 'ongoing') for the given user.
     """
     # Query completed activities
     query = Activities.query.filter(
         Activities.username == username,
-        Activities.status != 'in_progress'  # Completed activities
+        Activities.status != 'ongoing'  # Completed activities
     )
 
     # Apply filters
@@ -68,14 +72,14 @@ def get_completed_activities(username, filters):
     # Fetch required attributes
     return query.with_entities(
         Activities.id.label('activity_id'),
-        Entries.media_type,
-        Entries.media_name,
+        Activities.media_type,
+        Activities.media_name,
         func.sum(Entries.duration).label('total_duration'),
         func.min(Entries.date).label('start_date'),  # Get the earliest date for the activity
         func.max(Entries.date).label('end_date'),  # Get the latest date for the activity
         Activities.rating
     ).join(Entries, Activities.id == Entries.activity_id).group_by(
-        Activities.id, Entries.media_type, Entries.media_name, Activities.rating
+        Activities.id, Activities.media_type, Activities.media_name, Activities.rating
     ).order_by(Activities.id.desc()).all()
 
 def apply_activity_filters(query, filters):
@@ -85,9 +89,9 @@ def apply_activity_filters(query, filters):
     if filters.get('end_date'):
         query = query.filter(Entries.date <= filters['end_date'])
     if filters.get('media_name'):
-        query = query.filter(Entries.media_name.ilike(f"%{filters['media_name']}%"))
+        query = query.filter(Activities.media_name.ilike(f"%{filters['media_name']}%"))
     if filters.get('media_type'):
-        query = query.filter(Entries.media_type.ilike(f"%{filters['media_type']}%"))
+        query = query.filter(Activities.media_type.ilike(f"%{filters['media_type']}%"))
     if filters.get('min_duration'):
         query = query.filter(Entries.duration >= int(filters['min_duration']))
     if filters.get('max_duration'):
@@ -124,28 +128,3 @@ def handle_end_activity(activity_id, username, rating=None, comment=None):
         db.session.rollback()
         flash(f"An error occurred while completing the activity: {e}", "danger")
         return False
-    
-def handle_add_new_activity(username, media_type, media_name, duration):
-    # Add a new activity and its first media entry
-    new_activity = Activities(
-        username=username,
-        start_date=datetime.now().date(),
-        rating=None,
-        comment=None
-    )
-    db.session.add(new_activity)
-    db.session.commit()
-
-    new_entry = Entries(
-        activity_id=new_activity.id,
-        media_type=media_type,
-        media_name=media_name,
-        duration=duration,
-        date=datetime.now().date()
-    )
-    db.session.add(new_entry)
-    db.session.commit()
-
-    # Update the activity's start_entry_id to the new entry's id
-    new_activity.start_entry_id = new_entry.id
-    db.session.commit()

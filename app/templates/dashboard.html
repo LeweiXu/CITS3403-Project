@@ -63,8 +63,7 @@
                     <td>{{ activity.total_duration }}</td>
                     <td>
                         <form action="{{ url_for('dashboard') }}" method="POST" class="d-inline">
-                            <input type="hidden" name="media_name" value="{{ activity.media_name }}">
-                            <input type="hidden" name="media_type" value="{{ activity.media_type }}">
+                            <input type="hidden" name="activity_id" value="{{ activity.activity_id }}">
                             <input type="number" name="duration" class="form-control d-inline w-50" placeholder="Minutes" required>
                             <button type="submit" name="add_duration" class="btn btn-success btn-sm">Add</button>
                         </form>
@@ -108,24 +107,38 @@
         </div>
     </div>
 
-    <!-- Add New Media Entry Section -->
+    <!-- Add New Activity Modal -->
+    <div class="modal" id="addActivityModal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form action="{{ url_for('dashboard') }}" method="POST">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Add New Activity</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="media_type" class="form-label">Media Type</label>
+                            <input type="text" id="media_type" name="media_type" class="form-control" placeholder="e.g., Movie, Book" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="media_name" class="form-label">Media Name</label>
+                            <input type="text" id="media_name" name="media_name" class="form-control" placeholder="e.g., Inception, 1984" required>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" name="add_new_entry" class="btn btn-primary">Add Activity</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Trigger Button for Add New Activity Modal -->
     <section class="add-new-entry mt-5">
         <h2 class="section-title">Add New</h2>
-        <form action="{{ url_for('dashboard') }}" method="POST">
-            <div class="mb-3">
-                <label for="media_type" class="form-label">Media Type</label>
-                <input type="text" id="media_type" name="media_type" class="form-control" placeholder="e.g., Movie, Book" required>
-            </div>
-            <div class="mb-3">
-                <label for="media_name" class="form-label">Media Name</label>
-                <input type="text" id="media_name" name="media_name" class="form-control" placeholder="e.g., Inception, 1984" required>
-            </div>
-            <div class="mb-3">
-                <label for="duration" class="form-label">Duration (minutes)</label>
-                <input type="number" id="duration" name="duration" class="form-control" placeholder="e.g., 120" required>
-            </div>
-            <button type="submit" name="add_new_entry" class="btn btn-primary">Add New Activity</button>
-        </form>
+        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addActivityModal">Add New Activity</button>
     </section>
 </div>
 

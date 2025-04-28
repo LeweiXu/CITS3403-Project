@@ -1,4 +1,4 @@
-"""empty message
+"""Add comment column to Entries table
 
 Revision ID: 7fd7fc347bc5
 Revises: b876127cee6d

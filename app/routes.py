@@ -97,7 +97,6 @@ def viewdata():
 
     # Delegate the logic to the handler
     entries = handle_viewdata(username, request)
-
     return render_template('viewdata.html', entries=entries)
 
 @app.route('/delete_entry/<int:entry_id>')
@@ -161,8 +160,5 @@ def analysis():
         return redirect(url_for('login'))
 
     username = session['username']
-
-    # Fetch analysis data
     analysis_data = get_analysis_data(username)
-
     return render_template('analysis.html', analysis_data=analysis_data)

@@ -18,13 +18,16 @@
                 <h1>MediaTracker</h1>
                 <nav role="navigation" aria-label="Main navigation">
                     <ul>
-                        <li><a href="/">Home</a></li>
+
                         {% if session.get('username') %}
                             <li><a href="/dashboard">Dashboard</a></li>
-                            <li><a href="/viewdata">History</a></li>
+                            <li><a href="/analysis">Analysis</a></li>
                             <li><a href="/past_activities">Activities</a></li>
+                            <li><a href="/viewdata">History</a></li>
+                            <li><a href="/sharedata">Share</a></li>
                             <li><a href="/logout">Logout</a></li>
                         {% else %}
+                            <li><a href="/">Home</a></li>
                             <li><a href="/login">Login</a></li>
                         {% endif %}
                     </ul>

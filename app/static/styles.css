@@ -385,7 +385,7 @@ margin-top: 0.5rem;
 }
 
 /* Registration link styling */
-.login-section a {
+.modal-footer a {
     color: var(--primary-color);
     font-weight: 500;
     text-decoration: none;

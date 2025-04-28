@@ -9,6 +9,7 @@ from app.helpers.activities_handler import fetch_past_activities, handle_end_act
 from app.helpers.analysis_handler import get_analysis_data
 
 @app.route('/')
+@app.route('/index')
 def index():
     return render_template('index.html')
 
@@ -123,7 +124,7 @@ def sharedata():
 def logout():
     session.clear()  # Clear all session data
     flash('You have been logged out successfully.', 'success')
-    return redirect(url_for('login'))  # Redirect to the login page
+    return redirect(url_for('index'))  # Redirect to the home page
 
 @app.route('/export_csv', methods=['GET'])
 def export_csv():

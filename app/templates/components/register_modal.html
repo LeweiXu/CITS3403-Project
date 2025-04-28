@@ -1,0 +1,56 @@
+ <!-- Register Modal -->
+ <div class="modal fade" id="registerModal" tabindex="-1" aria-labelledby="registerModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="registerModalLabel">Register</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="registerForm" method="POST" action="/register">
+                        <div class="mb-3">
+                            <label for="reg-username" class="form-label">Username</label>
+                            <input type="text" class="form-control" id="reg-username" name="username" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="reg-email" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="reg-email" name="email" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="reg-password" class="form-label">Password</label>
+                            <input type="password" class="form-control" id="reg-password" name="password" required>
+                        </div>
+                        <div class="modal-footer d-flex flex-column align-items-center">
+                            <button type="submit" class="btn btn-primary">Register</button>
+                            <p class="text-center mt-3">
+                                Already have an account? <a href="#" data-bs-toggle="modal" data-bs-target="#loginModal" data-bs-dismiss="modal">Login</a>
+                            </p>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.getElementById('registerForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const formData = new FormData(e.target);
+        const response = await fetch('/register', {
+            method: 'POST',
+            body: formData
+        });
+
+        if (response.redirected) {
+            window.location.href = response.url;
+        } else {
+            const result = await response.text();
+            if (result.includes('error')) {
+                alert('Registration failed. Please try again.');
+            }
+        }
+    });
+</script>

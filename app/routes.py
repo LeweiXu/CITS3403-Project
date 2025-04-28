@@ -7,6 +7,7 @@ from app.helpers.export_csv_handler import generate_csv
 from app.helpers.viewdata_handler import handle_viewdata
 from app.helpers.activities_handler import fetch_past_activities, handle_end_activity
 from app.helpers.analysis_handler import get_analysis_data
+from app.helpers.sharedata_handler import share_data_handler
 
 @app.route('/')
 def index():
@@ -123,29 +124,7 @@ def sharedata():
 
     username = session['username']
 
-    if request.method == 'POST':
-        # Handle sharing data with another user
-        target_user = request.form.get('target_user')
-        if target_user:
-            # Check if the target user exists in the Users table
-            user_exists = Users.query.filter_by(username=target_user).first()
-            if user_exists:
-                # Check if the sharing entry already exists
-                existing_entry = SharedUsers.query.filter_by(username=username, shared_username=target_user).first()
-                if not existing_entry:
-                    # Add the tuple (username, target_user) to the SharedUsers table
-                    new_shared_user = SharedUsers(username=username, shared_username=target_user)
-                    db.session.add(new_shared_user)
-                    db.session.commit()
-                    flash(f'Data shared with {target_user} successfully.', 'success')
-                else:
-                    flash(f'You have already shared your data with {target_user}.', 'info')
-            else:
-                flash(f'User {target_user} does not exist.', 'danger')
-
-    # Fetch users who shared their data with the current user
-    shared_with_me = SharedUsers.query.filter_by(shared_username=username).all()
-    shared_with = SharedUsers.query.filter_by(username=username).all()
+    shared_with_me, shared_with = share_data_handler(username, request)
 
     return render_template('sharedata.html', shared_with_me=shared_with_me, shared_with=shared_with)
 

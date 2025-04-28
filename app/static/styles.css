@@ -372,6 +372,7 @@ margin-top: 0.5rem;
     border: 1px solid #dee2e6;
     transition: all 0.3s ease;
     font-size: 1rem;
+    background-color: #edf0f19c;
 }
 
 .form-control:focus {

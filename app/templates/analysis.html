@@ -4,34 +4,38 @@
 
 {% block content %}
 <div class="container mt-4">
-    <h1>Analysis</h1>
-
-    <!-- Overall Statistics Section -->
-    <div class="mt-4">
-        <h2>Overall Statistics</h2>
-        <div class="row">
-            <div class="col-md-4">
-                <h4>Total Time Spent</h4>
-                <p>Books: <span id="total-books">{{ analysis_data.statistics.total_books }} hours</span></p>
-                <p>Visual Media: <span id="total-visual-media">{{ analysis_data.statistics.total_visual_media }} hours</span></p>
-                <p>Games: <span id="total-games">{{ analysis_data.statistics.total_games }} hours</span></p>
+    <!-- Analysis Section -->
+    <section id="analysis-section" class="wow fadeInUp" data-wow-delay=".1s">
+        <h1 class="text-center">Analysis</h1>
+        <div class="mt-4 row">
+            <div class="col-md-4 wow fadeInUp" data-wow-delay=".2s">
+                <div class="card a0 dark:a1 a2d p-3 shadow">
+                    <h4>Total Time Spent</h4>
+                    <p>Books: <span id="total-books">{{ analysis_data.statistics.total_books }} hours</span></p>
+                    <p>Visual Media: <span id="total-visual-media">{{ analysis_data.statistics.total_visual_media }} hours</span></p>
+                    <p>Games: <span id="total-games">{{ analysis_data.statistics.total_games }} hours</span></p>
+                </div>
             </div>
-            <div class="col-md-4">
-                <h4>Time Spent in the Past Week</h4>
-                <p>Books: <span id="week-books">{{ analysis_data.statistics.week_books }} hours</span></p>
-                <p>Visual Media: <span id="week-visual-media">{{ analysis_data.statistics.week_visual_media }} hours</span></p>
-                <p>Games: <span id="week-games">{{ analysis_data.statistics.week_games }} hours</span></p>
+            <div class="col-md-4 wow fadeInUp" data-wow-delay=".3s">
+                <div class="card a0 dark:a1 a2d p-3 shadow">
+                    <h4>Time Spent in the Past Week</h4>
+                    <p>Books: <span id="week-books">{{ analysis_data.statistics.week_books }} hours</span></p>
+                    <p>Visual Media: <span id="week-visual-media">{{ analysis_data.statistics.week_visual_media }} hours</span></p>
+                    <p>Games: <span id="week-games">{{ analysis_data.statistics.week_games }} hours</span></p>
+                </div>
             </div>
-            <div class="col-md-4">
-                <h4>Longest Activity</h4>
-                <p>Media Name: <span id="longest-activity-name">{{ analysis_data.statistics.longest_activity.media_name }}</span></p>
-                <p>Duration: <span id="longest-activity-duration">{{ analysis_data.statistics.longest_activity.duration }} hours</span></p>
+            <div class="col-md-4 wow fadeInUp" data-wow-delay=".4s">
+                <div class="card a0 dark:a1 a2d p-3 shadow">
+                    <h4>Longest Activity</h4>
+                    <p>Media Name: <span id="longest-activity-name">{{ analysis_data.statistics.longest_activity.media_name }}</span></p>
+                    <p>Duration: <span id="longest-activity-duration">{{ analysis_data.statistics.longest_activity.duration }} hours</span></p>
+                </div>
             </div>
         </div>
-    </div>
+    </section>
 
     <!-- Rankings Section -->
-    <div class="mt-4">
+    <section id="rankings-section" class="mt-5 wow fadeInUp" data-wow-delay=".5s">
         <h2>Rankings</h2>
         <div class="mb-3">
             <label for="ranking-select" class="form-label">Select Ranking:</label>
@@ -42,7 +46,7 @@
                 <option value="entries-media-type">Entries by Media Type</option>
             </select>
         </div>
-        <div id="ranking-view">
+        <div id="ranking-view" class="card a0 dark:a1 a2d p-3 shadow">
             <h4>Activities Ranked by Duration</h4>
             <table class="table">
                 <thead>
@@ -67,10 +71,10 @@
                 </tbody>
             </table>
         </div>
-    </div>
+    </section>
 
     <!-- Graphs Section -->
-    <div class="mt-4">
+    <section id="graphs-section" class="mt-5 wow fadeInUp" data-wow-delay=".6s">
         <h2>Graphs</h2>
         <div class="mb-3">
             <label for="graph-select" class="form-label">Select Graph:</label>
@@ -80,213 +84,17 @@
                 <option value="daily-category">Daily Time by Category (Past Week)</option>
             </select>
         </div>
-        <div id="graph-view">
+        <div id="graph-view" class="card a0 dark:a1 a2d p-3 shadow">
             <canvas id="graph-canvas" width="400" height="200"></canvas>
         </div>
-    </div>
+    </section>
 </div>
 
+<link rel="stylesheet" href="{{ url_for('static', filename='css/animate.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/analysis.css') }}">
+<script src="{{ url_for('static', filename='js/wow.min.js') }}"></script>
 <script>
-    document.addEventListener('DOMContentLoaded', () => {
-        const rankingSelect = document.getElementById('ranking-select');
-        const rankingView = document.getElementById('ranking-view');
-
-        rankingSelect.addEventListener('change', () => {
-            const selectedRanking = rankingSelect.value;
-            rankingView.innerHTML = ''; // Clear previous content
-
-            if (selectedRanking === 'activities-duration') {
-                rankingView.innerHTML = `
-                    <h4>Activities Ranked by Duration</h4>
-                    <table class="table">
-                        <thead>
-                            <tr>
-                                <th>Media Name</th>
-                                <th>Type</th>
-                                <th>Duration</th>
-                                <th>Start Date</th>
-                                <th>End Date</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for activity in analysis_data.rankings.activities_by_duration %}
-                            <tr>
-                                <td>{{ activity.media_name }}</td>
-                                <td>{{ activity.media_type }}</td>
-                                <td>{{ activity.total_duration }}</td>
-                                <td>{{ activity.start_date }}</td>
-                                <td>{{ activity.end_date }}</td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                `;
-            } else if (selectedRanking === 'entries-duration') {
-                rankingView.innerHTML = `
-                    <h4>Entries Ranked by Duration</h4>
-                    <table class="table">
-                        <thead>
-                            <tr>
-                                <th>Media Name</th>
-                                <th>Type</th>
-                                <th>Duration</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for entry in analysis_data.rankings.entries_by_duration %}
-                            <tr>
-                                <td>{{ entry.media_name }}</td>
-                                <td>{{ entry.media_type }}</td>
-                                <td>{{ entry.duration }}</td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                `;
-            } else if (selectedRanking === 'activities-start-date') {
-                rankingView.innerHTML = `
-                    <h4>Activities Ranked by Start Date</h4>
-                    <table class="table">
-                        <thead>
-                            <tr>
-                                <th>Media Name</th>
-                                <th>Type</th>
-                                <th>Start Date</th>
-                                <th>Duration</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for activity in analysis_data.rankings.activities_by_start_date %}
-                            <tr>
-                                <td>{{ activity.media_name }}</td>
-                                <td>{{ activity.media_type }}</td>
-                                <td>{{ activity.start_date }}</td>
-                                <td>{{ activity.total_duration }}</td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                `;
-            } else if (selectedRanking === 'entries-media-type') {
-                rankingView.innerHTML = `
-                    <h4>Entries Ranked by Media Type</h4>
-                    <table class="table">
-                        <thead>
-                            <tr>
-                                <th>Media Type</th>
-                                <th>Total Duration</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for entry in analysis_data.rankings.entries_by_media_type %}
-                            <tr>
-                                <td>{{ entry.media_type }}</td>
-                                <td>{{ entry.total_duration }}</td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                `;
-            }
-        });
-
-        // Graphs Section
-        const graphSelect = document.getElementById('graph-select');
-        const graphCanvas = document.getElementById('graph-canvas').getContext('2d');
-        let currentChart;
-
-        graphSelect.addEventListener('change', () => {
-            const selectedGraph = graphSelect.value;
-
-            // Destroy the previous chart if it exists
-            if (currentChart) {
-                currentChart.destroy();
-            }
-
-            if (selectedGraph === 'daily-time') {
-                currentChart = new Chart(graphCanvas, {
-                    type: 'bar',
-                    data: {
-                        labels: [], // Populate dynamically
-                        datasets: [{
-                            label: 'Total Time Spent Daily (Hours)',
-                            data: [], // Populate dynamically
-                            backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                            borderColor: 'rgba(75, 192, 192, 1)',
-                            borderWidth: 1
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        scales: {
-                            y: {
-                                beginAtZero: true
-                            }
-                        }
-                    }
-                });
-            } else if (selectedGraph === 'weekly-average') {
-                currentChart = new Chart(graphCanvas, {
-                    type: 'line',
-                    data: {
-                        labels: [], // Populate dynamically
-                        datasets: [{
-                            label: 'Weekly Average Time (Hours)',
-                            data: [], // Populate dynamically
-                            borderColor: 'rgba(54, 162, 235, 1)',
-                            backgroundColor: 'rgba(54, 162, 235, 0.2)',
-                            borderWidth: 1
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        scales: {
-                            y: {
-                                beginAtZero: true
-                            }
-                        }
-                    }
-                });
-            } else if (selectedGraph === 'daily-category') {
-                currentChart = new Chart(graphCanvas, {
-                    type: 'line',
-                    data: {
-                        labels: [], // Populate dynamically
-                        datasets: [
-                            {
-                                label: 'Reading',
-                                data: [], // Populate dynamically
-                                borderColor: 'rgba(255, 99, 132, 1)',
-                                backgroundColor: 'rgba(255, 99, 132, 0.2)',
-                                borderWidth: 1
-                            },
-                            {
-                                label: 'Gaming',
-                                data: [], // Populate dynamically
-                                borderColor: 'rgba(54, 162, 235, 1)',
-                                backgroundColor: 'rgba(54, 162, 235, 0.2)',
-                                borderWidth: 1
-                            },
-                            {
-                                label: 'Visual Media',
-                                data: [], // Populate dynamically
-                                borderColor: 'rgba(75, 192, 192, 1)',
-                                backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                                borderWidth: 1
-                            }
-                        ]
-                    },
-                    options: {
-                        responsive: true,
-                        scales: {
-                            y: {
-                                beginAtZero: true
-                            }
-                        }
-                    }
-                });
-            }
-        });
-    });
+    // Initialize WOW.js
+    new WOW().init();
 </script>
 {% endblock %}

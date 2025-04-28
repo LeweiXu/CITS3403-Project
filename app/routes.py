@@ -201,14 +201,30 @@ def past_activities():
         total_pages=total_pages,
         request_args=args
     )
-@app.route('/analysis', methods=['GET'])
-def analysis():
-    if 'username' not in session:
-        flash('Please log in to view the analysis page.', 'danger')
-        return redirect(url_for('login'))
 
-    username = session['username']
-    analysis_data = get_analysis_data(username)
+@app.route('/analysis')
+def analysis():
+    analysis_data = {
+        "statistics": {
+
+            "total_visual_media": 80,
+            "total_games": 50,
+            "week_books": 10,
+            "week_visual_media": 8,
+            "week_games": 5,
+            "longest_activity": {
+                "media_name": "The Witcher 3",
+                "duration": 40
+            }
+        },
+        "rankings": {
+            "activities_by_duration": [
+                {"media_name": "The Witcher 3", "media_type": "Game", "total_duration": 40, "start_date": "2023-01-01", "end_date": "2023-01-10"},
+                {"media_name": "Breaking Bad", "media_type": "TV Show", "total_duration": 30, "start_date": "2023-01-11", "end_date": "2023-01-20"},
+                {"media_name": "Harry Potter", "media_type": "Book", "total_duration": 25, "start_date": "2023-01-21", "end_date": "2023-01-30"}
+            ]
+        }
+    }
     return render_template('analysis.html', analysis_data=analysis_data)
 
 @app.route('/view_shared_data/<data_type>', methods=['GET','POST'])

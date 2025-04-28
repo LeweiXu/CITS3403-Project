@@ -1,12 +1,13 @@
 from flask import render_template, request, redirect, url_for, flash, session, Response
 from app import app, db
-from app.models import Entries
+from app.models import Entries, SharedUsers, Users
 from app.helpers.upload_handler import handle_upload
 from app.helpers.dashboard_handler import *
 from app.helpers.export_csv_handler import generate_csv
 from app.helpers.viewdata_handler import handle_viewdata
 from app.helpers.activities_handler import fetch_past_activities, handle_end_activity
 from app.helpers.analysis_handler import get_analysis_data
+from app.helpers.sharedata_handler import share_data_handler
 
 @app.route('/')
 def index():
@@ -115,9 +116,17 @@ def delete_entry(entry_id):
         flash('Entry not found.', 'danger')
     return redirect(url_for('viewdata'))
 
-@app.route('/sharedata')
+@app.route('/sharedata', methods=['GET', 'POST'])
 def sharedata():
-    return render_template('sharedata.html')
+    if 'username' not in session:
+        flash('Please log in to access this page.', 'danger')
+        return redirect(url_for('login'))
+
+    username = session['username']
+
+    shared_with_me, shared_with = share_data_handler(username, request)
+
+    return render_template('sharedata.html', shared_with_me=shared_with_me, shared_with=shared_with)
 
 @app.route('/logout')
 def logout():
@@ -162,3 +171,35 @@ def analysis():
     username = session['username']
     analysis_data = get_analysis_data(username)
     return render_template('analysis.html', analysis_data=analysis_data)
+
+@app.route('/view_shared_data/<data_type>', methods=['POST'])
+def view_shared_data(data_type):
+    if 'username' not in session:
+        flash('Please log in to access this page.', 'danger')
+        return redirect(url_for('login'))
+
+    username = session['username']
+    target_user = request.form.get('target_user')
+
+    # Check if the target_user has shared their data with the current user
+    shared_entry = SharedUsers.query.filter_by(username=target_user, shared_username=username).first()
+    if not shared_entry:
+        flash('You do not have permission to view this user’s data.', 'danger')
+        return redirect(url_for('sharedata'))
+
+    if data_type == 'analysis':
+        analysis_data = get_analysis_data(target_user)
+        return render_template('analysis.html', analysis_data=analysis_data)
+    elif data_type == 'activities':
+        activities = fetch_past_activities(target_user, request)
+        return render_template(
+            'past_activities.html',
+            uncompleted_activities=activities["uncompleted_activities"],
+            completed_activities=activities["completed_activities"]
+        )
+    elif data_type == 'history':
+        entries = handle_viewdata(target_user, request)
+        return render_template('viewdata.html', entries=entries)
+    else:
+        flash('Invalid data type requested.', 'danger')
+        return redirect(url_for('sharedata'))

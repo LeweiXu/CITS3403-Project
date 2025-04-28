@@ -2,7 +2,7 @@ from app.models import Entries, Activities
 from app import db
 from flask import flash
 from datetime import datetime
-from sqlalchemy.sql import func
+from sqlalchemy import func, cast, Integer
 
 def fetch_past_activities(username, request):
     """
@@ -33,27 +33,27 @@ def get_uncompleted_activities(username, filters):
     Include activities even if there are no corresponding entries.
     """
     # Query uncompleted activities
-    query = Activities.query.filter(
-        Activities.username == username,
-        Activities.status == 'in_progress'  # Uncompleted activities
-    )
-
-    # Apply filters
-    query = apply_activity_filters(query, filters)
-
-    # Fetch required attributes, using outer join to include activities without entries
-    return db.session.query(
+    query = (db.session.query(
         Activities.id.label('activity_id'),
         Activities.media_type,
         Activities.media_name,
-        func.coalesce(func.sum(Entries.duration), 0).label('total_duration'),
-        func.min(Entries.date).label('start_date')
+        func.coalesce(func.sum(cast(Entries.duration, Integer)),0).label('total_duration'),
+        func.min(Entries.date).label('start_date')  # Get the earliest date for the activity
     ).outerjoin(Entries, Activities.id == Entries.activity_id).filter(
         Activities.username == username,
-        Activities.status == 'ongoing'
+        Activities.status == 'in_progress'  # Uncompleted activities
     ).group_by(
         Activities.id, Activities.media_type, Activities.media_name
-    ).order_by(Activities.id.desc()).all()
+    )
+    )
+    if filters.get('min_duration'):
+        min_d=int(filters['min_duration'])
+        query = query.having(func.sum(cast(Entries.duration, Integer)) >= min_d)
+    if filters.get('max_duration'): 
+        max_d=int(filters['max_duration'])
+        query = query.having(func.sum(cast(Entries.duration, Integer)) <= max_d)
+    return query.order_by(Activities.id.desc()).all()
+    
 
 
 def get_completed_activities(username, filters):
@@ -61,26 +61,28 @@ def get_completed_activities(username, filters):
     Fetch completed activities (status != 'ongoing') for the given user.
     """
     # Query completed activities
-    query = Activities.query.filter(
-        Activities.username == username,
-        Activities.status != 'ongoing'  # Completed activities
-    )
-
-    # Apply filters
-    query = apply_activity_filters(query, filters)
-
-    # Fetch required attributes
-    return query.with_entities(
+    query = (db.session.query(
         Activities.id.label('activity_id'),
         Activities.media_type,
         Activities.media_name,
-        func.sum(Entries.duration).label('total_duration'),
+        func.sum(cast(Entries.duration, Integer)).label('total_duration'),
         func.min(Entries.date).label('start_date'),  # Get the earliest date for the activity
         func.max(Entries.date).label('end_date'),  # Get the latest date for the activity
         Activities.rating
-    ).join(Entries, Activities.id == Entries.activity_id).group_by(
-        Activities.id, Activities.media_type, Activities.media_name, Activities.rating
-    ).order_by(Activities.id.desc()).all()
+    ).join(Activities, Activities.id == Entries.activity_id).filter(
+        Activities.username == username,
+        Activities.status != 'ongoing'  # Completed activities
+    ).group_by(
+        Activities.id, Activities.media_type, Activities.media_name, Activities.end_date, Activities.rating, Activities.comment
+    )
+    )
+    if filters.get('min_duration'):
+        min_d=int(filters['min_duration'])
+        query = query.having(func.sum(cast(Entries.duration, Integer)) >= min_d)
+    if filters.get('max_duration'):
+        max_d=int(filters['max_duration'])
+        query = query.having(func.sum(cast(Entries.duration, Integer)) <= max_d)
+    return query.order_by(Activities.id.desc()).all()
 
 def apply_activity_filters(query, filters):
     # Apply filters to the query

@@ -95,10 +95,29 @@ def viewdata():
         return redirect(url_for('login'))
 
     username = session['username']
+    # Fetch all entries for the logged-in user
+    all_entries = handle_viewdata(username, request)
+    ## 2) pagination parameters
+    PER_PAGE    = 20
+    page        = request.args.get('page', 1, type=int)
+    total       = len(all_entries)
+    total_pages = (total + PER_PAGE - 1) // PER_PAGE
+    start_idx   = (page - 1) * PER_PAGE
+    # 3) slice out just this page
+    entries = all_entries[start_idx : start_idx + PER_PAGE]
+    # Build a copy of request.args **without** the 'page' key
+    args = request.args.to_dict()
+    args.pop('page', None)
 
-    # Delegate the logic to the handler
-    entries = handle_viewdata(username, request)
-    return render_template('viewdata.html', entries=entries)
+
+
+    return render_template(
+        'viewdata.html',
+        entries=entries,
+        page=page,
+        total_pages=total_pages,
+        request_args=args
+    )
 
 @app.route('/delete_entry/<int:entry_id>')
 def delete_entry(entry_id):
@@ -152,16 +171,36 @@ def past_activities():
     if 'username' not in session:
         flash('Please log in to view your activities.', 'danger')
         return redirect(url_for('login'))
-    
-    # Delegate the logic to the handler
-    activities = fetch_past_activities(session['username'], request)
+    username = session['username']
+    data     = fetch_past_activities(username, request)
+    uncompleted = data["uncompleted_activities"]
+    completed   = data["completed_activities"]
+    # Combine for simple pagination
+    combined    = uncompleted + completed
+    PER_PAGE    = 20
+    page        = request.args.get('page', 1, type=int)
+    total       = len(combined)
+    total_pages = (total + PER_PAGE - 1) // PER_PAGE
+    start_idx   = (page - 1) * PER_PAGE
+
+    page_slice = combined[start_idx : start_idx + PER_PAGE]
+    # split back
+    ongoing_page   = [a for a in page_slice if a in uncompleted]
+    completed_page = [a for a in page_slice if a in completed]
+
+    # **strip** the 'page' param before passing into template
+    args = request.args.to_dict()
+    args.pop('page', None)
+
 
     return render_template(
         'past_activities.html',
-        uncompleted_activities=activities["uncompleted_activities"],
-        completed_activities=activities["completed_activities"]
+        uncompleted_activities=ongoing_page,
+        completed_activities=completed_page,
+        page=page,
+        total_pages=total_pages,
+        request_args=args
     )
-
 @app.route('/analysis', methods=['GET'])
 def analysis():
     if 'username' not in session:
@@ -172,15 +211,18 @@ def analysis():
     analysis_data = get_analysis_data(username)
     return render_template('analysis.html', analysis_data=analysis_data)
 
-@app.route('/view_shared_data/<data_type>', methods=['POST'])
+@app.route('/view_shared_data/<data_type>', methods=['GET','POST'])
 def view_shared_data(data_type):
     if 'username' not in session:
         flash('Please log in to access this page.', 'danger')
         return redirect(url_for('login'))
 
     username = session['username']
-    target_user = request.form.get('target_user')
-
+    # 1) grab target_user from form (POST) or args (GET)
+    if request.method == 'POST':
+        target_user = request.form.get('target_user')
+    else:
+        target_user = request.args.get('target_user')
     # Check if the target_user has shared their data with the current user
     shared_entry = SharedUsers.query.filter_by(username=target_user, shared_username=username).first()
     if not shared_entry:
@@ -190,16 +232,48 @@ def view_shared_data(data_type):
     if data_type == 'analysis':
         analysis_data = get_analysis_data(target_user)
         return render_template('analysis.html', analysis_data=analysis_data)
-    elif data_type == 'activities':
+    if data_type == 'activities':
         activities = fetch_past_activities(target_user, request)
-        return render_template(
-            'past_activities.html',
-            uncompleted_activities=activities["uncompleted_activities"],
-            completed_activities=activities["completed_activities"]
-        )
+        combined = activities["uncompleted_activities"] + activities["completed_activities"]
+        template ='past_activities.html'
+    
     elif data_type == 'history':
-        entries = handle_viewdata(target_user, request)
-        return render_template('viewdata.html', entries=entries)
+        combined = handle_viewdata(target_user, request)
+        template ='viewdata.html'
     else:
         flash('Invalid data type requested.', 'danger')
         return redirect(url_for('sharedata'))
+    # 5) pagination logic
+    PER_PAGE    = 20
+    page        = request.args.get('page', 1, type=int)
+    total       = len(combined)
+    total_pages = (total + PER_PAGE - 1) // PER_PAGE
+    start_idx   = (page - 1) * PER_PAGE
+    page_slice  = combined[start_idx : start_idx + PER_PAGE]
+
+    # 6) clean up args for url_for (remove any existing 'page')
+    args = request.args.to_dict()
+    args.pop('page', None)
+    args['target_user'] = target_user
+
+    # 7) render with correct context
+    if data_type == 'activities':
+        ongoing = [a for a in page_slice if a in activities["uncompleted_activities"]]
+        done    = [a for a in page_slice if a in activities["completed_activities"]]
+        return render_template(
+            template,
+            uncompleted_activities=ongoing,
+            completed_activities=done,
+            page=page,
+            total_pages=total_pages,
+            request_args=args
+        )
+
+    # history case
+    return render_template(
+        template,
+        entries=page_slice,
+        page=page,
+        total_pages=total_pages,
+        request_args=args
+    )

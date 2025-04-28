@@ -6,57 +6,54 @@
 <div class="container mt-5">
     <h2 class="text-center mb-4">Users Sharing Their Data</h2>
     <div class="row justify-content-center">
-        <p>The idea is that on this page you can view all the users that shared their stats with you, and we can simply pass their username as an argument to the analysis page and view their data analysis.</p>
-        <!-- User 1 -->
-        <div class="container mt-3">
-            <div class="row justify-content-center">
-                <div class="col-md-6">
-                    <form method="POST" action="/search_user">
-                        <div class="input-group mb-3">
-                            <input type="text" class="form-control" placeholder="Search for a user" name="username" required>
-                            <button class="btn btn-outline-primary" type="submit">Search</button>
-                        </div>
+        <form method="POST" action="/sharedata">
+            <div class="input-group mb-3">
+                <input type="text" class="form-control" placeholder="Search for a user" name="target_user" required>
+                <button class="btn btn-outline-primary" type="submit">Search and Share</button>
+            </div>
+        </form>
+    </div>
+
+    <h3 class="text-center mt-5">Users You Have Shared Your Data With</h3>
+    <div class="row justify-content-center">
+        {% for shared_with_user in shared_with %}
+        <div class="col-md-4">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h5 class="card-title">User: {{ shared_with_user.shared_username }}</h5>
+                    <form method="POST" action="/sharedata">
+                        <input type="hidden" name="delete_user" value="{{ shared_with_user.shared_username }}">
+                        <button type="submit" class="btn btn-danger">Delete</button>
                     </form>
                 </div>
             </div>
-            <div class="row justify-content-center">
-                <div class="col-md-6 text-center">
-                    <form method="POST" action="/share_data">
-                        <input type="hidden" name="target_user" value="searched_user">
-                        <button class="btn btn-success" type="submit">Share My Data</button>
+        </div>
+        {% endfor %}
+    </div>
+
+    <h3 class="text-center mt-5">Users Who Shared Their Data With You</h3>
+    <div class="row justify-content-center">
+        {% for shared_user in shared_with_me %}
+        <div class="col-md-4">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h5 class="card-title">User: {{ shared_user.username }}</h5>
+                    <form method="POST" action="/view_shared_data/analysis">
+                        <input type="hidden" name="target_user" value="{{ shared_user.username }}">
+                        <button type="submit" class="btn btn-primary">View Analysis</button>
+                    </form>
+                    <form method="POST" action="/view_shared_data/activities">
+                        <input type="hidden" name="target_user" value="{{ shared_user.username }}">
+                        <button type="submit" class="btn btn-secondary">View Activities</button>
+                    </form>
+                    <form method="POST" action="/view_shared_data/history">
+                        <input type="hidden" name="target_user" value="{{ shared_user.username }}">
+                        <button type="submit" class="btn btn-info">View History</button>
                     </form>
                 </div>
             </div>
         </div>
-        <div class="col-md-4">
-            <div class="card text-center">
-                <div class="card-body">
-                    <h5 class="card-title">User: Alice</h5>
-                    <p class="card-text">"I love tracking my books and movies!"</p>
-                    <a href="/analysis" class="btn btn-primary">View Analysis</a>
-                </div>
-            </div>
-        </div>
-        <!-- User 2 -->
-        <div class="col-md-4">
-            <div class="card text-center">
-                <div class="card-body">
-                    <h5 class="card-title">User: Bob</h5>
-                    <p class="card-text">"Gaming stats are my favorite!"</p>
-                    <a href="/analysis" class="btn btn-primary">View Analysis</a>
-                </div>
-            </div>
-        </div>
-        <!-- User 3 -->
-        <div class="col-md-4">
-            <div class="card text-center">
-                <div class="card-body">
-                    <h5 class="card-title">User: Charlie</h5>
-                    <p class="card-text">"Check out my media trends!"</p>
-                    <a href="/analysis" class="btn btn-primary">View Analysis</a>
-                </div>
-            </div>
-        </div>
+        {% endfor %}
     </div>
 </div>
 {% endblock %}

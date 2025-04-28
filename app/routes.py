@@ -1,6 +1,6 @@
 from flask import render_template, request, redirect, url_for, flash, session, Response
 from app import app, db
-from app.models import Entries
+from app.models import Entries, SharedUsers, Users
 from app.helpers.upload_handler import handle_upload
 from app.helpers.dashboard_handler import *
 from app.helpers.export_csv_handler import generate_csv
@@ -115,9 +115,39 @@ def delete_entry(entry_id):
         flash('Entry not found.', 'danger')
     return redirect(url_for('viewdata'))
 
-@app.route('/sharedata')
+@app.route('/sharedata', methods=['GET', 'POST'])
 def sharedata():
-    return render_template('sharedata.html')
+    if 'username' not in session:
+        flash('Please log in to access this page.', 'danger')
+        return redirect(url_for('login'))
+
+    username = session['username']
+
+    if request.method == 'POST':
+        # Handle sharing data with another user
+        target_user = request.form.get('target_user')
+        if target_user:
+            # Check if the target user exists in the Users table
+            user_exists = Users.query.filter_by(username=target_user).first()
+            if user_exists:
+                # Check if the sharing entry already exists
+                existing_entry = SharedUsers.query.filter_by(username=username, shared_username=target_user).first()
+                if not existing_entry:
+                    # Add the tuple (username, target_user) to the SharedUsers table
+                    new_shared_user = SharedUsers(username=username, shared_username=target_user)
+                    db.session.add(new_shared_user)
+                    db.session.commit()
+                    flash(f'Data shared with {target_user} successfully.', 'success')
+                else:
+                    flash(f'You have already shared your data with {target_user}.', 'info')
+            else:
+                flash(f'User {target_user} does not exist.', 'danger')
+
+    # Fetch users who shared their data with the current user
+    shared_with_me = SharedUsers.query.filter_by(shared_username=username).all()
+    shared_with = SharedUsers.query.filter_by(username=username).all()
+
+    return render_template('sharedata.html', shared_with_me=shared_with_me, shared_with=shared_with)
 
 @app.route('/logout')
 def logout():
@@ -162,3 +192,35 @@ def analysis():
     username = session['username']
     analysis_data = get_analysis_data(username)
     return render_template('analysis.html', analysis_data=analysis_data)
+
+@app.route('/view_shared_data/<data_type>', methods=['POST'])
+def view_shared_data(data_type):
+    if 'username' not in session:
+        flash('Please log in to access this page.', 'danger')
+        return redirect(url_for('login'))
+
+    username = session['username']
+    target_user = request.form.get('target_user')
+
+    # Check if the target_user has shared their data with the current user
+    shared_entry = SharedUsers.query.filter_by(username=target_user, shared_username=username).first()
+    if not shared_entry:
+        flash('You do not have permission to view this user’s data.', 'danger')
+        return redirect(url_for('sharedata'))
+
+    if data_type == 'analysis':
+        analysis_data = get_analysis_data(target_user)
+        return render_template('analysis.html', analysis_data=analysis_data)
+    elif data_type == 'activities':
+        activities = fetch_past_activities(target_user, request)
+        return render_template(
+            'past_activities.html',
+            uncompleted_activities=activities["uncompleted_activities"],
+            completed_activities=activities["completed_activities"]
+        )
+    elif data_type == 'history':
+        entries = handle_viewdata(target_user, request)
+        return render_template('viewdata.html', entries=entries)
+    else:
+        flash('Invalid data type requested.', 'danger')
+        return redirect(url_for('sharedata'))

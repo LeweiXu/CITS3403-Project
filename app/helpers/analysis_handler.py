@@ -1,3 +1,4 @@
+from app.helpers.media_types import get_main_media_type
 from app.models import Activities, Entries
 from app import db
 from sqlalchemy.sql import func
@@ -9,38 +10,50 @@ def get_analysis_data(username):
     Fetch data for the analysis page, including statistics, rankings, and graph data.
     """
     # Overall Statistics
-    total_books = db.session.query(func.sum(Entries.duration)).join(Activities).filter(
-        Activities.username == username,
-        Activities.media_type.ilike('%book%')
-    ).scalar() or 0
-
     total_visual_media = db.session.query(func.sum(Entries.duration)).join(Activities).filter(
         Activities.username == username,
-        Activities.media_type.ilike('%visual media%') | Activities.media_type.ilike('%tv%')
+        Activities.media_type == 'Visual Media'
     ).scalar() or 0
 
-    total_games = db.session.query(func.sum(Entries.duration)).join(Activities).filter(
+    total_audio_media = db.session.query(func.sum(Entries.duration)).join(Activities).filter(
         Activities.username == username,
-        Activities.media_type.ilike('%game%')
+        Activities.media_type == 'Audio Media'
     ).scalar() or 0
 
-    # Time spent in the past week
+    total_text_media = db.session.query(func.sum(Entries.duration)).join(Activities).filter(
+        Activities.username == username,
+        Activities.media_type == 'Text Media'
+    ).scalar() or 0
+
+    total_interactive_media = db.session.query(func.sum(Entries.duration)).join(Activities).filter(
+        Activities.username == username,
+        Activities.media_type == 'Interactive Media'
+    ).scalar() or 0
+
+    # Time spent in the past week by main media type
     one_week_ago = datetime.now().date() - timedelta(days=7)
-    week_books = db.session.query(func.sum(Entries.duration)).join(Activities).filter(
-        Activities.username == username,
-        Activities.media_type.ilike('%book%'),
-        Entries.date >= one_week_ago
-    ).scalar() or 0
 
     week_visual_media = db.session.query(func.sum(Entries.duration)).join(Activities).filter(
         Activities.username == username,
-        (Activities.media_type.ilike('%visual media%') | Activities.media_type.ilike('%tv%')),
+        Activities.media_type == 'Visual Media',
         Entries.date >= one_week_ago
     ).scalar() or 0
 
-    week_games = db.session.query(func.sum(Entries.duration)).join(Activities).filter(
+    week_audio_media = db.session.query(func.sum(Entries.duration)).join(Activities).filter(
         Activities.username == username,
-        Activities.media_type.ilike('%game%'),
+        Activities.media_type == 'Audio Media',
+        Entries.date >= one_week_ago
+    ).scalar() or 0
+
+    week_text_media = db.session.query(func.sum(Entries.duration)).join(Activities).filter(
+        Activities.username == username,
+        Activities.media_type == 'Text Media',
+        Entries.date >= one_week_ago
+    ).scalar() or 0
+
+    week_interactive_media = db.session.query(func.sum(Entries.duration)).join(Activities).filter(
+        Activities.username == username,
+        Activities.media_type == 'Interactive Media',
         Entries.date >= one_week_ago
     ).scalar() or 0
 
@@ -79,11 +92,11 @@ def get_analysis_data(username):
         func.min(Entries.date).asc()
     ).limit(10).all()
 
-    entries_by_media_type = db.session.query(
-        Activities.media_type, func.sum(Entries.duration).label('total_duration')
+    entries_by_media_subtype = db.session.query(
+        Activities.media_subtype, func.sum(Entries.duration).label('total_duration')
     ).join(Entries).filter(
         Activities.username == username
-    ).group_by(Activities.media_type).order_by(func.sum(Entries.duration).desc()).limit(10).all()
+    ).group_by(Activities.media_subtype).order_by(func.sum(Entries.duration).desc()).limit(10).all()
 
     # Graph Data
     daily_time_past_week = db.session.query(
@@ -111,14 +124,17 @@ def get_analysis_data(username):
         Entries.date >= one_week_ago
     ).group_by(Entries.date).order_by(Entries.date).all()
 
+    print(entries_by_media_subtype)
     return {
         "statistics": {
-            "total_books": round(total_books / 60, 2),
             "total_visual_media": round(total_visual_media / 60, 2),
-            "total_games": round(total_games / 60, 2),
-            "week_books": round(week_books / 60, 2),
+            "total_audio_media": round(total_audio_media / 60, 2),
+            "total_text_media": round(total_text_media / 60, 2),
+            "total_interactive_media": round(total_interactive_media / 60, 2),
             "week_visual_media": round(week_visual_media / 60, 2),
-            "week_games": round(week_games / 60, 2),
+            "week_audio_media": round(week_audio_media / 60, 2),
+            "week_text_media": round(week_text_media / 60, 2),
+            "week_interactive_media": round(week_interactive_media / 60, 2),
             "longest_activity": {
                 "media_name": longest_activity[0] if longest_activity else "N/A",
                 "duration": round(longest_activity[1] / 60, 2) if longest_activity else 0
@@ -128,7 +144,7 @@ def get_analysis_data(username):
             "activities_by_duration": activities_by_duration,
             "entries_by_duration": entries_by_duration,
             "activities_by_start_date": activities_by_start_date,
-            "entries_by_media_type": entries_by_media_type
+            "entries_by_media_subtype": entries_by_media_subtype
         },
         "graphs": {
             "daily_time_past_week": daily_time_past_week,

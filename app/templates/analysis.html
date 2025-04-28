@@ -12,15 +12,17 @@
         <div class="row">
             <div class="col-md-4">
                 <h4>Total Time Spent</h4>
-                <p>Books: <span id="total-books">{{ analysis_data.statistics.total_books }} hours</span></p>
                 <p>Visual Media: <span id="total-visual-media">{{ analysis_data.statistics.total_visual_media }} hours</span></p>
-                <p>Games: <span id="total-games">{{ analysis_data.statistics.total_games }} hours</span></p>
+                <p>Audio Media: <span id="total-audio-media">{{ analysis_data.statistics.total_audio_media }} hours</span></p>
+                <p>Text Media: <span id="total-text-media">{{ analysis_data.statistics.total_text_media }} hours</span></p>
+                <p>Interactive Media: <span id="total-interactive-media">{{ analysis_data.statistics.total_interactive_media }} hours</span></p>
             </div>
             <div class="col-md-4">
                 <h4>Time Spent in the Past Week</h4>
-                <p>Books: <span id="week-books">{{ analysis_data.statistics.week_books }} hours</span></p>
                 <p>Visual Media: <span id="week-visual-media">{{ analysis_data.statistics.week_visual_media }} hours</span></p>
-                <p>Games: <span id="week-games">{{ analysis_data.statistics.week_games }} hours</span></p>
+                <p>Audio Media: <span id="week-audio-media">{{ analysis_data.statistics.week_audio_media }} hours</span></p>
+                <p>Text Media: <span id="week-text-media">{{ analysis_data.statistics.week_text_media }} hours</span></p>
+                <p>Interactive Media: <span id="week-interactive-media">{{ analysis_data.statistics.week_interactive_media }} hours</span></p>
             </div>
             <div class="col-md-4">
                 <h4>Longest Activity</h4>
@@ -39,29 +41,23 @@
                 <option value="activities-duration">Activities by Duration</option>
                 <option value="entries-duration">Entries by Duration</option>
                 <option value="activities-start-date">Activities by Start Date</option>
-                <option value="entries-media-type">Entries by Media Type</option>
+                <option value="entries-media-subtype">Entries by Media Subtype</option>
             </select>
         </div>
         <div id="ranking-view">
-            <h4>Activities Ranked by Duration</h4>
+            <h4>Entries Ranked by Media Subtype</h4>
             <table class="table">
                 <thead>
                     <tr>
-                        <th>Media Name</th>
-                        <th>Type</th>
-                        <th>Duration</th>
-                        <th>Start Date</th>
-                        <th>End Date</th>
+                        <th>Media Subtype</th>
+                        <th>Total Duration</th>
                     </tr>
                 </thead>
                 <tbody>
-                    {% for activity in analysis_data.rankings.activities_by_duration %}
+                    {% for entry in analysis_data.rankings.entries_by_media_subtype %}
                     <tr>
-                        <td>{{ activity.media_name }}</td>
-                        <td>{{ activity.media_type }}</td>
-                        <td>{{ activity.total_duration }}</td>
-                        <td>{{ activity.start_date }}</td>
-                        <td>{{ activity.end_date }}</td>
+                        <td>{{ entry.media_subtype }}</td>
+                        <td>{{ entry.total_duration }}</td>
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -167,7 +163,7 @@
                         </tbody>
                     </table>
                 `;
-            } else if (selectedRanking === 'entries-media-type') {
+            } else if (selectedRanking === 'entries-media-subtype') {
                 rankingView.innerHTML = `
                     <h4>Entries Ranked by Media Type</h4>
                     <table class="table">
@@ -178,9 +174,9 @@
                             </tr>
                         </thead>
                         <tbody>
-                            {% for entry in analysis_data.rankings.entries_by_media_type %}
+                            {% for entry in analysis_data.rankings.entries_by_media_subtype %}
                             <tr>
-                                <td>{{ entry.media_type }}</td>
+                                <td>{{ entry.media_subtype }}</td>
                                 <td>{{ entry.total_duration }}</td>
                             </tr>
                             {% endfor %}

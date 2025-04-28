@@ -17,6 +17,7 @@ class Activities(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(80), db.ForeignKey('Users.username'), nullable=False)
     media_type = db.Column(db.String(50), nullable=False)
+    media_subtype = db.Column(db.String(50), nullable=True)
     media_name = db.Column(db.String(120), nullable=False)
     status = db.Column(db.String(20), nullable=False, default='ongoing')
     start_date = db.Column(db.Date, nullable=True)

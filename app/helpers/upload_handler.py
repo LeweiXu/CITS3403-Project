@@ -22,6 +22,7 @@ def handle_upload(request, app):
                         id=int(row['id']),
                         username=session['username'],
                         media_type=row['media_type'],
+                        media_subtype=row['media_subtype'] if row['media_subtype'] else None,
                         media_name=row['media_name'],
                         status=row['status'],
                         start_date=datetime.strptime(row['start_date'], '%Y-%m-%d').date() if row['start_date'] else None,

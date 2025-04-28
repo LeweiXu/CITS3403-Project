@@ -166,8 +166,8 @@ def export_csv():
         headers={'Content-Disposition': 'attachment;filename=media_entries.csv'}
     )
 
-@app.route('/past_activities', methods=['GET'])
-def past_activities():
+@app.route('/activities', methods=['GET'])
+def activities():
     if 'username' not in session:
         flash('Please log in to view your activities.', 'danger')
         return redirect(url_for('login'))
@@ -192,9 +192,8 @@ def past_activities():
     args = request.args.to_dict()
     args.pop('page', None)
 
-
     return render_template(
-        'past_activities.html',
+        'activities.html',
         uncompleted_activities=ongoing_page,
         completed_activities=completed_page,
         page=page,

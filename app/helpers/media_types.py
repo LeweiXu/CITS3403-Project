@@ -12,7 +12,5 @@ def get_main_media_type(type):
         "Text Media": ["Book", "Article", "Blog", "News", "Comic", "Manga", "Webtoon", "Graphic Novel", "Light Novel", "Novel", "Short Story", "Web Novel"],
         "Interactive Media": ["First Person Shooter", "Role Playing Game", "Simulation", "Puzzle", "Platformer", "Strategy", "Adventure"],
     }
-    for main_type, sub_types in media_types.items():
-        if type in sub_types:
-            return main_type
-    return type
+
+# Honestly this file doesn't do much delete if needed

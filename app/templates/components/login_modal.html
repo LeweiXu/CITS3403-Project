@@ -2,12 +2,13 @@
 <div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="loginModalLabel">Login</h5>
+            <div class="modal-content login-section">
+                <div class="modal-header border-0" style="padding: 0;">
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <div class="modal-body">
+                <div class="modal-body" style="padding: 0;">
+                    <h2 class="text-center">Login</h2>
+                    <p class="text-center">Access your account to track your media consumption.</p>
                     <form id="loginForm" method="POST" action="/login">
                         <div class="mb-3">
                             <label for="username" class="form-label">Username</label>
@@ -17,8 +18,8 @@
                             <label for="password" class="form-label">Password</label>
                             <input type="password" class="form-control" id="password" name="password" required>
                         </div>
-                        <div class="modal-footer d-flex flex-column align-items-center">
-                            <button type="submit" class="btn btn-primary">Login</button>
+                        <button type="submit" class="btn btn-primary w-100">Login</button>
+                        <div class="modal-footer flex-column">
                             <p class="text-center mt-3">
                                 Don't have an account? <a href="#" data-bs-toggle="modal" data-bs-target="#registerModal" data-bs-dismiss="modal">Register</a>
                             </p>

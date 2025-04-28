@@ -28,7 +28,7 @@
                             <li><a href="/logout">Logout</a></li>
                         {% else %}
                             <li><a href="/">Home</a></li>
-                            <li><a href="/login">Login</a></li>
+                            <li><a href="#" data-bs-toggle="modal" data-bs-target="#loginModal">Login</a></li>
                         {% endif %}
                     </ul>
                 </nav>
@@ -41,6 +41,11 @@
              {% block content %}{% endblock %}
          </div>
     </main>
+
+
+    <!-- Make sure the modals for login and register is included in this page -->
+    {% include 'components/login_modal.html' %}
+    {% include 'components/register_modal.html' %}
 
     <footer role =  "contentinfo">
         <div class="footer-container">

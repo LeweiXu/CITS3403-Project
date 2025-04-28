@@ -2,14 +2,18 @@
 :root {
     --primary-color: #3498db;
     --secondary-color: #2c3e50;
+    --background-color:#f1f5f9;
+    --light-border: #e2e8f0;
 }
+/* f8f9fa previoius background colour */
 
 /* Body Styles */
 
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: #f8f9fa;
+    background-color: var(--background-color);
 }
+
 
 /* Header Styles */
 
@@ -36,6 +40,11 @@ header h1 span {
     color: var(--primary-color);
 }
 
+h1 {
+    margin-top: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
 /* Navigation Styles */
 
 nav ul {
@@ -50,7 +59,7 @@ nav ul li {
 }
 
 nav ul li a {
-    color: #ffffff;
+    color: white;
     text-decoration: none;
     font-weight: 500;
     transition: color 0.3s;
@@ -93,11 +102,6 @@ nav ul li a:hover {
     box-shadow: 0 10px 20px rgba(0,0,0,0.15);
 }
 
-/* CTA Section */
-.cta-section {
-    background-color: #f0f4f8;
-    padding: 4rem 0;
-}
 
 /* Global layout for sticky footer */
 html, body {
@@ -119,7 +123,7 @@ main {
 /* Footer Styles */
 .footer-container {
     background-color: var(--secondary-color);
-    color: #ffffff;
+    color: white;
     padding: 2rem 0;
     text-align: center;
 }
@@ -128,6 +132,38 @@ footer a {
     color: var(--primary-color);
 }
 
+/* Mainly for the dashboard table */
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th {
+    background-color: #f8fafc;
+    padding: 0.75rem 1rem;
+    text-align: left;
+    font-weight: 500;
+    color: #495057;
+    border-bottom: 1px solid var(--light-border);
+    font-size: 1.2rem;
+    }
+
+td {
+padding: 0.75rem;
+border-bottom: 1px solid var(--light-border);
+vertical-align: middle;
+}
+
+thead {
+    padding: 0.75rem 1rem;
+}
+
+.table-container {
+    overflow-x: auto;
+    margin-top: 1rem;
+}
+
+/* Icons for social media, for footer */
 .social-icons {
     margin-top: 1rem;
 }
@@ -164,24 +200,34 @@ footer a {
     color: var(--primary-color);
 }
 
-.stats-overview {
-    padding: 2rem 1rem;
-    text-align: center;
-    background-color: #f0f4f8; /* A light background to make cards stand out */
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.25rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid var(--light-border);
+}
+
+/* Renamed from "stats-overview" for reusability, also edited some attributes */
+.section {                  
+    background: white;  /* A light background to make cards stand out */
+    border-radius: 0.75rem;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    padding: 1.5rem;
     margin-bottom: 2rem;
 }
 
-.stats-overview .section-title {
+.section .section-title {
     font-size: 2rem;
     margin-bottom: 1.5rem;
     color: var(--secondary-color);
 }
 
 .stats-grid {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 1.5rem; /* Space between cards */
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
 }
 
 .stats-metric-card {
@@ -191,7 +237,8 @@ footer a {
     flex: 0 1 280px; /* Each card is at least 280px wide; it wraps if smaller screens */
     box-shadow: 0 4px 8px rgba(0,0,0,0.1);
     text-align: center;
-    transition: transform 0.3s, box-shadow 0.3s;
+    transition: transform 0.3s, box-shadow 0.3s; 
+    border: 1px solid #e2e8f0;
 }
 
 /* Hover effect to give a more interactive feel */
@@ -221,9 +268,9 @@ footer a {
 
 /* If you want sub-text or percentage changes below the main stat */
 .stats-sub {
-    margin-top: 0.5rem;
-    font-size: 0.9rem;
-    color: #777777;
+    font-size: 0.75rem;
+    color: #5f6b7c;
+    margin-top: 0.25rem;
 }
 
 .upload-container {
@@ -340,8 +387,11 @@ margin-top: 0.5rem;
     margin-top: 2rem;
 }
 
-/* Better login form  */
-.login-section {
+/* 
+    Better login form  
+    Will probably be used for register too
+*/
+.entry-section {
     background-color: white;
     border-radius: 12px;
     padding: 2.5rem;
@@ -350,26 +400,34 @@ margin-top: 0.5rem;
     margin: 3rem auto;
 }
 
-.login-section h2 {
+.entry-section h2 {
     font-size: 2.2rem;
     margin-bottom: 1rem;
     color: var(--secondary-color);
     font-weight: 600;
 }
 
-.login-section p {
+.entry-section p {
     color: #6c757d;
-    margin-bottom: 2rem;
     font-size: 1.1rem;
+}
+
+/* Link styling, link to go to register or login from the other */
+.form-box-section a {
+    color: var(--primary-color);
+    font-weight: 500;
+    text-decoration: none;
+    transition: color 0.2s ease;
 }
 
 /* Form stuff */
 .form-control {
     padding: 0.8rem 1rem;
     border-radius: 8px;
-    border: 1px solid #dee2e6;
+    border: 1px solid var(--light-border);
     transition: all 0.3s ease;
     font-size: 1rem;
+    background-color: #f2f4f59c;
 }
 
 .form-control:focus {
@@ -385,7 +443,7 @@ margin-top: 0.5rem;
 }
 
 /* Registration link styling */
-.login-section a {
+.modal-footer a {
     color: var(--primary-color);
     font-weight: 500;
     text-decoration: none;
@@ -398,7 +456,12 @@ margin-top: 0.5rem;
     display: flex;
 }
 
-/* Better register */
+/*  
+    Better register section
+    Will probably have the login form used for cleaner code and less duplication
+    Might be deleted later
+*/
+
 .register-section {
     background-color: white;
     border-radius: 12px;
@@ -421,6 +484,7 @@ margin-top: 0.5rem;
     background: linear-gradient(135deg,  var(--secondary-color), var(--primary-color));
     display: flex;
 }
+
 
 .hidden {
     display: none;

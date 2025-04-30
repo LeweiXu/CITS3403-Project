@@ -7,7 +7,7 @@
     <h2 class="text-center">Past Activities</h2>
 
     <!-- Filter Form -->
-    <form action="{{ url_for('past_activities') }}" method="GET" class="mb-4">
+    <form action="{{ url_for('activities') }}" method="GET" class="mb-4">
         <div class="row">
             <div class="col-md-2">
                 <label for="start_date" class="form-label">Start Date</label>
@@ -37,7 +37,7 @@
         <div class="row mt-3">
             <div class="col-md-12 text-center">
                 <button type="submit" class="btn btn-primary">Search</button>
-                <a href="{{ url_for('past_activities') }}" class="btn btn-secondary">Reset</a>
+                <a href="{{ url_for('activities') }}" class="btn btn-secondary">Reset</a>
             </div>
         </div>
     </form>
@@ -47,6 +47,8 @@
         <thead>
             <tr>
                 <th>Media Name</th>
+                <th>Media Type</th>
+                <th>Sub-Type</th>
                 <th>Total Duration (minutes)</th>
                 <th>Start Date</th>
                 <th>End Date</th>
@@ -58,10 +60,12 @@
             {% for activity in uncompleted_activities %}
             <tr>
                 <td>{{ activity.media_name }}</td>
+                <td>{{ activity.media_type }}</td>
+                <td>{{ activity.media_subtype }}</td>
                 <td>{{ activity.total_duration }}</td>
                 <td>{{ activity.start_date }}</td>
                 <td>Ongoing</td>
-                <td>Rating: N/A</td>
+                <td>N/A</td>
             </tr>
             {% endfor %}
 
@@ -69,6 +73,8 @@
             {% for activity in completed_activities %}
             <tr>
                 <td>{{ activity.media_name }}</td>
+                <td>{{ activity.media_type }}</td>
+                <td>{{ activity.media_subtype }}</td>
                 <td>{{ activity.total_duration }}</td>
                 <td>{{ activity.start_date }}</td>
                 <td>{{ activity.end_date }}</td>

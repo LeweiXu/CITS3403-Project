@@ -82,6 +82,8 @@
     </div>
 </div>
 
+<input type="hidden" id="analysis-data" value='{{ analysis_data|tojson }}'>
+
 <script>
     document.addEventListener('DOMContentLoaded', () => {
         const rankingSelect = document.getElementById('ranking-select');
@@ -198,15 +200,19 @@
             if (currentChart) {
                 currentChart.destroy();
             }
+            console.log("testing"); // ############Debigugging###############
+
+            const analysisData = JSON.parse(document.getElementById('analysis-data').value || '{}');
 
             if (selectedGraph === 'daily-time') {
+                const dailyData = analysisData.graphs.daily_time_past_week;
                 currentChart = new Chart(graphCanvas, {
                     type: 'bar',
                     data: {
-                        labels: [], // Populate dynamically
+                        labels: dailyData.map(d => d.date),
                         datasets: [{
                             label: 'Total Time Spent Daily (Hours)',
-                            data: [], // Populate dynamically
+                            data: dailyData.map(d => d.total_duration / 60), // Convert minutes to hours
                             backgroundColor: 'rgba(75, 192, 192, 0.2)',
                             borderColor: 'rgba(75, 192, 192, 1)',
                             borderWidth: 1
@@ -216,19 +222,24 @@
                         responsive: true,
                         scales: {
                             y: {
-                                beginAtZero: true
+                                beginAtZero: true,
+                                title: {
+                                    display: true,
+                                    text: 'Hours'
+                                }
                             }
                         }
                     }
                 });
             } else if (selectedGraph === 'weekly-average') {
+                const weeklyData = analysisData.graphs.weekly_average_past_10_weeks;
                 currentChart = new Chart(graphCanvas, {
                     type: 'line',
                     data: {
-                        labels: [], // Populate dynamically
+                        labels: weeklyData.map(w => w.week),
                         datasets: [{
                             label: 'Weekly Average Time (Hours)',
-                            data: [], // Populate dynamically
+                            data: weeklyData.map(w => w.average_duration / 60),
                             borderColor: 'rgba(54, 162, 235, 1)',
                             backgroundColor: 'rgba(54, 162, 235, 0.2)',
                             borderWidth: 1
@@ -238,36 +249,48 @@
                         responsive: true,
                         scales: {
                             y: {
-                                beginAtZero: true
+                                beginAtZero: true,
+                                title: {
+                                    display: true,
+                                    text: 'Hours'
+                                }
                             }
                         }
                     }
                 });
             } else if (selectedGraph === 'daily-category') {
+                const categoryData = analysisData.graphs.daily_category_past_week;
                 currentChart = new Chart(graphCanvas, {
                     type: 'line',
                     data: {
-                        labels: [], // Populate dynamically
+                        labels: categoryData.map(d => d.date),
                         datasets: [
                             {
-                                label: 'Reading',
-                                data: [], // Populate dynamically
+                                label: 'Visual Media',
+                                data: categoryData.map(d => d.visual_media / 60),
                                 borderColor: 'rgba(255, 99, 132, 1)',
                                 backgroundColor: 'rgba(255, 99, 132, 0.2)',
                                 borderWidth: 1
                             },
                             {
-                                label: 'Gaming',
-                                data: [], // Populate dynamically
-                                borderColor: 'rgba(54, 162, 235, 1)',
+                                label: 'Audio Media',
+                                data: categoryData.map(d => d.audio_media / 60),
+                                borderColor: 'rgba(54, 162, 235, 1)', 
                                 backgroundColor: 'rgba(54, 162, 235, 0.2)',
                                 borderWidth: 1
                             },
                             {
-                                label: 'Visual Media',
-                                data: [], // Populate dynamically
+                                label: 'Text Media',
+                                data: categoryData.map(d => d.text_media / 60),
                                 borderColor: 'rgba(75, 192, 192, 1)',
                                 backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                                borderWidth: 1
+                            },
+                            {
+                                label: 'Interactive Media',
+                                data: categoryData.map(d => d.interactive_media / 60),
+                                borderColor: 'rgba(153, 102, 255, 1)',
+                                backgroundColor: 'rgba(153, 102, 255, 0.2)',
                                 borderWidth: 1
                             }
                         ]
@@ -276,12 +299,17 @@
                         responsive: true,
                         scales: {
                             y: {
-                                beginAtZero: true
+                                beginAtZero: true,
+                                title: {
+                                    display: true,
+                                    text: 'Hours'
+                                }
                             }
                         }
                     }
                 });
             }
+
         });
     });
 </script>

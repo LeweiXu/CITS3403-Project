@@ -115,14 +115,74 @@ def get_analysis_data(username):
     ).group_by('week').order_by('week').all()
 
     daily_category_past_week = db.session.query(
-        Entries.date,
-        func.sum(case((Activities.media_type.ilike('%book%'), Entries.duration), else_=0)).label('books'),
-        func.sum(case((Activities.media_type.ilike('%movie%') | Activities.media_type.ilike('%tv%'), Entries.duration), else_=0)).label('visual_media'),
-        func.sum(case((Activities.media_type.ilike('%game%'), Entries.duration), else_=0)).label('games')
-    ).join(Activities).filter(
-        Activities.username == username,
-        Entries.date >= one_week_ago
-    ).group_by(Entries.date).order_by(Entries.date).all()
+    Entries.date,
+    func.sum(case((Activities.media_type == 'Visual Media', Entries.duration), else_=0)).label('visual_media'),
+    func.sum(case((Activities.media_type == 'Audio Media', Entries.duration), else_=0)).label('audio_media'),
+    func.sum(case((Activities.media_type == 'Text Media', Entries.duration), else_=0)).label('text_media'),
+    func.sum(case((Activities.media_type == 'Interactive Media', Entries.duration), else_=0)).label('interactive_media')
+).join(Activities).filter(
+    Activities.username == username,
+    Entries.date >= one_week_ago
+).group_by(Entries.date).order_by(Entries.date).all()
+
+    # Convert query results to dictionaries
+    activities_by_duration = [
+        {
+            'media_name': a.media_name,
+            'media_type': a.media_type,
+            'total_duration': round(a.total_duration / 60, 2),
+            'start_date': a.start_date.strftime('%Y-%m-%d'),
+            'end_date': a.end_date.strftime('%Y-%m-%d') if a.end_date else None
+        } for a in activities_by_duration
+    ]
+
+    entries_by_duration = [
+        {
+            'media_name': e.media_name,
+            'media_type': e.media_type,
+            'duration': round(e.duration / 60, 2)
+        } for e in entries_by_duration
+    ]
+
+    activities_by_start_date = [
+        {
+            'media_name': a.media_name,
+            'media_type': a.media_type,
+            'start_date': a.start_date.strftime('%Y-%m-%d'),
+            'total_duration': round(a.total_duration / 60, 2)
+        } for a in activities_by_start_date
+    ]
+
+    entries_by_media_subtype = [
+        {
+            'media_subtype': e.media_subtype,
+            'total_duration': round(e.total_duration / 60, 2)
+        } for e in entries_by_media_subtype
+    ]
+
+    daily_time_past_week = [
+        {
+            'date': d.date.strftime('%Y-%m-%d'),
+            'total_duration': d.total_duration
+        } for d in daily_time_past_week
+    ]
+
+    weekly_average_past_10_weeks = [
+        {
+            'week': w.week,
+            'average_duration': w.average_duration
+        } for w in weekly_average_past_10_weeks
+    ]
+
+    daily_category_past_week = [
+        {
+            'date': d.date.strftime('%Y-%m-%d'),
+            'visual_media': d.visual_media,
+            'audio_media': d.audio_media,
+            'text_media': d.text_media,
+            'interactive_media': d.interactive_media
+        } for d in daily_category_past_week
+    ]
 
     print(entries_by_media_subtype)
     return {

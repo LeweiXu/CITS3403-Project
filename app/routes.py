@@ -1,4 +1,5 @@
-from flask import render_template, request, redirect, url_for, flash, session, Response
+import re
+from flask import render_template, request, redirect, url_for, flash, session, Response, jsonify
 from app import app, db
 from app.models import Entries, SharedUsers, Users
 from app.helpers.upload_handler import handle_upload
@@ -27,10 +28,37 @@ def login():
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
-    if request.method == 'POST':
-        result = handle_register(request)
-        return result  # Redirect to login or register page based on the result
-    return render_template('register.html')
+    username = request.form.get('username')
+    email = request.form.get('email')
+    password = request.form.get('password')
+
+    # Server-side validation for registration
+
+    # Username validation
+    if len(username) < 3 or len(username) > 20:
+        return jsonify({'error': 'username', 'message': 'Username must be between 3 and 20 characters.'}), 400
+    
+    # Email validation
+    if not re.match(r'^[^\s@]+@[^\s@]+\.[^\s@]+$', email):
+        return jsonify({'error': 'email', 'message': 'Invalid email address.'}), 400
+    
+    # Password validation
+    if not re.match(r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$', password):
+        return jsonify({'error': 'password', 'message': 'Password must contain at least 8 characters, one uppercase letter, one lowercase letter, and one number.'}), 400
+
+    # Check for existing users
+    if Users.query.filter_by(username=username).first():
+        return jsonify({'error': 'username', 'message': 'Username already exists'}), 400
+    if Users.query.filter_by(email=email).first():
+        return jsonify({'error': 'email', 'message': 'Email already exists'}), 400
+
+    result = handle_register(request)
+    return result
+
+    # if request.method == 'POST':
+    #     result = handle_register(request)
+    #     return result  # Redirect to login or register page based on the result
+    # return render_template('register.html')
 
 @app.route('/dashboard', methods=['GET', 'POST'])
 def dashboard():

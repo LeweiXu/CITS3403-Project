@@ -11,23 +11,29 @@
         <h2>Overall Statistics</h2>
         <div class="row">
             <div class="col-md-4">
-                <h4>Total Time Spent</h4>
-                <p>Visual Media: <span id="total-visual-media">{{ analysis_data.statistics.total_visual_media }} hours</span></p>
-                <p>Audio Media: <span id="total-audio-media">{{ analysis_data.statistics.total_audio_media }} hours</span></p>
-                <p>Text Media: <span id="total-text-media">{{ analysis_data.statistics.total_text_media }} hours</span></p>
-                <p>Interactive Media: <span id="total-interactive-media">{{ analysis_data.statistics.total_interactive_media }} hours</span></p>
+                <div class="stats-box">
+                    <h4>Total Time Spent</h4>
+                    <p>Visual Media: <span id="total-visual-media">{{ analysis_data.statistics.total_visual_media }} hours</span></p>
+                    <p>Audio Media: <span id="total-audio-media">{{ analysis_data.statistics.total_audio_media }} hours</span></p>
+                    <p>Text Media: <span id="total-text-media">{{ analysis_data.statistics.total_text_media }} hours</span></p>
+                    <p>Interactive Media: <span id="total-interactive-media">{{ analysis_data.statistics.total_interactive_media }} hours</span></p>
+                </div>
             </div>
             <div class="col-md-4">
-                <h4>Time Spent in the Past Week</h4>
-                <p>Visual Media: <span id="week-visual-media">{{ analysis_data.statistics.week_visual_media }} hours</span></p>
-                <p>Audio Media: <span id="week-audio-media">{{ analysis_data.statistics.week_audio_media }} hours</span></p>
-                <p>Text Media: <span id="week-text-media">{{ analysis_data.statistics.week_text_media }} hours</span></p>
-                <p>Interactive Media: <span id="week-interactive-media">{{ analysis_data.statistics.week_interactive_media }} hours</span></p>
+                <div class="stats-box">
+                    <h4>Time Spent in the Past Week</h4>
+                    <p>Visual Media: <span id="week-visual-media">{{ analysis_data.statistics.week_visual_media }} hours</span></p>
+                    <p>Audio Media: <span id="week-audio-media">{{ analysis_data.statistics.week_audio_media }} hours</span></p>
+                    <p>Text Media: <span id="week-text-media">{{ analysis_data.statistics.week_text_media }} hours</span></p>
+                    <p>Interactive Media: <span id="week-interactive-media">{{ analysis_data.statistics.week_interactive_media }} hours</span></p>
+                </div>
             </div>
             <div class="col-md-4">
-                <h4>Longest Activity</h4>
-                <p>Media Name: <span id="longest-activity-name">{{ analysis_data.statistics.longest_activity.media_name }}</span></p>
-                <p>Duration: <span id="longest-activity-duration">{{ analysis_data.statistics.longest_activity.duration }} hours</span></p>
+                <div class="stats-box">
+                    <h4>Longest Activity</h4>
+                    <p>Media Name: <span id="longest-activity-name">{{ analysis_data.statistics.longest_activity.media_name }}</span></p>
+                    <p>Duration: <span id="longest-activity-duration">{{ analysis_data.statistics.longest_activity.duration }} hours</span></p>
+                </div>
             </div>
         </div>
     </div>

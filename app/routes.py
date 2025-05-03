@@ -251,7 +251,7 @@ def view_shared_data(data_type):
     if data_type == 'activities':
         activities = fetch_past_activities(target_user, request)
         combined = activities["uncompleted_activities"] + activities["completed_activities"]
-        template ='past_activities.html'
+        template ='activities.html'
     
     elif data_type == 'history':
         combined = handle_viewdata(target_user, request)

@@ -7,7 +7,7 @@
     <h2 class="text-center">Past Activities</h2>
 
     <!-- Filter Form -->
-    <form action="{{ url_for('past_activities') }}" method="GET" class="mb-4">
+    <form action="{{ url_for('activities') }}" method="GET" class="mb-4">
         <div class="row">
             <div class="col-md-2">
                 <label for="start_date" class="form-label">Start Date</label>
@@ -37,7 +37,7 @@
         <div class="row mt-3">
             <div class="col-md-12 text-center">
                 <button type="submit" class="btn btn-primary">Search</button>
-                <a href="{{ url_for('past_activities') }}" class="btn btn-secondary">Reset</a>
+                <a href="{{ url_for('activities') }}" class="btn btn-secondary">Reset</a>
             </div>
         </div>
     </form>
@@ -47,6 +47,8 @@
         <thead>
             <tr>
                 <th>Media Name</th>
+                <th>Media Type</th>
+                <th>Sub-Type</th>
                 <th>Total Duration (minutes)</th>
                 <th>Start Date</th>
                 <th>End Date</th>
@@ -56,19 +58,23 @@
         <tbody>
             <!-- Uncompleted Activities -->
             {% for activity in uncompleted_activities %}
-            <tr class="wow fadeInUp" data-wow-delay="{{ loop.index * 0.1 }}s">
+            <tr>
                 <td>{{ activity.media_name }}</td>
+                <td>{{ activity.media_type }}</td>
+                <td>{{ activity.media_subtype }}</td>
                 <td>{{ activity.total_duration }}</td>
                 <td>{{ activity.start_date }}</td>
                 <td>Ongoing</td>
-                <td>Rating: N/A</td>
+                <td>N/A</td>
             </tr>
             {% endfor %}
 
             <!-- Completed Activities -->
             {% for activity in completed_activities %}
-            <tr class="wow fadeInUp" data-wow-delay="{{ (loop.index + uncompleted_activities|length) * 0.1 }}s">
+            <tr>
                 <td>{{ activity.media_name }}</td>
+                <td>{{ activity.media_type }}</td>
+                <td>{{ activity.media_subtype }}</td>
                 <td>{{ activity.total_duration }}</td>
                 <td>{{ activity.start_date }}</td>
                 <td>{{ activity.end_date }}</td>
@@ -108,11 +114,10 @@
         </nav>
         {% endif %}
 </div>
-
 <!-- Include WOW.js and Animate.css -->
 <link rel="stylesheet" href="{{ url_for('static', filename='css/animate.css') }}">
 <script src="{{ url_for('static', filename='js/wow.min.js') }}"></script>
-<link rel="stylesheet" href="{{ url_for('static', filename='css/past_activities.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/activities.css') }}">
 <script>
     // Initialize WOW.js
     new WOW().init();

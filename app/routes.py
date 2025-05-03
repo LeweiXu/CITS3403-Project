@@ -43,7 +43,7 @@ def register():
         return jsonify({'error': 'email', 'message': 'Invalid email address.'}), 400
     
     # Password validation
-    if not re.match(r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$', password):
+    if not re.match(r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*(),.?":{}|<>])[A-Za-z\d!@#$%^&*(),.?":{}|<>]{8,}$', password):
         return jsonify({'error': 'password', 'message': 'Password must contain at least 8 characters, one uppercase letter, one lowercase letter, and one number.'}), 400
 
     # Check for existing users

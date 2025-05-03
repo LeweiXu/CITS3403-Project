@@ -65,6 +65,9 @@
 
         // Email validation
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        // [^\s@] - not a whitespace or @, any characters but those
+        // + @ and [^\s@] again
+        // + \. - at least one dot and [^\s@] again
         if (!emailRegex.test(email)) {
             document.getElementById('reg-email').classList.add('is-invalid');
             document.getElementById('email-error').innerHTML = '<small>Please enter a valid email address.</small>';
@@ -72,10 +75,15 @@
         }
 
         // Password validation
-        const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/;
+        const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*(),.?":{}|<>])[A-Za-z\d!@#$%^&*(),.?":{}|<>]{8,}$/;
+        // (?=.*[a-z]) - at least one lowercase letter
+        // (?=.*[A-Z]) - at least one uppercase letter
+        // (?=.*\d) - at least one number
+        // (?=.*[!@#$%^&*(),.?":{}|<>]) - at least one special character
+        // [A-Za-z\d!@#$%^&*(),.?":{}|<>]{8,} - total length of 8 or more characters
         if (!passwordRegex.test(password)) {
             document.getElementById('reg-password').classList.add('is-invalid');
-            document.getElementById('password-error').innerHTML = '<small>Password must contain:<br>• At least 8 characters<br>• At least one uppercase letter<br>• At least one lowercase letter<br>• At least one number</small>';
+            document.getElementById('password-error').innerHTML = '<small>Password must contain:<br>• At least 8 characters<br>• At least one uppercase letter<br>• At least one lowercase letter<br>• At least one number<br>• At least one special character (!@# etc.)</small>';
             isValid = false;
         }
 
@@ -121,13 +129,5 @@
             alert('Registration failed. Please try again.');
         }
 
-        // if (response.redirected) {
-        //     window.location.href = response.url;
-        // } else {
-        //     const result = await response.text();
-        //     if (result.includes('error')) {
-        //         alert('Registration failed. Please try again.');
-        //     }
-        // }
     });
 </script>

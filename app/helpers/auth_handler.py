@@ -24,8 +24,11 @@ def handle_register(request):
 
     # Check if user already exists
     if Users.query.filter_by(username=username).first():
-        flash('Username already exists!', 'danger')
-        return redirect(url_for('register'))
+        return 'username_exists'
+    
+    # Check if email already exists
+    if Users.query.filter_by(email=email).first():
+        return 'email_exists'
 
     # Create new user
     try:
@@ -33,8 +36,8 @@ def handle_register(request):
         db.session.add(new_user)
         db.session.commit()
         flash('Registration successful! Please log in.', 'success')
-        return redirect(url_for('login'))
+        return 'success'
     except Exception as e:
-        flash('An error occurred during registration.', 'danger')
+        #flash('An error occurred during registration.', 'danger')
         print(f"Error: {e}")  # Debugging output
-        return redirect(url_for('register'))
+        return 'error'

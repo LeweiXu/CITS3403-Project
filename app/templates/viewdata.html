@@ -160,6 +160,7 @@
 {% endblock %}
 
 {% block extra_scripts %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/viewdata.css') }}">
 <script>
     document.addEventListener('DOMContentLoaded', () => {
         // Toggle visibility of the advanced section

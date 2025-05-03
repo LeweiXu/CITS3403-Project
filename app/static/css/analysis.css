@@ -14,7 +14,7 @@ section {
     margin-bottom: 30px; /* Space between sections */
     border-radius: 10px; /* Rounded corners */
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
-    transition: background-color 0.3s ease;
+    transition: background-color 0.1s ease;
 }
 
 section:hover {
@@ -27,7 +27,7 @@ section:hover {
     background: #f5f3ff; /* Light purple background */
     padding: 20px; /* Inner padding */
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow */
-    transition: transform 0.3s ease, box-shadow 0.3s ease; /* Smooth hover effect */
+    transition: transform 0.1s ease, box-shadow 0.1s ease; /* Smooth hover effect */
     height: 250px; /* Fixed height for uniform size */
     display: flex; /* Flexbox for alignment */
     flex-direction: column; /* Stack content vertically */
@@ -78,7 +78,7 @@ select.form-select {
     border: 1px solid #ddd; /* Subtle border */
     border-radius: 5px; /* Rounded corners */
     background-color: #fff; /* White background */
-    transition: border-color 0.3s ease;
+    transition: border-color 0.1s ease;
 }
 
 select.form-select:focus {

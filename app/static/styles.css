@@ -2,7 +2,7 @@
 :root {
     --primary-color: #3498db;
     --secondary-color: #2c3e50;
-    --background-color:#f1f5f9;
+    --background-color: #cce7ff; 
     --light-border: #e2e8f0;
 }
 /* f8f9fa previoius background colour */
@@ -10,8 +10,8 @@
 /* Body Styles */
 
 body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: var(--background-color);
+    font-family: 'Sour Gummy', sans-serif ; 
+    background-color: var(--background-color); 
 }
 
 
@@ -254,9 +254,12 @@ thead {
 }
 
 .stats-info h3 {
-    font-size: 1.2rem;
-    color: var(--secondary-color);
+    font-size: 1.5rem; 
+    font-weight: bold; 
+    color: var(--secondary-color); 
     margin-bottom: 0.5rem;
+    text-align: center; 
+    font-family: 'Sour Gummy', sans-serif ; 
 }
 
 .stats-info p {
@@ -266,11 +269,13 @@ thead {
     color: #333333;
 }
 
-/* If you want sub-text or percentage changes below the main stat */
+/* Stats Card Subtitles */
 .stats-sub {
-    font-size: 0.75rem;
-    color: #5f6b7c;
-    margin-top: 0.25rem;
+    font-size: 1rem;
+    color: #6c757d; 
+    text-align: center; 
+    margin-top: 0.25rem; 
+    font-family: 'Sour Gummy', sans-serif ; 
 }
 
 .upload-container {
@@ -603,4 +608,86 @@ margin-top: 0.5rem;
 }
 .nav-btn:focus {
     outline: none;
+}
+
+/* Dashboard Main Title */
+h1.section-title {
+    font-size: 2.5rem; 
+    font-weight: bold; 
+    text-align: center;
+    color: var(--secondary-color); 
+    margin-bottom: 2rem; 
+    font-family: 'Sour Gummy', sans-serif; 
+}
+
+/* Section Titles (Key Stats, Current Activities, Add New) */
+h2.section-title {
+    font-size: 2rem; 
+    font-weight: 600; 
+    color: var(--primary-color); 
+    margin-bottom: 1.5rem; 
+    text-align: left; 
+    font-family: 'Sour Gummy', sans-serif !important; 
+}
+
+/* Stats Box Styles */
+.stats-box {
+    border: 2px solid var(--light-border); 
+    border-radius: 8px; 
+    padding: 1.5rem;
+    background-color: #ffffff; 
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); 
+    margin-bottom: 1.5rem; 
+    width: 100%; 
+    max-width: 300px; 
+    height: 250px; 
+    display: flex; 
+    flex-direction: column; 
+    justify-content: center; 
+    align-items: center; 
+    text-align: center; 
+}
+
+.row {
+    display: flex;
+    justify-content: center; 
+    gap: 1rem; 
+    flex-wrap: wrap; 
+}
+
+/* Shared With - Horizontal Layout */
+.shared-with-card .card-body {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 1.5rem;
+}
+
+.shared-with-card .card-title {
+    margin: 0;
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--secondary-color);
+}
+
+/* Shared With Me - Vertical Buttons */
+.shared-with-me-card .card-body {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 1.5rem;
+}
+
+.shared-with-me-card .card-title {
+    margin: 0;
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--secondary-color);
+}
+
+.shared-with-me-card .button-container {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-left: 1rem;
 }

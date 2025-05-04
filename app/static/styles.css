@@ -433,3 +433,42 @@ thead {
     border-radius: 0.25rem;
     box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.175);
 }
+
+/* Add styles for card and card-body */
+.card {
+    margin: 1rem 0;
+    border: 1px solid #ddd;
+    border-radius: 0.5rem;
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+}
+
+/* Adjust spacing between username and delete button */
+.card-body {
+    padding: 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.5rem; /* Minimal spacing between username and delete button */
+}
+
+/* Ensure delete button is in line with user text */
+.card-body .btn-danger {
+    margin-left: auto;
+}
+
+.shared-card{
+    display: inline-block;
+    margin: 1rem 0;
+    border: 1px solid #ddd;
+    border-radius: 0.5rem;
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+}
+
+.shared-card-body {
+    padding: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.2rem; /* Minimal spacing between username and delete button */
+}

@@ -10,7 +10,7 @@
 /* Body Styles */
 
 body {
-    font-family: 'Sour Gummy', sans-serif ; 
+    font-family: Arial, sans-serif; 
     background-color: var(--background-color); 
 }
 
@@ -139,7 +139,7 @@ table {
 }
 
 th {
-    background-color: #f8fafc;
+    background-color: #fafdff00;
     padding: 0.75rem 1rem;
     text-align: left;
     font-weight: 500;
@@ -211,7 +211,7 @@ thead {
 
 /* Renamed from "stats-overview" for reusability, also edited some attributes */
 .section {                  
-    background: white;  /* A light background to make cards stand out */
+    background: linear-gradient(135deg,#b4fdc269,#bebcf5);
     border-radius: 0.75rem;
     box-shadow: 0 4px 8px rgba(0,0,0,0.1);
     padding: 1.5rem;
@@ -231,20 +231,40 @@ thead {
 }
 
 .stats-metric-card {
-    background-color: #ffffff;
+    background: linear-gradient(135deg, #c8d5f9, #81a2e9); 
+    color: white; 
     border-radius: 8px;
     padding: 1.5rem;
-    flex: 0 1 280px; /* Each card is at least 280px wide; it wraps if smaller screens */
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    flex: 0 1 280px; 
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     text-align: center;
-    transition: transform 0.3s, box-shadow 0.3s; 
+    transition: transform 0.3s, box-shadow 0.3s;
     border: 1px solid #e2e8f0;
 }
 
-/* Hover effect to give a more interactive feel */
+/* Hover effect for better interactivity */
 .stats-metric-card:hover {
     transform: translateY(-5px);
-    box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+}
+
+/* Adjust text styles inside the card */
+.stats-metric-card h3 {
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+}
+
+.stats-metric-card p {
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin: 0;
+}
+
+.stats-metric-card .stats-sub {
+    font-size: 1rem;
+    color: #fbff00; 
+    margin-top: 0.5rem;
 }
 
 .stats-icon {
@@ -259,7 +279,7 @@ thead {
     color: var(--secondary-color); 
     margin-bottom: 0.5rem;
     text-align: center; 
-    font-family: 'Sour Gummy', sans-serif ; 
+    font-family: Arial, sans-serif; 
 }
 
 .stats-info p {
@@ -275,7 +295,7 @@ thead {
     color: #6c757d; 
     text-align: center; 
     margin-top: 0.25rem; 
-    font-family: 'Sour Gummy', sans-serif ; 
+    font-family: Arial, sans-serif; 
 }
 
 .upload-container {
@@ -617,7 +637,7 @@ h1.section-title {
     text-align: center;
     color: var(--secondary-color); 
     margin-bottom: 2rem; 
-    font-family: 'Sour Gummy', sans-serif; 
+    font-family: Arial, sans-serif; 
 }
 
 /* Section Titles (Key Stats, Current Activities, Add New) */
@@ -627,25 +647,39 @@ h2.section-title {
     color: var(--primary-color); 
     margin-bottom: 1.5rem; 
     text-align: left; 
-    font-family: 'Sour Gummy', sans-serif !important; 
+    font-family: Arial, sans-serif; 
 }
 
-/* Stats Box Styles */
+/* Stats Box Styles with Gradient Background */
 .stats-box {
-    border: 2px solid var(--light-border); 
-    border-radius: 8px; 
+    background: linear-gradient(135deg, #58627f7c, #8499c585); 
+    color: white; 
+    border-radius: 12px; 
     padding: 1.5rem;
-    background-color: #ffffff; 
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); 
     margin-bottom: 1.5rem; 
-    width: 100%; 
-    max-width: 300px; 
-    height: 250px; 
-    display: flex; 
-    flex-direction: column; 
-    justify-content: center; 
-    align-items: center; 
+    box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.1), -4px -4px 10px rgba(255, 255, 255, 0.7); 
     text-align: center; 
+    transition: transform 0.3s, box-shadow 0.3s; 
+}
+
+/* Hover Effect for Stats Box */
+.stats-box:hover {
+    transform: translateY(-5px); 
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2); 
+}
+
+/* Stats Box Title */
+.stats-box h4 {
+    font-size: 1.5rem; 
+    font-weight: bold; 
+    margin-bottom: 1rem; 
+}
+
+/* Stats Box Content */
+.stats-box p {
+    font-size: 1.2rem; 
+    margin: 0.5rem 0; 
+    color: rgb(254, 255, 181);
 }
 
 .row {
@@ -653,6 +687,128 @@ h2.section-title {
     justify-content: center; 
     gap: 1rem; 
     flex-wrap: wrap; 
+}
+
+/* Shared With - Horizontal Layout */
+.shared-with-card {
+    background: linear-gradient(145deg, #f3f3f3, #e0e0e0); 
+    border-radius: 12px; 
+    padding: 1rem 1.5rem; 
+    margin-bottom: 1rem;
+    box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.1), -4px -4px 10px rgba(255, 255, 255, 0.7); 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+    max-width: 800px; 
+    margin-left: auto; 
+    margin-right: auto; 
+}
+
+/* Username Text */
+.shared-username {
+    font-size: 1.2rem; 
+    font-weight: bold; 
+    color: var(--secondary-color); 
+}
+
+/* Delete Button Form */
+.delete-form {
+    margin-left: auto; 
+}
+
+.delete-form button {
+    padding: 0.5rem 1rem; 
+    font-size: 1rem; 
+    font-weight: bold; 
+    border-radius: 8px; 
+    background-color: #dc3545; 
+    color: white; 
+    border: none;
+    cursor: pointer; 
+    transition: background-color 0.3s, transform 0.2s;
+}
+
+.delete-form button:hover {
+    background-color: #c82333; 
+    transform: scale(1.05); 
+}
+
+/* Button Container for Shared With Me */
+.button-container {
+    display: flex;
+    justify-content: space-around;
+    margin-top: 10px;
+}
+
+.button-container form {
+    margin: 0 5px;
+}
+
+.button-container button {
+    width: 140px; 
+    height: 50px; 
+    border-radius: 8px; 
+    color: white;
+    font-weight: bold;
+    font-size: 16px;
+    border: none;
+}
+
+.button-container .btn-primary {
+    background-color: #007bff;
+}
+
+.button-container .btn-secondary {
+    background-color: #6c757d;
+}
+
+.button-container .btn-info {
+    background-color: #17a2b8;
+}
+
+/* Card Title */
+.card-title {
+    font-size: 1.2rem; 
+    font-weight: bold; 
+    color: var(--secondary-color); 
+    margin-bottom: 0.5rem; 
+    text-align: left;
+    border: none; 
+    padding: 0; 
+}
+
+/* Card Styles */
+.card {
+    max-width: 300px;      
+    width: 200%;           
+    margin: 50px;   
+    padding: 30px;
+    background-color: #f1f1f1;
+    border: 2px solid #ccc;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+   
+.card-body {
+    padding: 15px; 
+    font-size: 18px; 
+}
+
+/* Horizontal Buttons for Shared With Me */
+.horizontal-buttons {
+    display: flex;
+    flex-direction: column; 
+    align-items: center; 
+    gap: 10px; 
+    margin-top: 1rem;
+}
+
+.horizontal-buttons button {
+    border-radius: 8px; 
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+    font-weight: bold;
+    width: 120px; 
 }
 
 /* Shared With - Horizontal Layout */

@@ -5,7 +5,7 @@
 {% block content %}
 <div class="page-container">
     <h2 class="text-center page-title">Your Media Entries</h2>
-    <section class="section wow fadeIn" data-wow-duration="1s" data-wow-delay="0.2s">
+    <section class="section wow fadeIn" data-wow-duration="0.2s" data-wow-delay="0.05s">
         <!-- Search Bar -->
         <form action="{{ url_for('viewdata') }}" method="GET" class="mb-4">
             <div class="row">
@@ -43,25 +43,25 @@
         </form>
     </section>  
 
-    <section class="table-section wow fadeIn" data-wow-duration="1s" data-wow-delay="0.3s">
+    <section class="table-section wow fadeIn" data-wow-duration="0.2s" data-wow-delay="0.1">
         <table class="table table-striped mt-4">
             <thead>
                 <tr>
-                    <th class="wow fadeInUp" data-wow-duration="0.5s" data-wow-delay="0.1s">Date</th>
-                    <th class="wow fadeInUp" data-wow-duration="0.5s" data-wow-delay="0.2s">Media Type</th>
-                    <th class="wow fadeInUp" data-wow-duration="0.5s" data-wow-delay="0.3s">Media Name</th>
-                    <th class="wow fadeInUp" data-wow-duration="0.5s" data-wow-delay="0.4s">Duration (minutes)</th>
-                    <th class="wow fadeInUp" data-wow-duration="0.5s" data-wow-delay="0.5s">Actions</th>
+                    <th class="wow fadeInUp" data-wow-duration="0.2s" data-wow-delay="0.05s">Date</th>
+                    <th class="wow fadeInUp" data-wow-duration="0.2s" data-wow-delay="0.1s">Media Type</th>
+                    <th class="wow fadeInUp" data-wow-duration="0.2s" data-wow-delay="0.15s">Media Name</th>
+                    <th class="wow fadeInUp" data-wow-duration="0.2s" data-wow-delay="0.2s">Duration (minutes)</th>
+                    <th class="wow fadeInUp" data-wow-duration="0.2s" data-wow-delay="0.25s">Actions</th>
                 </tr>
             </thead>
             <tbody>
                 {% for entry in entries %}
                 <tr>
-                    <td class="wow fadeInUp" data-wow-duration="0.5s" data-wow-delay="0.1s">{{ entry.date }}</td>
-                    <td class="wow fadeInUp" data-wow-duration="0.5s" data-wow-delay="0.2s">{{ entry.activity.media_type }}</td>
-                    <td class="wow fadeInUp" data-wow-duration="0.5s" data-wow-delay="0.3s">{{ entry.activity.media_name }}</td>
-                    <td class="wow fadeInUp" data-wow-duration="0.5s" data-wow-delay="0.4s">{{ entry.duration }}</td>
-                    <td class="wow fadeInUp" data-wow-duration="0.5s" data-wow-delay="0.5s">
+                    <td class="wow fadeInUp" data-wow-duration="0.2s" data-wow-delay="0.05s">{{ entry.date }}</td>
+                    <td class="wow fadeInUp" data-wow-duration="0.2s" data-wow-delay="0.1s">{{ entry.activity.media_type }}</td>
+                    <td class="wow fadeInUp" data-wow-duration="0.2s" data-wow-delay="0.15s">{{ entry.activity.media_name }}</td>
+                    <td class="wow fadeInUp" data-wow-duration="0.2s" data-wow-delay="0.2s">{{ entry.duration }}</td>
+                    <td class="wow fadeInUp" data-wow-duration="0.2s" data-wow-delay="0.25s">
                         <a href="{{ url_for('delete_entry', entry_id=entry.id) }}" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this entry?');">Delete</a>
                     </td>
                 </tr>

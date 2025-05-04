@@ -4,50 +4,59 @@
 
 {% block content %}
 <div class="container">
-    <h1 class="text-center section-title">Dashboard</h1>
-    <!-- Stats Overview Section -->
-    <section class="stats-overview">
-        <h2 class="section-title">Key Stats</h2>
+    <h1 class="text-center page-title">Dashboard</h1>
+
+     <!-- Stats Overview Section -->
+     <section class="section wow fadeInUp" data-wow-duration="0.5s" data-wow-delay="0.3s">
+        <div class="section-header">
+            <h2 class="section-title">Key Stats</h2>
+        </div>
         <div class="stats-grid">
-            <!-- Total time spent on media -->
+            <!-- Time Spent -->
             <div class="stats-metric-card">
-                <div class="stats-icon">
+                <div class="stats-icon clock">
                     <i class="fas fa-clock"></i>
                 </div>
-                <div class="stats-info">
-                    <h3>Total Time Spent</h3>
-                    <p class="stats-value">{{ total_time }} hours</p>
+                <div class="container">
+                    <div class="stats-info"><h3>Total Time Spent</h3></div>
+                    <div class="stats-info"><p>{{ total_time }} hours</p></div>
+                    <div class="stats-sub">Since Jan 2025</div>         <!-- FAKE STAT -->
                 </div>
             </div>
-
-            <!-- Most Consumed Media -->
+            
+            <!-- Most Used Media -->
             <div class="stats-metric-card">
-                <div class="stats-icon">
+                <div class="stats-icon film">
                     <i class="fas fa-film"></i>
                 </div>
-                <div class="stats-info">
-                    <h3>Most Consumed Media</h3>
-                    <p class="stats-value">{{ most_consumed_media }}</p>
+                <div class="container">
+                    <div class="stats-info"><h3>Most Consumed Media</h3></div>
+                    <div class="stats-info"><p>{{ most_consumed_media }}</p></div>
+                    <div class="stats-sub">52% of total time</div>          <!-- FAKE STAT -->       
                 </div>
             </div>
-
-            <!-- Average Daily Media Consumption -->
+            
+            <!-- Daily Consumption -->
             <div class="stats-metric-card">
-                <div class="stats-icon">
+                <div class="stats-icon chart">
                     <i class="fas fa-chart-line"></i>
                 </div>
-                <div class="stats-info">
-                    <h3>Average Daily Consumption</h3>
-                    <p class="stats-value">{{ daily_average_time }} hours</p>
+                <div class="container">
+                    <div class="stats-info"><h3>Daily Consumption</h3></div>
+                    <div class="stats-info"><p>{{ daily_average_time }} hours</p></div>
+                    <div class="stats-sub">Last 30 days</div>           <!-- FAKE STAT -->       
                 </div>
             </div>
         </div>
     </section>
 
     <!-- Current Media Section -->
-    <section class="current-media mt-5">
-        <h2 class="section-title">Current Activities</h2>
-        <table class="table table-striped mt-4">
+    <section class="section wow fadeInUp" data-wow-duration="0.5s" data-wow-delay="0.3s">
+        <div class="section-header" style="margin-bottom: 0;">
+            <h2 class="section-title">Current Activities</h2>
+        </div>
+        <div  class="table-container">
+        <table>
             <thead>
                 <tr>
                     <th>Media Name</th>
@@ -74,8 +83,13 @@
                     </td>
                 </tr>
                 {% endfor %}
+                <tr>
+                    <td></td><td></td><td></td>
+                    <td><button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#addActivityModal">Add New Activity</button></td>
+                </tr>
             </tbody>
         </table>
+        </div>
     </section>
 
     <!-- End Activity Modal -->
@@ -119,11 +133,23 @@
                     <div class="modal-body">
                         <div class="mb-3">
                             <label for="media_type" class="form-label">Media Type</label>
-                            <input type="text" id="media_type" name="media_type" class="form-control" placeholder="e.g., Movie, Book" required>
+                            <select id="media_type" name="media_type" class="form-select" required>
+                                <option value="">Select Media Type</option>
+                                <option value="Visual Media">Visual Media</option>
+                                <option value="Audio Media">Audio Media</option>
+                                <option value="Text Media">Text Media</option>
+                                <option value="Interactive Media">Interactive Media</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="media_subtype" class="form-label">Media Subtype</label>
+                            <select id="media_subtype" name="media_subtype" class="form-select" disabled>
+                                <option value="">None</option>
+                            </select>
                         </div>
                         <div class="mb-3">
                             <label for="media_name" class="form-label">Media Name</label>
-                            <input type="text" id="media_name" name="media_name" class="form-control" placeholder="e.g., Inception, 1984" required>
+                            <input type="text" id="media_name" name="media_name" class="form-control" placeholder="Enter media name" required>
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -134,12 +160,6 @@
             </div>
         </div>
     </div>
-
-    <!-- Trigger Button for Add New Activity Modal -->
-    <section class="add-new-entry mt-5">
-        <h2 class="section-title">Add New</h2>
-        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addActivityModal">Add New Activity</button>
-    </section>
 </div>
 
 <script>
@@ -163,6 +183,37 @@
             document.getElementById('rating').value = '';
             document.getElementById('comment').value = '';
             endActivityForm.submit();
+        });
+
+        const mediaTypeSelect = document.getElementById('media_type');
+        const mediaSubtypeSelect = document.getElementById('media_subtype');
+
+        const mediaTypes = {
+            "Visual Media": ["None", "Movie", "TV Show", "Documentary", "Anime", "Short Film", "Theater Play"],
+            "Audio Media": ["None", "Podcast", "Music", "Audiobook"],
+            "Text Media": ["None", "Book", "Article", "Blog", "News", "Comic", "Manga", "Webtoon", "Graphic Novel", "Light Novel", "Novel", "Short Story", "Web Novel"],
+            "Interactive Media": ["None", "First Person Shooter", "Role Playing Game", "Simulation", "Puzzle", "Platformer", "Strategy", "Adventure"]
+        };
+
+        mediaTypeSelect.addEventListener('change', () => {
+            const selectedType = mediaTypeSelect.value;
+            mediaSubtypeSelect.innerHTML = '';
+
+            if (selectedType) {
+                mediaSubtypeSelect.disabled = false;
+                mediaTypes[selectedType].forEach(subtype => {
+                    const option = document.createElement('option');
+                    option.value = subtype;
+                    option.textContent = subtype;
+                    mediaSubtypeSelect.appendChild(option);
+                });
+            } else {
+                mediaSubtypeSelect.disabled = true;
+                const defaultOption = document.createElement('option');
+                defaultOption.value = '';
+                defaultOption.textContent = 'None';
+                mediaSubtypeSelect.appendChild(defaultOption);
+            }
         });
     });
 </script>

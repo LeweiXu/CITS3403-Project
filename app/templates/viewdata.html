@@ -3,164 +3,106 @@
 {% block title %}MediaTracker - View Data{% endblock %}
 
 {% block content %}
-<div class="container">
-    <h2 class="text-center">Your Media Entries</h2>
-    <!-- Advanced Section -->
-    <div class="advanced-section mt-5">
-        <button id="toggle-advanced" class="btn btn-secondary">Advanced</button>
-        <div id="advanced-content" class="hidden">
-            <h2 class="text-center mt-4">Upload CSV File & Media Details</h2>
-            <!-- CSV Upload Section -->
-            <section class="form-section">
-                <h3>Upload CSV File</h3>
-                <form action="/upload" method="post" enctype="multipart/form-data" id="csv-upload-form">
-                    <div class="form-group full">
-                        <!-- CSV Drag and Drop Zone -->
-                        <div id="drop-zone">
-                            <p>Drag &amp; drop your CSV here <br>- or - <br>
-                                <button type="button" id="choose-file-btn" class="btn btn-outline-primary btn-sm">
-                                    Browse files
-                                </button>
-                            </p>
-                            <!-- Hide the native picker -->
-                            <input type="file" id="csvFile" name="csvFile" accept=".csv" required hidden>
-                        </div>
-                    </div>
-                    <div class="form-actions full">
-                        <button type="submit" class="btn btn-primary btn-sm">Upload</button>
-                    </div>
-                </form>
-            </section>
+<div class="page-container">
+    <h2 class="text-center page-title">Your Media Entries</h2>
+    <section class="section wow fadeIn" data-wow-duration="1s" data-wow-delay="0.2s">
+        <!-- Search Bar -->
+        <form action="{{ url_for('viewdata') }}" method="GET" class="mb-4">
+            <div class="row">
+                <div class="col-md-2">
+                    <label for="start_date" class="form-label">Start Date</label>
+                    <input type="date" id="start_date" name="start_date" class="form-control" value="{{ request.args.get('start_date', '') }}">
+                </div>
+                <div class="col-md-2">
+                    <label for="end_date" class="form-label">End Date</label>
+                    <input type="date" id="end_date" name="end_date" class="form-control" value="{{ request.args.get('end_date', '') }}">
+                </div>
+                <div class="col-md-2">
+                    <label for="media_name" class="form-label">Media Name</label>
+                    <input type="text" id="media_name" name="media_name" class="form-control" placeholder="e.g., Inception" value="{{ request.args.get('media_name', '') }}">
+                </div>
+                <div class="col-md-2">
+                    <label for="media_type" class="form-label">Media Type</label>
+                    <input type="text" id="media_type" name="media_type" class="form-control" placeholder="e.g., Movie" value="{{ request.args.get('media_type', '') }}">
+                </div>
+                <div class="col-md-2">
+                    <label for="min_duration" class="form-label">Min Duration</label>
+                    <input type="number" id="min_duration" name="min_duration" class="form-control" placeholder="e.g., 30" value="{{ request.args.get('min_duration', '') }}">
+                </div>
+                <div class="col-md-2">
+                    <label for="max_duration" class="form-label">Max Duration</label>
+                    <input type="number" id="max_duration" name="max_duration" class="form-control" placeholder="e.g., 120" value="{{ request.args.get('max_duration', '') }}">
+                </div>
+            </div>
+            <div class="row mt-3">
+                <div class="col-md-12 text-center">
+                    <button type="submit" class="btn btn-primary">Search</button>
+                    <a href="{{ url_for('viewdata') }}" class="btn btn-secondary">Reset</a>
+                </div>
+            </div>
+        </form>
+    </section>  
 
-            <!-- Media Details Form -->
-            <section class="form-section">
-                <h3>Media Details</h3>
-                <form action="/upload" method="post" class="upload-form">
-                    <div class="form-group">
-                        <label for="mediaType">Media Type:</label>
-                        <input type="text" id="mediaType" name="mediaType" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="mediaName">Media Name:</label>
-                        <input type="text" id="mediaName" name="mediaName" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="duration">Duration:</label>
-                        <input type="text" id="duration" name="duration" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="date">Date:</label>
-                        <input type="date" id="date" name="date" required>
-                    </div>
-                    <div class="form-actions full">
-                        <button type="submit" class="btn btn-primary btn-sm">Submit</button>
-                    </div>
-                </form>
-            </section>
-
-            <!-- Export CSV Section -->
-            <section class="form-section mt-4">
-                <h3>Export Media Entries</h3>
-                <form action="{{ url_for('export_csv') }}" method="GET">
-                    <button type="submit" class="btn btn-success btn-sm">Export as CSV</button>
-                </form>
-            </section>
-        </div>
-    </div>
-    <!-- Search Bar -->
-    <form action="{{ url_for('viewdata') }}" method="GET" class="mb-4">
-        <div class="row">
-            <div class="col-md-2">
-                <label for="start_date" class="form-label">Start Date</label>
-                <input type="date" id="start_date" name="start_date" class="form-control" value="{{ request.args.get('start_date', '') }}">
-            </div>
-            <div class="col-md-2">
-                <label for="end_date" class="form-label">End Date</label>
-                <input type="date" id="end_date" name="end_date" class="form-control" value="{{ request.args.get('end_date', '') }}">
-            </div>
-            <div class="col-md-2">
-                <label for="media_name" class="form-label">Media Name</label>
-                <input type="text" id="media_name" name="media_name" class="form-control" placeholder="e.g., Inception" value="{{ request.args.get('media_name', '') }}">
-            </div>
-            <div class="col-md-2">
-                <label for="media_type" class="form-label">Media Type</label>
-                <input type="text" id="media_type" name="media_type" class="form-control" placeholder="e.g., Movie" value="{{ request.args.get('media_type', '') }}">
-            </div>
-            <div class="col-md-2">
-                <label for="min_duration" class="form-label">Min Duration</label>
-                <input type="number" id="min_duration" name="min_duration" class="form-control" placeholder="e.g., 30" value="{{ request.args.get('min_duration', '') }}">
-            </div>
-            <div class="col-md-2">
-                <label for="max_duration" class="form-label">Max Duration</label>
-                <input type="number" id="max_duration" name="max_duration" class="form-control" placeholder="e.g., 120" value="{{ request.args.get('max_duration', '') }}">
-            </div>
-        </div>
-        <div class="row mt-3">
-            <div class="col-md-12 text-center">
-                <button type="submit" class="btn btn-primary">Search</button>
-                <a href="{{ url_for('viewdata') }}" class="btn btn-secondary">Reset</a>
-            </div>
-        </div>
-    </form>
-    <table class="table table-striped mt-4">
-        <thead>
-            <tr>
-                <th>Date</th>
-                <th>Media Type</th>
-                <th>Media Name</th>
-                <th>Duration (minutes)</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for entry in entries %}
-            <tr>
-                <td>{{ entry.date }}</td>
-                <td>{{ entry.activity.media_type }}</td>
-                <td>{{ entry.activity.media_name }}</td>
-                <td>{{ entry.duration }}</td>
-                <td>
-                    <a href="{{ url_for('delete_entry', entry_id=entry.id) }}" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this entry?');">Delete</a>
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-    {% if total_pages > 1 %}
-        <nav aria-label="Pagination">
-        <ul class="pagination justify-content-center mt-4">
-            {% if page > 1 %}
-            <li class="page-item">
-                <a class="page-link"
-                href="{{ url_for(request.endpoint, page=page-1, **request_args) }}">
-                &laquo; Prev
-                </a>
-            </li>
+    <section class="table-section wow fadeIn" data-wow-duration="1s" data-wow-delay="0.3s">
+        <table class="table table-striped mt-4">
+            <thead>
+                <tr>
+                    <th class="wow fadeInUp" data-wow-duration="0.5s" data-wow-delay="0.1s">Date</th>
+                    <th class="wow fadeInUp" data-wow-duration="0.5s" data-wow-delay="0.2s">Media Type</th>
+                    <th class="wow fadeInUp" data-wow-duration="0.5s" data-wow-delay="0.3s">Media Name</th>
+                    <th class="wow fadeInUp" data-wow-duration="0.5s" data-wow-delay="0.4s">Duration (minutes)</th>
+                    <th class="wow fadeInUp" data-wow-duration="0.5s" data-wow-delay="0.5s">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for entry in entries %}
+                <tr>
+                    <td class="wow fadeInUp" data-wow-duration="0.5s" data-wow-delay="0.1s">{{ entry.date }}</td>
+                    <td class="wow fadeInUp" data-wow-duration="0.5s" data-wow-delay="0.2s">{{ entry.activity.media_type }}</td>
+                    <td class="wow fadeInUp" data-wow-duration="0.5s" data-wow-delay="0.3s">{{ entry.activity.media_name }}</td>
+                    <td class="wow fadeInUp" data-wow-duration="0.5s" data-wow-delay="0.4s">{{ entry.duration }}</td>
+                    <td class="wow fadeInUp" data-wow-duration="0.5s" data-wow-delay="0.5s">
+                        <a href="{{ url_for('delete_entry', entry_id=entry.id) }}" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this entry?');">Delete</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% if total_pages > 1 %}
+            <nav aria-label="Pagination">
+            <ul class="pagination justify-content-center mt-4">
+                {% if page > 1 %}
+                <li class="page-item">
+                    <a class="page-link"
+                    href="{{ url_for(request.endpoint, page=page-1, **request_args) }}">
+                    &laquo; Prev
+                    </a>
+                </li>
+                {% endif %}
+                {% for p in range(1, total_pages+1) %}
+                <li class="page-item {% if p==page %}active{% endif %}">
+                    <a class="page-link"
+                    href="{{ url_for(request.endpoint, page=p, **request_args) }}">
+                    {{ p }}
+                    </a>
+                </li>
+                {% endfor %}
+                {% if page < total_pages %}
+                <li class="page-item">
+                    <a class="page-link"
+                    href="{{ url_for(request.endpoint, page=page+1, **request_args) }}">
+                    Next &raquo;
+                    </a>
+                </li>
+                {% endif %}
+            </ul>
+            </nav>
             {% endif %}
-            {% for p in range(1, total_pages+1) %}
-            <li class="page-item {% if p==page %}active{% endif %}">
-                <a class="page-link"
-                href="{{ url_for(request.endpoint, page=p, **request_args) }}">
-                {{ p }}
-                </a>
-            </li>
-            {% endfor %}
-            {% if page < total_pages %}
-            <li class="page-item">
-                <a class="page-link"
-                href="{{ url_for(request.endpoint, page=page+1, **request_args) }}">
-                Next &raquo;
-                </a>
-            </li>
-            {% endif %}
-        </ul>
-        </nav>
-        {% endif %}
+    </section>
 </div>
 {% endblock %}
 
 {% block extra_scripts %}
-<link rel="stylesheet" href="{{ url_for('static', filename='css/viewdata.css') }}">
 <script>
     document.addEventListener('DOMContentLoaded', () => {
         // Toggle visibility of the advanced section

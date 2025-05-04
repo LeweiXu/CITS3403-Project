@@ -1,0 +1,133 @@
+ <!-- Register Modal -->
+ <div class="modal fade" id="registerModal" tabindex="-1" aria-labelledby="registerModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-dialog-centered">
+            <div class="modal-content entry-section">
+                <div class="modal-header border-0" style="padding: 0;">
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" style="padding: 0;">
+                    <h2 class="text-center">Register</h2>
+                    <p class="text-center">Create an account to start tracking your media consumption.</p>
+                    <form id="registerForm" method="POST" action="/register">
+                        <div class="mb-3">
+                            <label for="reg-username" class="form-label">Username</label>
+                            <input type="text" class="form-control" id="reg-username" name="username" required>
+                            <div id="username-error" class="invalid-feedback"></div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="reg-email" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="reg-email" name="email" required>
+                            <div id="email-error" class="invalid-feedback"></div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="reg-password" class="form-label">Password</label>
+                            <input type="password" class="form-control" id="reg-password" name="password" required>
+                            <div id="password-error" class="invalid-feedback"></div>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">Register</button>
+                        <div class="modal-footer flex-column">
+                            <p class="text-center mt-3">
+                                Already have an account? <a href="#" data-bs-toggle="modal" data-bs-target="#loginModal" data-bs-dismiss="modal">Login</a>
+                            </p>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.getElementById('registerForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        // Reset previous error states
+        const inputs = ['username', 'email', 'password'];
+        inputs.forEach(input => {
+            document.getElementById(`reg-${input}`).classList.remove('is-invalid');
+            document.getElementById(`${input}-error`).textContent = '';
+        });
+
+        let isValid = true;
+        
+        // Validation variables
+        const username = document.getElementById('reg-username').value;
+        const email = document.getElementById('reg-email').value;
+        const password = document.getElementById('reg-password').value;
+
+        // Username validation
+        if (username.length < 3 || username.length > 20) {
+            document.getElementById('reg-username').classList.add('is-invalid');
+            document.getElementById('username-error').innerHTML = '<small>Username must be between 3 and 20 characters.</small>';
+            isValid = false;
+        }
+
+        // Email validation
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        // [^\s@] - not a whitespace or @, any characters but those
+        // + @ and [^\s@] again
+        // + \. - at least one dot and [^\s@] again
+        if (!emailRegex.test(email)) {
+            document.getElementById('reg-email').classList.add('is-invalid');
+            document.getElementById('email-error').innerHTML = '<small>Please enter a valid email address.</small>';
+            isValid = false;
+        }
+
+        // Password validation
+        const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*(),.?":{}|<>])[A-Za-z\d!@#$%^&*(),.?":{}|<>]{8,}$/;
+        // (?=.*[a-z]) - at least one lowercase letter
+        // (?=.*[A-Z]) - at least one uppercase letter
+        // (?=.*\d) - at least one number
+        // (?=.*[!@#$%^&*(),.?":{}|<>]) - at least one special character
+        // [A-Za-z\d!@#$%^&*(),.?":{}|<>]{8,} - total length of 8 or more characters
+        if (!passwordRegex.test(password)) {
+            document.getElementById('reg-password').classList.add('is-invalid');
+            document.getElementById('password-error').innerHTML = '<small>Password must contain:<br>• At least 8 characters<br>• At least one uppercase letter<br>• At least one lowercase letter<br>• At least one number<br>• At least one special character (!@# etc.)</small>';
+            isValid = false;
+        }
+
+        // If any validation fails, do not proceed
+        if (!isValid) return;
+
+        // For showing the modal
+        const formData = new FormData(e.target);
+        const response = await fetch('/register', {
+            method: 'POST',
+            body: formData
+        });
+
+        if (response.ok) {
+            const result = await response.text();
+            switch(result) {
+                case 'username_exists':
+                    document.getElementById('reg-username').classList.add('is-invalid');
+                    document.getElementById('username-error').innerHTML = '<small>Username already exists.</small>';
+                    break;
+                case 'email_exists':
+                    document.getElementById('reg-email').classList.add('is-invalid');
+                    document.getElementById('email-error').innerHTML = '<small>Email already exists.</small>';
+                    break;
+                case 'success':
+                    alert('Registration successful! Please log in.');
+
+                    // Close register modal
+                    const registerModal = bootstrap.Modal.getInstance(document.getElementById('registerModal'));
+                    registerModal.hide();
+                    
+                    // Open login modal
+                    const loginModal = new bootstrap.Modal(document.getElementById('loginModal'));
+                    loginModal.show();
+                    
+                    // Clear the registration form
+                    document.getElementById('registerForm').reset();
+                    break;
+                default:
+                    alert('Registration failed. Please try again.');
+            }
+        } else {
+            alert('Registration failed. Please try again.');
+        }
+
+    });
+</script>

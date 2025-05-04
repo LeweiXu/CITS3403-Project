@@ -3,12 +3,11 @@
 {% block title %}MediaTracker - Analysis{% endblock %}
 
 {% block content %}
-<div class="container mt-4">
-    <h1>Analysis</h1>
-
+<div class="container">
+    <h1 class="page-title text-center">Analysis</h1>
     <!-- Overall Statistics Section -->
-    <div class="mt-4">
-        <h2>Overall Statistics</h2>
+    <section class="section wow fadeInUp" data-wow-duration="0.5s" data-wow-delay="0.3s">
+        <h2 class="section-header">Overall Statistics</h2>
         <div class="row">
             <div class="col-md-4">
                 <h4>Total Time Spent</h4>
@@ -30,11 +29,11 @@
                 <p>Duration: <span id="longest-activity-duration">{{ analysis_data.statistics.longest_activity.duration }} hours</span></p>
             </div>
         </div>
-    </div>
+    </section>
 
     <!-- Rankings Section -->
-    <div class="mt-4">
-        <h2>Rankings</h2>
+    <section class="section wow fadeInUp" data-wow-duration="0.5s" data-wow-delay="0.3s">
+        <h2 class="section-header">Rankings</h2>
         <div class="mb-3">
             <label for="ranking-select" class="form-label">Select Ranking:</label>
             <select id="ranking-select" class="form-select">
@@ -63,11 +62,11 @@
                 </tbody>
             </table>
         </div>
-    </div>
+    </section>
 
     <!-- Graphs Section -->
-    <div class="mt-4">
-        <h2>Graphs</h2>
+    <section class="section wow fadeInUp" data-wow-duration="0.5s" data-wow-delay="0.3s">
+        <h2 class="section-header">Graphs</h2>
         <div class="mb-3">
             <label for="graph-select" class="form-label">Select Graph:</label>
             <select id="graph-select" class="form-select">
@@ -79,7 +78,7 @@
         <div id="graph-view">
             <canvas id="graph-canvas" width="400" height="200"></canvas>
         </div>
-    </div>
+    </section>
 </div>
 
 <input type="hidden" id="analysis-data" value='{{ analysis_data|tojson }}'>
@@ -193,6 +192,35 @@
         const graphCanvas = document.getElementById('graph-canvas').getContext('2d');
         let currentChart;
 
+        // Load the default graph on page load
+        const analysisData = JSON.parse(document.getElementById('analysis-data').value || '{}');
+        const dailyData = analysisData.graphs.daily_time_past_week;
+        currentChart = new Chart(graphCanvas, {
+            type: 'bar',
+            data: {
+                labels: dailyData.map(d => d.date),
+                datasets: [{
+                    label: 'Total Time Spent Daily (Hours)',
+                    data: dailyData.map(d => d.total_duration / 60), // Convert minutes to hours
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Hours'
+                        }
+                    }
+                }
+            }
+        });
+
         graphSelect.addEventListener('change', () => {
             const selectedGraph = graphSelect.value;
 
@@ -201,8 +229,6 @@
                 currentChart.destroy();
             }
             console.log("testing"); // ############Debigugging###############
-
-            const analysisData = JSON.parse(document.getElementById('analysis-data').value || '{}');
 
             if (selectedGraph === 'daily-time') {
                 const dailyData = analysisData.graphs.daily_time_past_week;

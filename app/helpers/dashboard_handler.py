@@ -64,12 +64,14 @@ def handle_dashboard_form(username, form):
             flash(f'Duration added to activity ID {activity_id}.', 'success')
     elif 'add_new_entry' in form:  # Add a new media entry
         media_type = form.get('media_type')
+        media_subtype = form.get('media_subtype')
         media_name = form.get('media_name')
         if media_type and media_name:
             # Add a new activity and its first media entry
             new_activity = Activities(
                 username=username,
                 media_type=media_type,
+                media_subtype=media_subtype if media_subtype else None,
                 media_name=media_name,
                 start_date=datetime.now().date(),
                 rating=None,

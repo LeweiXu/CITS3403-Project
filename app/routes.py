@@ -1,4 +1,5 @@
-from flask import render_template, request, redirect, url_for, flash, session, Response
+import re
+from flask import render_template, request, redirect, url_for, flash, session, Response, jsonify
 from app import app, db
 from app.models import Entries, SharedUsers, Users
 from app.helpers.upload_handler import handle_upload
@@ -10,6 +11,7 @@ from app.helpers.analysis_handler import get_analysis_data
 from app.helpers.sharedata_handler import share_data_handler
 
 @app.route('/')
+@app.route('/index')
 def index():
     return render_template('index.html')
 
@@ -26,10 +28,39 @@ def login():
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
-    if request.method == 'POST':
-        result = handle_register(request)
-        return result  # Redirect to login or register page based on the result
-    return render_template('register.html')
+    username = request.form.get('username')
+    email = request.form.get('email')
+    password = request.form.get('password')
+
+    # Server-side validation for registration
+
+    # Username validation
+    if len(username) < 3 or len(username) > 20:
+        return jsonify({'error': 'username', 'message': 'Username must be between 3 and 20 characters.'}), 400
+    
+    # Email validation
+    if not re.match(r'^[^\s@]+@[^\s@]+\.[^\s@]+$', email):
+        return jsonify({'error': 'email', 'message': 'Invalid email address.'}), 400
+    
+    # Password validation
+    if not re.match(r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*(),.?":{}|<>])[A-Za-z\d!@#$%^&*(),.?":{}|<>]{8,}$', password):
+        return jsonify({'error': 'password', 'message': 'Password must contain at least 8 characters, one uppercase letter, one lowercase letter, and one number.'}), 400
+
+    # Check for existing users
+    if Users.query.filter_by(username=username).first():
+        return jsonify({'error': 'username', 'message': 'Username already exists'}), 400
+    if Users.query.filter_by(email=email).first():
+        return jsonify({'error': 'email', 'message': 'Email already exists'}), 400
+
+    result = handle_register(request)
+    return result
+
+@app.route('/advanced', methods=['GET', 'POST'])
+def advanced():
+    if 'username' not in session:
+        flash('Please log in to access this page.', 'danger')
+        return redirect(url_for('login'))
+    return render_template('advanced.html')
 
 @app.route('/dashboard', methods=['GET', 'POST'])
 def dashboard():
@@ -109,8 +140,6 @@ def viewdata():
     args = request.args.to_dict()
     args.pop('page', None)
 
-
-
     return render_template(
         'viewdata.html',
         entries=entries,
@@ -151,7 +180,7 @@ def sharedata():
 def logout():
     session.clear()  # Clear all session data
     flash('You have been logged out successfully.', 'success')
-    return redirect(url_for('login'))  # Redirect to the login page
+    return redirect(url_for('index'))  # Redirect to the home page
 
 @app.route('/export_csv', methods=['GET'])
 def export_csv():
@@ -166,8 +195,8 @@ def export_csv():
         headers={'Content-Disposition': 'attachment;filename=media_entries.csv'}
     )
 
-@app.route('/past_activities', methods=['GET'])
-def past_activities():
+@app.route('/activities', methods=['GET'])
+def activities():
     if 'username' not in session:
         flash('Please log in to view your activities.', 'danger')
         return redirect(url_for('login'))
@@ -192,39 +221,22 @@ def past_activities():
     args = request.args.to_dict()
     args.pop('page', None)
 
-
     return render_template(
-        'past_activities.html',
+        'activities.html',
         uncompleted_activities=ongoing_page,
         completed_activities=completed_page,
         page=page,
         total_pages=total_pages,
         request_args=args
     )
-
-@app.route('/analysis')
+@app.route('/analysis', methods=['GET'])
 def analysis():
-    analysis_data = {
-        "statistics": {
+    if 'username' not in session:
+        flash('Please log in to view the analysis page.', 'danger')
+        return redirect(url_for('login'))
 
-            "total_visual_media": 80,
-            "total_games": 50,
-            "week_books": 10,
-            "week_visual_media": 8,
-            "week_games": 5,
-            "longest_activity": {
-                "media_name": "The Witcher 3",
-                "duration": 40
-            }
-        },
-        "rankings": {
-            "activities_by_duration": [
-                {"media_name": "The Witcher 3", "media_type": "Game", "total_duration": 40, "start_date": "2023-01-01", "end_date": "2023-01-10"},
-                {"media_name": "Breaking Bad", "media_type": "TV Show", "total_duration": 30, "start_date": "2023-01-11", "end_date": "2023-01-20"},
-                {"media_name": "Harry Potter", "media_type": "Book", "total_duration": 25, "start_date": "2023-01-21", "end_date": "2023-01-30"}
-            ]
-        }
-    }
+    username = session['username']
+    analysis_data = get_analysis_data(username)
     return render_template('analysis.html', analysis_data=analysis_data)
 
 @app.route('/view_shared_data/<data_type>', methods=['GET','POST'])

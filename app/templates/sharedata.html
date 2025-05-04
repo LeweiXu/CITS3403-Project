@@ -1,27 +1,29 @@
 {% extends "base.html" %}
 
-{% block title %}MediaTracker - Share Data{% endblock %}
+{% block title %}Shared Data{% endblock %}
 
 {% block content %}
 <div class="container mt-5">
-    <h2 class="text-center mb-4">Users Sharing Their Data</h2>
+    <h2 class="page-title text-center">Share</h2>
     <div class="row justify-content-center">
-        <form method="POST" action="/sharedata" class="d-flex flex-wrap gap-2 justify-content-center w-100">
-            <input type="text" class="form-control w-auto flex-grow-1" placeholder="Search for a user" name="target_user" required style="max-width: 400px; border-radius: 10px 0 0 10px;">
-            <button class="btn btn-primary" type="submit" style="border-radius: 0 10px 10px 0;">Search and Share</button>
+        <form method="POST" action="/sharedata">
+            <div class="input-group mb-3">
+                <input type="text" class="form-control" placeholder="Search for a user" name="target_user" required>
+                <button class="btn btn-outline-primary" type="submit">Search and Share</button>
+            </div>
         </form>
     </div>
 
     <h3 class="text-center mt-5">Users You Have Shared Your Data With</h3>
     <div class="row justify-content-center">
         {% for shared_with_user in shared_with %}
-        <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
-            <div class="card shadow rounded h-100">
-                <div class="card-body text-center">
-                    <h5 class="card-title">👤 {{ shared_with_user.shared_username }}</h5>
+        <div class="col-md-4">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h5 class="card-title">User: {{ shared_with_user.shared_username }}</h5>
                     <form method="POST" action="/sharedata">
                         <input type="hidden" name="delete_user" value="{{ shared_with_user.shared_username }}">
-                        <button type="submit" class="btn btn-danger mt-2">Delete</button>
+                        <button type="submit" class="btn btn-danger">Delete</button>
                     </form>
                 </div>
             </div>
@@ -32,29 +34,26 @@
     <h3 class="text-center mt-5">Users Who Shared Their Data With You</h3>
     <div class="row justify-content-center">
         {% for shared_user in shared_with_me %}
-        <div class="col-lg-6 col-md-8 col-sm-12 mb-4">
-            <div class="card shadow rounded h-100">
-                <div class="card-body text-center">
-                    <h5 class="card-title mb-4">👤 {{ shared_user.username }}</h5>
-                    <div class="d-flex justify-content-between">
-                        <form method="POST" action="/view_shared_data/analysis" class="me-2">
-                            <input type="hidden" name="target_user" value="{{ shared_user.username }}">
-                            <button type="submit" class="btn btn-outline-primary btn-lg w-100" style="height: 100px; font-size: 1.2rem;">View Analysis</button>
-                        </form>
-                        <form method="POST" action="/view_shared_data/activities" class="me-2">
-                            <input type="hidden" name="target_user" value="{{ shared_user.username }}">
-                            <button type="submit" class="btn btn-outline-secondary btn-lg w-100" style="height: 100px; font-size: 1.2rem;">View Activities</button>
-                        </form>
-                        <form method="POST" action="/view_shared_data/history">
-                            <input type="hidden" name="target_user" value="{{ shared_user.username }}">
-                            <button type="submit" class="btn btn-outline-info btn-lg w-100" style="height: 100px; font-size: 1.2rem;">View History</button>
-                        </form>
-                    </div>
+        <div class="col-md-4">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h5 class="card-title">User: {{ shared_user.username }}</h5>
+                    <form method="POST" action="/view_shared_data/analysis">
+                        <input type="hidden" name="target_user" value="{{ shared_user.username }}">
+                        <button type="submit" class="btn btn-primary">View Analysis</button>
+                    </form>
+                    <form method="POST" action="/view_shared_data/activities">
+                        <input type="hidden" name="target_user" value="{{ shared_user.username }}">
+                        <button type="submit" class="btn btn-secondary">View Activities</button>
+                    </form>
+                    <form method="POST" action="/view_shared_data/history">
+                        <input type="hidden" name="target_user" value="{{ shared_user.username }}">
+                        <button type="submit" class="btn btn-info">View History</button>
+                    </form>
                 </div>
             </div>
         </div>
         {% endfor %}
     </div>
 </div>
-<link rel="stylesheet" href="{{ url_for('static', filename='css/sharedata.css') }}">
 {% endblock %}

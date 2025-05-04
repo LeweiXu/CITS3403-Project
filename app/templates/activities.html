@@ -3,12 +3,13 @@
 {% block title %}MediaTracker - Past Activities{% endblock %}
 
 {% block content %}
-<div class="container">
-    <h2 class="text-center">Past Activities</h2>
+<div class="page-container">
+    <h2 class="text-center page-title">Activities</h2>
 
     <!-- Filter Form -->
+    <section class="section wow fadeInUp" data-wow-duration="0.5s" data-wow-delay="0.3s">
     <form action="{{ url_for('activities') }}" method="GET" class="mb-4">
-        <div class="row">
+        <div class="row align-items-center">
             <div class="col-md-2">
                 <label for="start_date" class="form-label">Start Date</label>
                 <input type="date" id="start_date" name="start_date" class="form-control" value="{{ request.args.get('start_date', '') }}">
@@ -33,52 +34,54 @@
                 <label for="max_duration" class="form-label">Max Duration</label>
                 <input type="number" id="max_duration" name="max_duration" class="form-control" placeholder="e.g., 120" value="{{ request.args.get('max_duration', '') }}">
             </div>
-        </div>
-        <div class="row mt-3">
-            <div class="col-md-12 text-center">
-                <button type="submit" class="btn btn-primary">Search</button>
-                <a href="{{ url_for('activities') }}" class="btn btn-secondary">Reset</a>
+            <div class="row mt-3">
+                <div class="col-md-12 text-center">
+                    <button type="submit" class="btn btn-primary">Search</button>
+                    <a href="{{ url_for('activities') }}" class="btn btn-secondary">Reset</a>
+                </div>
             </div>
         </div>
     </form>
+    </section>
 
     <!-- Activities Table -->
+    <section class="table-section">
     <table class="table table-striped mt-4">
         <thead>
             <tr>
-                <th>Media Name</th>
-                <th>Media Type</th>
-                <th>Sub-Type</th>
-                <th>Total Duration (minutes)</th>
-                <th>Start Date</th>
-                <th>End Date</th>
-                <th>Rating</th>
+                <th class="wow fadeInUp" data-wow-duration="0.5s" data-wow-delay="0.1s">Media Name</th>
+                <th class="wow fadeInUp" data-wow-duration="0.5s" data-wow-delay="0.2s">Media Type</th>
+                <th class="wow fadeInUp" data-wow-duration="0.5s" data-wow-delay="0.3s">Sub-Type</th>
+                <th class="wow fadeInUp" data-wow-duration="0.5s" data-wow-delay="0.4s">Total Duration (minutes)</th>
+                <th class="wow fadeInUp" data-wow-duration="0.5s" data-wow-delay="0.5s">Start Date</th>
+                <th class="wow fadeInUp" data-wow-duration="0.5s" data-wow-delay="0.6s">End Date</th>
+                <th class="wow fadeInUp" data-wow-duration="0.5s" data-wow-delay="0.7s">Rating</th>
             </tr>
         </thead>
         <tbody>
             <!-- Uncompleted Activities -->
             {% for activity in uncompleted_activities %}
             <tr>
-                <td>{{ activity.media_name }}</td>
-                <td>{{ activity.media_type }}</td>
-                <td>{{ activity.media_subtype }}</td>
-                <td>{{ activity.total_duration }}</td>
-                <td>{{ activity.start_date }}</td>
-                <td>Ongoing</td>
-                <td>N/A</td>
+                <td class="wow fadeInUp" data-wow-duration="0.5s" data-wow-delay="0.1s">{{ activity.media_name }}</td>
+                <td class="wow fadeInUp" data-wow-duration="0.5s" data-wow-delay="0.2s">{{ activity.media_type }}</td>
+                <td class="wow fadeInUp" data-wow-duration="0.5s" data-wow-delay="0.3s">{{ activity.media_subtype }}</td>
+                <td class="wow fadeInUp" data-wow-duration="0.5s" data-wow-delay="0.4s">{{ activity.total_duration }}</td>
+                <td class="wow fadeInUp" data-wow-duration="0.5s" data-wow-delay="0.5s">{{ activity.start_date }}</td>
+                <td class="wow fadeInUp" data-wow-duration="0.5s" data-wow-delay="0.6s">Ongoing</td>
+                <td class="wow fadeInUp" data-wow-duration="0.5s" data-wow-delay="0.7s">N/A</td>
             </tr>
             {% endfor %}
 
             <!-- Completed Activities -->
             {% for activity in completed_activities %}
             <tr>
-                <td>{{ activity.media_name }}</td>
-                <td>{{ activity.media_type }}</td>
-                <td>{{ activity.media_subtype }}</td>
-                <td>{{ activity.total_duration }}</td>
-                <td>{{ activity.start_date }}</td>
-                <td>{{ activity.end_date }}</td>
-                <td>{{ activity.rating }}</td>
+                <td class="wow fadeInUp" data-wow-duration="0.5s" data-wow-delay="0.1s">{{ activity.media_name }}</td>
+                <td class="wow fadeInUp" data-wow-duration="0.5s" data-wow-delay="0.2s">{{ activity.media_type }}</td>
+                <td class="wow fadeInUp" data-wow-duration="0.5s" data-wow-delay="0.3s">{{ activity.media_subtype }}</td>
+                <td class="wow fadeInUp" data-wow-duration="0.5s" data-wow-delay="0.4s">{{ activity.total_duration }}</td>
+                <td class="wow fadeInUp" data-wow-duration="0.5s" data-wow-delay="0.5s">{{ activity.start_date }}</td>
+                <td class="wow fadeInUp" data-wow-duration="0.5s" data-wow-delay="0.6s">{{ activity.end_date }}</td>
+                <td class="wow fadeInUp" data-wow-duration="0.5s" data-wow-delay="0.7s">{{ activity.rating }}</td>
             </tr>
             {% endfor %}
         </tbody>
@@ -113,13 +116,6 @@
         </ul>
         </nav>
         {% endif %}
+    </section>
 </div>
-<!-- Include WOW.js and Animate.css -->
-<link rel="stylesheet" href="{{ url_for('static', filename='css/animate.css') }}">
-<script src="{{ url_for('static', filename='js/wow.min.js') }}"></script>
-<link rel="stylesheet" href="{{ url_for('static', filename='css/activities.css') }}">
-<script>
-    // Initialize WOW.js
-    new WOW().init();
-</script>
 {% endblock %}

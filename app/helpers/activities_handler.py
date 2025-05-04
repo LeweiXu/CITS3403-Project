@@ -36,24 +36,20 @@ def get_uncompleted_activities(username, filters):
     query = (db.session.query(
         Activities.id.label('activity_id'),
         Activities.media_type,
+        Activities.media_subtype,
         Activities.media_name,
-        func.coalesce(func.sum(cast(Entries.duration, Integer)),0).label('total_duration'),
+        func.coalesce(func.sum(cast(Entries.duration, Integer)), 0).label('total_duration'),
         func.min(Entries.date).label('start_date')  # Get the earliest date for the activity
     ).outerjoin(Entries, Activities.id == Entries.activity_id).filter(
         Activities.username == username,
-        Activities.status == 'in_progress'  # Uncompleted activities
+        Activities.status == 'ongoing'  # Uncompleted activities
     ).group_by(
         Activities.id, Activities.media_type, Activities.media_name
     )
     )
-    if filters.get('min_duration'):
-        min_d=int(filters['min_duration'])
-        query = query.having(func.sum(cast(Entries.duration, Integer)) >= min_d)
-    if filters.get('max_duration'): 
-        max_d=int(filters['max_duration'])
-        query = query.having(func.sum(cast(Entries.duration, Integer)) <= max_d)
-    return query.order_by(Activities.id.desc()).all()
-    
+    query = apply_activity_filters(query, filters)
+    results = query.order_by(Activities.id.desc()).all()
+    return results
 
 
 def get_completed_activities(username, filters):
@@ -64,6 +60,7 @@ def get_completed_activities(username, filters):
     query = (db.session.query(
         Activities.id.label('activity_id'),
         Activities.media_type,
+        Activities.media_subtype,
         Activities.media_name,
         func.sum(cast(Entries.duration, Integer)).label('total_duration'),
         func.min(Entries.date).label('start_date'),  # Get the earliest date for the activity
@@ -76,13 +73,11 @@ def get_completed_activities(username, filters):
         Activities.id, Activities.media_type, Activities.media_name, Activities.end_date, Activities.rating, Activities.comment
     )
     )
-    if filters.get('min_duration'):
-        min_d=int(filters['min_duration'])
-        query = query.having(func.sum(cast(Entries.duration, Integer)) >= min_d)
-    if filters.get('max_duration'):
-        max_d=int(filters['max_duration'])
-        query = query.having(func.sum(cast(Entries.duration, Integer)) <= max_d)
-    return query.order_by(Activities.id.desc()).all()
+
+    query = apply_activity_filters(query, filters)
+    # Map media_type to main type
+    results = query.order_by(Activities.id.desc()).all()
+    return results
 
 def apply_activity_filters(query, filters):
     # Apply filters to the query
@@ -95,9 +90,11 @@ def apply_activity_filters(query, filters):
     if filters.get('media_type'):
         query = query.filter(Activities.media_type.ilike(f"%{filters['media_type']}%"))
     if filters.get('min_duration'):
-        query = query.filter(Entries.duration >= int(filters['min_duration']))
+        min_d = int(filters['min_duration'])
+        query = query.having(func.sum(cast(Entries.duration, Integer)) >= min_d)
     if filters.get('max_duration'):
-        query = query.filter(Entries.duration <= int(filters['max_duration']))
+        max_d = int(filters['max_duration'])
+        query = query.having(func.sum(cast(Entries.duration, Integer)) <= max_d)
     return query
 
 def handle_end_activity(activity_id, username, rating=None, comment=None):

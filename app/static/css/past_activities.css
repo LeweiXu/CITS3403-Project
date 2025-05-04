@@ -1,8 +1,0 @@
-/* Set overall page background */
-body {
-    background-color: #dce7f9 !important; /* Light blue background */
-    color: #333; /* Default text color */
-    font-family: 'Arial', sans-serif; /* Clean font */
-    margin: 0;
-    padding: 0;
-}

@@ -20,5 +20,6 @@ source <virtual-environment-path>/bin/activate
 This application requires sqlite3 to run. If you do not have sqlite3 installed, you can install via:
 ```
 sudo apt update
+
 sudo apt install sqlite3
 ```

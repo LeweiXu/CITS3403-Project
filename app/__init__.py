@@ -8,6 +8,7 @@ BASE_DIR = os.path.abspath(os.path.dirname(__file__))
 app.config['SECRET_KEY'] = "UwU"  # Store this securely in production
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(BASE_DIR, 'app.db')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.debug = True  # Set to False in production
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 

@@ -184,7 +184,6 @@ def get_analysis_data(username):
         } for d in daily_category_past_week
     ]
 
-    print(entries_by_media_subtype)
     return {
         "statistics": {
             "total_visual_media": round(total_visual_media / 60, 2),

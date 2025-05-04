@@ -4,7 +4,7 @@
 
 {% block content %}
 <div class="container">
-    <h1 class="text-center section-title">Dashboard</h1>
+    <h1 class="text-center page-title">Dashboard</h1>
 
      <!-- Stats Overview Section -->
      <section class="section">
@@ -83,6 +83,10 @@
                     </td>
                 </tr>
                 {% endfor %}
+                <tr>
+                    <td></td><td></td><td></td>
+                    <td><button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#addActivityModal">Add New Activity</button></td>
+                </tr>
             </tbody>
         </table>
         </div>
@@ -156,12 +160,6 @@
             </div>
         </div>
     </div>
-
-    <!-- Trigger Button for Add New Activity Modal -->
-    <section class="add-new-entry mt-5">
-        <h2 class="section-title">Add New</h2>
-        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addActivityModal">Add New Activity</button>
-    </section>
 </div>
 
 <script>

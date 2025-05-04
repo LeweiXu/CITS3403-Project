@@ -1,22 +1,18 @@
 /* Main Colors */
 :root {
-    --primary-color: #3498db;
-    --secondary-color: #2c3e50;
+    --primary-color: #0069af;
+    --secondary-color: #002346;
     --background-color:#f1f5f9;
     --light-border: #e2e8f0;
 }
-/* f8f9fa previoius background colour */
 
 /* Body Styles */
-
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     background-color: var(--background-color);
 }
 
-
 /* Header Styles */
-
 header {
     background-color: var(--secondary-color);
     padding: 1rem 0;
@@ -46,7 +42,6 @@ h1 {
 }
 
 /* Navigation Styles */
-
 nav ul {
     display: flex;
     list-style: none;
@@ -74,7 +69,6 @@ nav ul li a:hover {
 
 /* Hero Section */
 .hero-section {
-    /* Puts a graidient in the background with 135 degree angle */
     background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
     color: white;
     padding: 5rem 0;
@@ -102,7 +96,6 @@ nav ul li a:hover {
     box-shadow: 0 10px 20px rgba(0,0,0,0.15);
 }
 
-
 /* Global layout for sticky footer */
 html, body {
     height: 100%;
@@ -118,7 +111,6 @@ body {
 main {
     flex: 1;
 }
-
 
 /* Footer Styles */
 .footer-container {
@@ -146,12 +138,12 @@ th {
     color: #495057;
     border-bottom: 1px solid var(--light-border);
     font-size: 1.2rem;
-    }
+}
 
 td {
-padding: 0.75rem;
-border-bottom: 1px solid var(--light-border);
-vertical-align: middle;
+    padding: 0.75rem;
+    border-bottom: 1px solid var(--light-border);
+    vertical-align: middle;
 }
 
 thead {
@@ -160,7 +152,7 @@ thead {
 
 .table-container {
     overflow-x: auto;
-    margin-top: 1rem;
+    margin-top: 1.5rem;
 }
 
 /* Icons for social media, for footer */
@@ -211,15 +203,23 @@ thead {
 
 /* Renamed from "stats-overview" for reusability, also edited some attributes */
 .section {                  
-    background: white;  /* A light background to make cards stand out */
+    background: white;
     border-radius: 0.75rem;
     box-shadow: 0 4px 8px rgba(0,0,0,0.1);
     padding: 1.5rem;
     margin-bottom: 2rem;
 }
 
-.section .section-title {
+.section-title {
     font-size: 2rem;
+    font-weight: bold;
+    margin-bottom: 1.5rem;
+    color: var(--secondary-color);
+}
+
+.page-title {
+    font-size: 3rem;
+    font-weight: bold;
     margin-bottom: 1.5rem;
     color: var(--secondary-color);
 }
@@ -234,14 +234,13 @@ thead {
     background-color: #ffffff;
     border-radius: 8px;
     padding: 1.5rem;
-    flex: 0 1 280px; /* Each card is at least 280px wide; it wraps if smaller screens */
+    flex: 0 1 280px;
     box-shadow: 0 4px 8px rgba(0,0,0,0.1);
     text-align: center;
     transition: transform 0.3s, box-shadow 0.3s; 
     border: 1px solid #e2e8f0;
 }
 
-/* Hover effect to give a more interactive feel */
 .stats-metric-card:hover {
     transform: translateY(-5px);
     box-shadow: 0 10px 20px rgba(0,0,0,0.15);
@@ -266,341 +265,8 @@ thead {
     color: #333333;
 }
 
-/* If you want sub-text or percentage changes below the main stat */
 .stats-sub {
     font-size: 0.75rem;
     color: #5f6b7c;
     margin-top: 0.25rem;
-}
-
-.upload-container {
-    max-width: 800px;
-    margin:  2rem auto;
-    padding: 0 1rem;
-}
-
-.upload-card{
-    background: #ffffff;
-    border-radius: 8px;
-    padding: 2rem;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-}
-
-.upload-title{
-    color: var(--secondary-color);
-    font-size: 1.75rem;
-    text-align: center;
-    margin-bottom: 1.5rem;
-}
-
-.form-section + .form-section {
-    margin-top: 2rem;
-}
-
-.upload-form {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 2rem;
-    align-items: end;
-}
-
-.form-group{
-    display: flex;
-    flex-direction: column;
-}
-
-.form-group.full{
-    grid-column: 1 / -1;
-}
-
-.upload-form label{
-    font-weight: 600;
-    margin-bottom: 0.25rem;
-    color: var(--secondary-color);
-}
-
-.upload-form input{
-    padding: 0.5rem 0.75rem;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    font-size: 1rem;
-    width: 100%;
-    box-sizing:border-box;
-}
-
-.form-actions {
-    display: flex;
-    justify-content: flex-end;
-    grid-column: 2 / 3; /* align to right column by default */
-}
-  
-.form-actions.full {
-    grid-column: 1 / -1;
-    justify-content: center;
-}
-  
-.form-actions button {
-    padding: 0.75rem 1.5rem;
-    background-color: var(--primary-color);
-    border: none;
-    border-radius: 5px;
-    color: #fff;
-    font-size: 1rem;
-    cursor: pointer;
-    transition: background-color 0.2s;
-}
-  
-.form-actions button:hover {
-    background-color: #2980b9;
-}
-
-/* ——— Drag‑and‑Drop Zone ——— */
-#drop-zone {
-    border: 2px dashed var(--primary-color);
-    border-radius: 6px;
-    padding: 2rem;
-    text-align: center;
-    background: #fafafa;
-    transition: background 0.2s, border-color 0.2s;
-    cursor: pointer;
-}
-#drop-zone.hover {
-background: #eef6fc;
-border-color: #2980b9;
-}
-#drop-zone p {
-margin: 0;
-font-size: 1rem;
-color: var(--secondary-color);
-}
-#drop-zone button {
-margin-top: 0.5rem;
-}
-/* ── Upload button refinements ── */
-#csv-upload-form .form-actions button {
-    padding: 0.4rem 1rem;       /* slimmer vertical padding */
-    font-size: 0.875rem;        /* slightly smaller text */
-    border-radius: 4px;         /* tighter corners */
-} 
-#csv-upload-form .form-actions.full{
-    /* … */
-    margin-top: 2rem;
-}
-
-/* 
-    Better login form  
-    Will probably be used for register too
-*/
-.entry-section {
-    background-color: white;
-    border-radius: 12px;
-    padding: 2.5rem;
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
-    max-width: 450px;
-    margin: 3rem auto;
-}
-
-.entry-section h2 {
-    font-size: 2.2rem;
-    margin-bottom: 1rem;
-    color: var(--secondary-color);
-    font-weight: 600;
-}
-
-.entry-section p {
-    color: #6c757d;
-    font-size: 1.1rem;
-}
-
-/* Link styling, link to go to register or login from the other */
-.form-box-section a {
-    color: var(--primary-color);
-    font-weight: 500;
-    text-decoration: none;
-    transition: color 0.2s ease;
-}
-
-/* Form stuff */
-.form-control {
-    padding: 0.8rem 1rem;
-    border-radius: 8px;
-    border: 1px solid var(--light-border);
-    transition: all 0.3s ease;
-    font-size: 1rem;
-    background-color: #f2f4f59c;
-}
-
-.form-control:focus {
-    border-color: var(--primary-color);
-    box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25);
-    outline: none;
-}
-
-.form-label {
-    font-weight: 500;
-    margin-bottom: 0.5rem;
-    color: #495057;
-}
-
-/* Registration link styling */
-.modal-footer a {
-    color: var(--primary-color);
-    font-weight: 500;
-    text-decoration: none;
-    transition: color 0.2s ease;
-}
-
-/* Background for login page */
-.login-page {
-    background: linear-gradient(135deg,  var(--primary-color), var(--secondary-color));
-    display: flex;
-}
-
-/*  
-    Better register section
-    Will probably have the login form used for cleaner code and less duplication
-    Might be deleted later
-*/
-
-.register-section {
-    background-color: white;
-    border-radius: 12px;
-    padding: 2.5rem;
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
-    max-width: 450px;
-    margin: 3rem auto;
-}
-
-/* Login link style */
-.register-section a {
-    color: var(--primary-color);
-    font-weight: 500;
-    text-decoration: none;
-    transition: color 0.2s ease;
-}
-
-/* Background for register page */
-.register-page {
-    background: linear-gradient(135deg,  var(--secondary-color), var(--primary-color));
-    display: flex;
-}
-
-
-.hidden {
-    display: none;
-}
-
-/* ShareData: Moments & Chat */
-.moment-card {
-    background-color: white;
-    padding: 15px 20px;
-    margin-bottom: 15px;
-    border-radius: 12px;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
-    align-items: flex-start;
-}
-
-.avatar {
-    width: 48px;
-    height: 48px;
-    margin-right: 15px;
-    border-radius: 50%;
-}
-
-/* Chat style */
-.chat-container {
-    display: flex;
-    height: 500px;
-    border-radius: 12px;
-    overflow: hidden;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    background-color: white;
-}
-
-.chat-users {
-    width: 180px;
-    background-color: #f1f3f5;
-    padding: 10px;
-    border-right: 1px solid #dee2e6;
-}
-
-.chat-users div {
-    padding: 8px 10px;
-    border-radius: 6px;
-    margin-bottom: 6px;
-    cursor: pointer;
-}
-
-.chat-users div:hover {
-    background-color: #e2e6ea;
-}
-
-.chat-window {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    padding: 10px;
-}
-
-.chat-messages {
-    flex-grow: 1;
-    padding-right: 10px;
-}
-
-.message {
-    margin-bottom: 10px;
-    display: flex;
-    align-items: flex-start;
-}
-
-.message.you {
-    justify-content: flex-end;
-}
-
-.message-content {
-    background-color: #e9ecef;
-    padding: 8px 12px;
-    border-radius: 12px;
-    max-width: 70%;
-    word-wrap: break-word;
-}
-
-.message.you .message-content {
-    background-color: #d1e7dd;
-}
-
-/* "+" */
-.add-post-btn {
-    position: fixed;
-    bottom: 80px;
-    right: 24px;
-    width: 50px;
-    height: 50px;
-    font-size: 26px;
-    text-align: center;
-    line-height: 44px;
-    border-radius: 50%;
-    z-index: 999;
-}
-
-/* bottom navigation */
-.bottom-nav {
-    position: fixed;
-    bottom: 0;
-    width: 100%;
-    background-color: #ffffff;
-    border-top: 1px solid #dee2e6;
-    padding: 8px 0;
-    z-index: 998;
-}
-
-.nav-btn {
-    border: none;
-    background: none;
-    font-weight: 500;
-    font-size: 16px;
-    color: var(--primary-color);
-}
-.nav-btn:focus {
-    outline: none;
 }

@@ -55,10 +55,12 @@ def register():
     result = handle_register(request)
     return result
 
-    # if request.method == 'POST':
-    #     result = handle_register(request)
-    #     return result  # Redirect to login or register page based on the result
-    # return render_template('register.html')
+@app.route('/advanced', methods=['GET', 'POST'])
+def advanced():
+    if 'username' not in session:
+        flash('Please log in to access this page.', 'danger')
+        return redirect(url_for('login'))
+    return render_template('advanced.html')
 
 @app.route('/dashboard', methods=['GET', 'POST'])
 def dashboard():
@@ -137,8 +139,6 @@ def viewdata():
     # Build a copy of request.args **without** the 'page' key
     args = request.args.to_dict()
     args.pop('page', None)
-
-
 
     return render_template(
         'viewdata.html',
@@ -263,7 +263,7 @@ def view_shared_data(data_type):
     if data_type == 'activities':
         activities = fetch_past_activities(target_user, request)
         combined = activities["uncompleted_activities"] + activities["completed_activities"]
-        template ='past_activities.html'
+        template ='activities.html'
     
     elif data_type == 'history':
         combined = handle_viewdata(target_user, request)

@@ -318,3 +318,30 @@ def search_users_route():
         matching_users = search_users(query)
         return jsonify(matching_users)
     return jsonify([])
+
+@app.route('/delete_activity/<int:activity_id>')
+def delete_activity(activity_id):
+    if 'username' not in session:
+        flash('Please log in to perform this action.', 'danger')
+        return redirect(url_for('login'))
+
+    username = session['username']
+
+    # Fetch the activity to ensure it belongs to the logged-in user
+    print(activity_id, username)
+    activity = Activities.query.filter_by(id=activity_id, username=username).first()
+    if not activity:
+        flash('Activity not found or unauthorized.', 'danger')
+        return redirect(url_for('activities'))
+
+    # Delete all related entries in the Entries table
+    related_entries = Entries.query.filter_by(activity_id=activity.id).all()
+    for entry in related_entries:
+        db.session.delete(entry)
+
+    # Delete the activity itself
+    db.session.delete(activity)
+    db.session.commit()
+
+    flash('Activity and all related entries deleted successfully.', 'success')
+    return redirect(url_for('activities'))

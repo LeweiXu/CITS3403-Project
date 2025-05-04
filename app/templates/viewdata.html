@@ -44,29 +44,29 @@
     </section>  
 
     <section class="table-section wow fadeIn" data-wow-duration="0.2s" data-wow-delay="0.1">
-        <table class="table table-striped mt-4">
+        <table class="table">
             <thead>
                 <tr>
                     <th class="wow fadeInUp" data-wow-duration="0.2s" data-wow-delay="0.05s">Date</th>
                     <th class="wow fadeInUp" data-wow-duration="0.2s" data-wow-delay="0.1s">Media Type</th>
                     <th class="wow fadeInUp" data-wow-duration="0.2s" data-wow-delay="0.15s">Media Name</th>
                     <th class="wow fadeInUp" data-wow-duration="0.2s" data-wow-delay="0.2s">Duration (minutes)</th>
-                    {% if visitor == false %}
-                    <th class="wow fadeInUp" data-wow-duration="0.2s" data-wow-delay="0.25s">Actions</th>
-                    {% endif %}
                 </tr>
             </thead>
             <tbody>
                 {% for entry in entries %}
-                <tr>
+                <tr class="entry-row">
                     <td class="wow fadeInUp" data-wow-duration="0.2s" data-wow-delay="0.05s">{{ entry.date }}</td>
                     <td class="wow fadeInUp" data-wow-duration="0.2s" data-wow-delay="0.1s">{{ entry.activity.media_type }}</td>
                     <td class="wow fadeInUp" data-wow-duration="0.2s" data-wow-delay="0.15s">{{ entry.activity.media_name }}</td>
                     <td class="wow fadeInUp" data-wow-duration="0.2s" data-wow-delay="0.2s">{{ entry.duration }}</td>
-                    {% if visitor == false %}
-                    <td class="wow fadeInUp" data-wow-duration="0.2s" data-wow-delay="0.25s">
-                        <a href="{{ url_for('delete_entry', entry_id=entry.id) }}" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this entry?');">Delete</a>
-                    {% endif %}
+                </tr>
+                <tr class="entry-comment">
+                    <td colspan="3">Comment: {{ entry.comment }}</td>
+                    <td>
+                        {% if visitor == false %}
+                        <a href="{{ url_for('delete_entry', entry_id=entry.id) }}" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this entry?');">Delete Entry</a>
+                        {% endif %}
                     </td>
                 </tr>
                 {% endfor %}
@@ -116,6 +116,12 @@
         toggleAdvanced.addEventListener('click', () => {
             advancedContent.classList.toggle('hidden');
         });
+
+        document.querySelectorAll('.entry-row').forEach(row => {
+            row.addEventListener('click', () => {
+                row.classList.toggle('active');
+            });
+        });
     });
 
     // Drag-and-drop functionality for CSV upload
@@ -148,6 +154,24 @@
         if (!files.length) return;
         fileInput.files = files;
         dropZone.querySelector('p').textContent = files[0].name;
+    });
+</script>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // Ensure all comment rows are hidden by default
+        document.querySelectorAll('.entry-comment').forEach(commentRow => {
+            commentRow.style.display = 'none';
+        });
+
+        // Toggle visibility of the comment section when an entry row is clicked
+        document.querySelectorAll('.entry-row').forEach(row => {
+            row.addEventListener('click', () => {
+                const commentRow = row.nextElementSibling;
+                if (commentRow && commentRow.classList.contains('entry-comment')) {
+                    commentRow.style.display = commentRow.style.display === 'table-row' ? 'none' : 'table-row';
+                }
+            });
+        });
     });
 </script>
 {% endblock %}

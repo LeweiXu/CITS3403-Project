@@ -17,7 +17,6 @@ def handle_viewdata(username, request):
 
     # Get filtered entries
     entries = get_filtered_entries(username, filters)
-
     return entries
 
 def get_filtered_entries(username, filters):

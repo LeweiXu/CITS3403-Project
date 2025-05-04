@@ -131,7 +131,7 @@ table {
 }
 
 th {
-    background-color: #f8fafc;
+    background-color: #ffffff;
     padding: 0.75rem 1rem;
     text-align: left;
     font-weight: 500;
@@ -471,4 +471,24 @@ thead {
     display: flex;
     align-items: center;
     gap: 0.2rem; /* Minimal spacing between username and delete button */
+}
+
+/* Adjusting the background colors for media entries and comments */
+.entry-row {
+    background-color: white; /* Media entries in white */
+}
+
+.entry-row:hover {
+    background-color: rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+}
+.entry-comment {
+    display: none; /* Ensure comments are hidden by default */
+    border: 1px solid #dee2e6;
+    padding: 0.5rem;
+    margin-top: 0.5rem;
+    background-color: var(--background-color); /* Comments in light blue */
+}
+.entry-row.active + .entry-comment {
+    display: table-row;
 }

@@ -8,8 +8,8 @@
 
 /* Body Styles */
 body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: var(--background-color);
+    font-family: 'Sour Gummy', sans-serif ; 
+    background-color: var(--background-color); 
 }
 
 /* Header Styles */
@@ -253,9 +253,12 @@ thead {
 }
 
 .stats-info h3 {
-    font-size: 1.2rem;
-    color: var(--secondary-color);
+    font-size: 1.5rem; 
+    font-weight: bold; 
+    color: var(--secondary-color); 
     margin-bottom: 0.5rem;
+    text-align: center; 
+    font-family: 'Sour Gummy', sans-serif ; 
 }
 
 .stats-info p {
@@ -266,9 +269,11 @@ thead {
 }
 
 .stats-sub {
-    font-size: 0.75rem;
-    color: #5f6b7c;
-    margin-top: 0.25rem;
+    font-size: 1rem;
+    color: #6c757d; 
+    text-align: center; 
+    margin-top: 0.25rem; 
+    font-family: 'Sour Gummy', sans-serif ; 
 }
 
 .page-container {
@@ -305,4 +310,3 @@ thead {
     padding: 1.5rem;
     margin-bottom: 2rem;
     overflow-x: auto;
-}

@@ -404,3 +404,12 @@ thead {
     background: linear-gradient(135deg,  var(--secondary-color), var(--primary-color));
     display: flex;
 }
+
+/* WOW Animation */
+.wow {
+    visibility: hidden; 
+}
+
+.wow.animated {
+    visibility: visible; 
+}

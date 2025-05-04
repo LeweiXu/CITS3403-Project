@@ -1,6 +1,6 @@
 from app.models import Users, SharedUsers
 from app import db
-from flask import flash
+from flask import flash, jsonify
 
 def share_data_handler(username, request):
     """
@@ -48,3 +48,10 @@ def share_data_handler(username, request):
     shared_with = SharedUsers.query.filter_by(username=username).all()
 
     return shared_with_me, shared_with
+
+def search_users(query):
+    """
+    Fetch users whose usernames match the query.
+    """
+    matching_users = Users.query.filter(Users.username.ilike(f"%{query}%")).all()
+    return [user.username for user in matching_users]

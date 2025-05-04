@@ -51,7 +51,9 @@
                     <th class="wow fadeInUp" data-wow-duration="0.2s" data-wow-delay="0.1s">Media Type</th>
                     <th class="wow fadeInUp" data-wow-duration="0.2s" data-wow-delay="0.15s">Media Name</th>
                     <th class="wow fadeInUp" data-wow-duration="0.2s" data-wow-delay="0.2s">Duration (minutes)</th>
+                    {% if visitor == false %}
                     <th class="wow fadeInUp" data-wow-duration="0.2s" data-wow-delay="0.25s">Actions</th>
+                    {% endif %}
                 </tr>
             </thead>
             <tbody>
@@ -61,8 +63,10 @@
                     <td class="wow fadeInUp" data-wow-duration="0.2s" data-wow-delay="0.1s">{{ entry.activity.media_type }}</td>
                     <td class="wow fadeInUp" data-wow-duration="0.2s" data-wow-delay="0.15s">{{ entry.activity.media_name }}</td>
                     <td class="wow fadeInUp" data-wow-duration="0.2s" data-wow-delay="0.2s">{{ entry.duration }}</td>
+                    {% if visitor == false %}
                     <td class="wow fadeInUp" data-wow-duration="0.2s" data-wow-delay="0.25s">
                         <a href="{{ url_for('delete_entry', entry_id=entry.id) }}" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this entry?');">Delete</a>
+                    {% endif %}
                     </td>
                 </tr>
                 {% endfor %}

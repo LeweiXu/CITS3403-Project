@@ -145,7 +145,8 @@ def viewdata():
         entries=entries,
         page=page,
         total_pages=total_pages,
-        request_args=args
+        request_args=args,
+        visitor=False
     )
 
 @app.route('/delete_entry/<int:entry_id>')
@@ -227,7 +228,8 @@ def activities():
         completed_activities=completed_page,
         page=page,
         total_pages=total_pages,
-        request_args=args
+        request_args=args,
+        visitor=False
     )
 @app.route('/analysis', methods=['GET'])
 def analysis():
@@ -260,7 +262,7 @@ def view_shared_data(data_type):
 
     if data_type == 'analysis':
         analysis_data = get_analysis_data(target_user)
-        return render_template('analysis.html', analysis_data=analysis_data)
+        return render_template('analysis.html', analysis_data=analysis_data, visitor=True)
     if data_type == 'activities':
         activities = fetch_past_activities(target_user, request)
         combined = activities["uncompleted_activities"] + activities["completed_activities"]
@@ -295,7 +297,8 @@ def view_shared_data(data_type):
             completed_activities=done,
             page=page,
             total_pages=total_pages,
-            request_args=args
+            request_args=args,
+            visitor=True
         )
 
     # history case
@@ -304,7 +307,8 @@ def view_shared_data(data_type):
         entries=page_slice,
         page=page,
         total_pages=total_pages,
-        request_args=args
+        request_args=args,
+        visitor=True
     )
 
 @app.route('/search_users', methods=['GET'])

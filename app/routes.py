@@ -59,14 +59,14 @@ def register():
 def advanced():
     if 'username' not in session:
         flash('Please log in to access this page.', 'danger')
-        return redirect(url_for('login'))
+        return redirect(url_for('index'))
     return render_template('advanced.html')
 
 @app.route('/dashboard', methods=['GET', 'POST'])
 def dashboard():
     if 'username' not in session:
         flash('Please log in to view your dashboard.', 'danger')
-        return redirect(url_for('login'))
+        return redirect(url_for('index'))
 
     username = session['username']
 
@@ -91,7 +91,7 @@ def dashboard():
 def end_activity():
     if 'username' not in session:
         flash('Please log in to perform this action.', 'danger')
-        return redirect(url_for('login'))
+        return redirect(url_for('index'))
 
     username = session['username']
     activity_id = request.form.get('activity_id')
@@ -123,7 +123,7 @@ def upload():
 def viewdata():
     if 'username' not in session:
         flash('Please log in to view your data.', 'danger')
-        return redirect(url_for('login'))
+        return redirect(url_for('index'))
 
     username = session['username']
     # Fetch all entries for the logged-in user
@@ -168,7 +168,7 @@ def delete_entry(entry_id):
 def sharedata():
     if 'username' not in session:
         flash('Please log in to access this page.', 'danger')
-        return redirect(url_for('login'))
+        return redirect(url_for('index'))
 
     username = session['username']
 
@@ -186,7 +186,7 @@ def logout():
 def export_csv():
     if 'username' not in session:
         flash('Please log in to export your data.', 'danger')
-        return redirect(url_for('login'))
+        return redirect(url_for('index'))
     
     entries = Entries.query.filter_by(username=session['username']).all()
     return Response(
@@ -199,7 +199,7 @@ def export_csv():
 def activities():
     if 'username' not in session:
         flash('Please log in to view your activities.', 'danger')
-        return redirect(url_for('login'))
+        return redirect(url_for('index'))
     username = session['username']
     data     = fetch_past_activities(username, request)
     uncompleted = data["uncompleted_activities"]
@@ -233,7 +233,7 @@ def activities():
 def analysis():
     if 'username' not in session:
         flash('Please log in to view the analysis page.', 'danger')
-        return redirect(url_for('login'))
+        return redirect(url_for('index'))
 
     username = session['username']
     analysis_data = get_analysis_data(username)
@@ -244,7 +244,7 @@ def analysis():
 def view_shared_data(data_type):
     if 'username' not in session:
         flash('Please log in to access this page.', 'danger')
-        return redirect(url_for('login'))
+        return redirect(url_for('index'))
 
     username = session['username']
     # 1) grab target_user from form (POST) or args (GET)

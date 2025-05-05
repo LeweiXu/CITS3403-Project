@@ -8,7 +8,7 @@ from app.helpers.export_csv_handler import generate_csv
 from app.helpers.viewdata_handler import handle_viewdata
 from app.helpers.activities_handler import fetch_past_activities, handle_end_activity
 from app.helpers.analysis_handler import get_analysis_data
-from app.helpers.sharedata_handler import share_data_handler
+from app.helpers.sharedata_handler import share_data_handler, search_users
 
 @app.route('/')
 @app.route('/index')
@@ -239,6 +239,7 @@ def analysis():
     analysis_data = get_analysis_data(username)
     return render_template('analysis.html', analysis_data=analysis_data)
 
+# Pass the username internally to defend against users editing the URL to see other users' data
 @app.route('/view_shared_data/<data_type>', methods=['GET','POST'])
 def view_shared_data(data_type):
     if 'username' not in session:
@@ -305,3 +306,11 @@ def view_shared_data(data_type):
         total_pages=total_pages,
         request_args=args
     )
+
+@app.route('/search_users', methods=['GET'])
+def search_users_route():
+    query = request.args.get('query', '')
+    if query:
+        matching_users = search_users(query)
+        return jsonify(matching_users)
+    return jsonify([])

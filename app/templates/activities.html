@@ -7,7 +7,7 @@
     <h2 class="text-center page-title">Activities</h2>
 
     <!-- Filter Form -->
-    <section class="section">
+    <section class="section wow fadeInUp" data-wow-duration="0.2s" data-wow-delay="0.05s">
     <form action="{{ url_for('activities') }}" method="GET" class="mb-4">
         <div class="row align-items-center">
             <div class="col-md-2">
@@ -49,39 +49,39 @@
     <table class="table table-striped mt-4">
         <thead>
             <tr>
-                <th>Media Name</th>
-                <th>Media Type</th>
-                <th>Sub-Type</th>
-                <th>Total Duration (minutes)</th>
-                <th>Start Date</th>
-                <th>End Date</th>
-                <th>Rating</th>
+                <th class="wow fadeInUp" data-wow-duration="0.2s" data-wow-delay="0.05s">Media Name</th>
+                <th class="wow fadeInUp" data-wow-duration="0.2s" data-wow-delay="0.1s">Media Type</th>
+                <th class="wow fadeInUp" data-wow-duration="0.2s" data-wow-delay="0.15s">Sub-Type</th>
+                <th class="wow fadeInUp" data-wow-duration="0.2s" data-wow-delay="0.2s">Total Duration (minutes)</th>
+                <th class="wow fadeInUp" data-wow-duration="0.2s" data-wow-delay="0.25s">Start Date</th>
+                <th class="wow fadeInUp" data-wow-duration="0.2s" data-wow-delay="0.3s">End Date</th>
+                <th class="wow fadeInUp" data-wow-duration="0.2s" data-wow-delay="0.35s">Rating</th>
             </tr>
         </thead>
         <tbody>
             <!-- Uncompleted Activities -->
             {% for activity in uncompleted_activities %}
             <tr>
-                <td>{{ activity.media_name }}</td>
-                <td>{{ activity.media_type }}</td>
-                <td>{{ activity.media_subtype }}</td>
-                <td>{{ activity.total_duration }}</td>
-                <td>{{ activity.start_date }}</td>
-                <td>Ongoing</td>
-                <td>N/A</td>
+                <td class="wow fadeInUp" data-wow-duration="0.2s" data-wow-delay="0.05s">{{ activity.media_name }}</td>
+                <td class="wow fadeInUp" data-wow-duration="0.2s" data-wow-delay="0.1s">{{ activity.media_type }}</td>
+                <td class="wow fadeInUp" data-wow-duration="0.2s" data-wow-delay="0.15s">{{ activity.media_subtype }}</td>
+                <td class="wow fadeInUp" data-wow-duration="0.2s" data-wow-delay="0.2s">{{ activity.total_duration }}</td>
+                <td class="wow fadeInUp" data-wow-duration="0.2s" data-wow-delay="0.25s">{{ activity.start_date }}</td>
+                <td class="wow fadeInUp" data-wow-duration="0.2s" data-wow-delay="0.3s">Ongoing</td>
+                <td class="wow fadeInUp" data-wow-duration="0.2s" data-wow-delay="0.25s">N/A</td>
             </tr>
             {% endfor %}
 
             <!-- Completed Activities -->
             {% for activity in completed_activities %}
             <tr>
-                <td>{{ activity.media_name }}</td>
-                <td>{{ activity.media_type }}</td>
-                <td>{{ activity.media_subtype }}</td>
-                <td>{{ activity.total_duration }}</td>
-                <td>{{ activity.start_date }}</td>
-                <td>{{ activity.end_date }}</td>
-                <td>{{ activity.rating }}</td>
+                <td class="wow fadeInUp" data-wow-duration="0.2s" data-wow-delay="0.05s">{{ activity.media_name }}</td>
+                <td class="wow fadeInUp" data-wow-duration="0.2s" data-wow-delay="0.1s">{{ activity.media_type }}</td>
+                <td class="wow fadeInUp" data-wow-duration="0.2s" data-wow-delay="0.15s">{{ activity.media_subtype }}</td>
+                <td class="wow fadeInUp" data-wow-duration="0.2s" data-wow-delay="0.2s">{{ activity.total_duration }}</td>
+                <td class="wow fadeInUp" data-wow-duration="0.2s" data-wow-delay="0.25s">{{ activity.start_date }}</td>
+                <td class="wow fadeInUp" data-wow-duration="0.2s" data-wow-delay="0.3s">{{ activity.end_date }}</td>
+                <td class="wow fadeInUp" data-wow-duration="0.2s" data-wow-delay="0.35s">{{ activity.rating }}</td>
             </tr>
             {% endfor %}
         </tbody>

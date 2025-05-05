@@ -3,57 +3,95 @@
 {% block title %}Shared Data{% endblock %}
 
 {% block content %}
-<div class="container mt-5">
-    <h2 class="page-title text-center">Share</h2>
-    <div class="row justify-content-center">
-        <form method="POST" action="/sharedata">
-            <div class="input-group mb-3">
-                <input type="text" class="form-control" placeholder="Search for a user" name="target_user" required>
-                <button class="btn btn-outline-primary" type="submit">Search and Share</button>
-            </div>
-        </form>
-    </div>
+<div class="container">
+    <h1 class="page-title text-center">Share</h1>
+    <section class="section">
+        <div class="row justify-content-center">
+            <form method="POST" action="/sharedata">
+                <div class="input-group mb-3">
+                    <input type="text" class="form-control" placeholder="Search for a user" name="target_user" id="user-search" required autocomplete="off">
+                    <ul class="dropdown-menu" id="user-suggestions" style="display: none;"></ul>
+                    <button class="btn btn-outline-primary" type="submit">Search and Share</button>
+                </div>
+            </form>
+        </div>
+    </section>
 
-    <h3 class="text-center mt-5">Users You Have Shared Your Data With</h3>
-    <div class="row justify-content-center">
-        {% for shared_with_user in shared_with %}
-        <div class="col-md-4">
-            <div class="card text-center">
-                <div class="card-body">
-                    <h5 class="card-title">User: {{ shared_with_user.shared_username }}</h5>
-                    <form method="POST" action="/sharedata">
-                        <input type="hidden" name="delete_user" value="{{ shared_with_user.shared_username }}">
-                        <button type="submit" class="btn btn-danger">Delete</button>
-                    </form>
+    <section class="section">
+        <h3 class="text-center mt-5">Users You Have Shared Your Data With</h3>
+        <div class="row justify-content-center">
+            {% for shared_with_user in shared_with %}
+            <div class="col-md-4">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <h5 class="card-title">User: {{ shared_with_user.shared_username }}</h5>
+                        <form method="POST" action="/sharedata">
+                            <input type="hidden" name="delete_user" value="{{ shared_with_user.shared_username }}">
+                            <button type="submit" class="btn btn-danger">Delete</button>
+                        </form>
+                    </div>
                 </div>
             </div>
+            {% endfor %}
         </div>
-        {% endfor %}
-    </div>
+    </section>
 
-    <h3 class="text-center mt-5">Users Who Shared Their Data With You</h3>
-    <div class="row justify-content-center">
-        {% for shared_user in shared_with_me %}
-        <div class="col-md-4">
-            <div class="card text-center">
-                <div class="card-body">
-                    <h5 class="card-title">User: {{ shared_user.username }}</h5>
-                    <form method="POST" action="/view_shared_data/analysis">
-                        <input type="hidden" name="target_user" value="{{ shared_user.username }}">
-                        <button type="submit" class="btn btn-primary">View Analysis</button>
-                    </form>
-                    <form method="POST" action="/view_shared_data/activities">
-                        <input type="hidden" name="target_user" value="{{ shared_user.username }}">
-                        <button type="submit" class="btn btn-secondary">View Activities</button>
-                    </form>
-                    <form method="POST" action="/view_shared_data/history">
-                        <input type="hidden" name="target_user" value="{{ shared_user.username }}">
-                        <button type="submit" class="btn btn-info">View History</button>
-                    </form>
+    <section class="section">
+        <h3 class="text-center mt-5">Users Who Shared Their Data With You</h3>
+        <div class="row justify-content-center">
+            {% for shared_user in shared_with_me %}
+            <div class="col-md-4">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <h5 class="card-title">User: {{ shared_user.username }}</h5>
+                        <form method="POST" action="/view_shared_data/analysis?data_type=analysis">
+                            <input type="hidden" name="target_user" value="{{ shared_user.username }}">
+                            <button type="submit" class="btn btn-primary">View Analysis</button>
+                        </form>
+                        <form method="POST" action="/view_shared_data/activities?data_type=activities">
+                            <input type="hidden" name="target_user" value="{{ shared_user.username }}">
+                            <button type="submit" class="btn btn-secondary">View Activities</button>
+                        </form>
+                        <form method="POST" action="/view_shared_data/history?data_type=history">
+                            <input type="hidden" name="target_user" value="{{ shared_user.username }}">
+                            <button type="submit" class="btn btn-info">View History</button>
+                        </form>
+                    </div>
                 </div>
             </div>
+            {% endfor %}
         </div>
-        {% endfor %}
-    </div>
+    </section>
 </div>
+
+<script>
+    document.getElementById('user-search').addEventListener('input', function() {
+        const query = this.value;
+        if (query.length > 0) {
+            fetch(`/search_users?query=${query}`)
+                .then(response => response.json())
+                .then(data => {
+                    const suggestions = document.getElementById('user-suggestions');
+                    suggestions.innerHTML = '';
+                    if (data.length > 0) {
+                        suggestions.style.display = 'block';
+                        data.forEach(user => {
+                            const li = document.createElement('li');
+                            li.className = 'dropdown-item';
+                            li.textContent = user;
+                            li.addEventListener('click', () => {
+                                document.getElementById('user-search').value = user;
+                                suggestions.style.display = 'none';
+                            });
+                            suggestions.appendChild(li);
+                        });
+                    } else {
+                        suggestions.style.display = 'none';
+                    }
+                });
+        } else {
+            document.getElementById('user-suggestions').style.display = 'none';
+        }
+    });
+</script>
 {% endblock %}

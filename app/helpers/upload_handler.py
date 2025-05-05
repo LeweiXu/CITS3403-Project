@@ -7,6 +7,7 @@ from datetime import datetime
 
 def handle_upload(request, app):
     if 'csvFile' in request.files and request.files['csvFile'].filename != '':
+        print("CSV file upload detected.")
         csv_file = request.files['csvFile']
         csv_path = os.path.join(app.instance_path, 'uploads', csv_file.filename)
         os.makedirs(os.path.dirname(csv_path), exist_ok=True)

@@ -34,7 +34,7 @@ def get_uncompleted_activities(username, filters):
     """
     # Query uncompleted activities
     query = (db.session.query(
-        Activities.id.label('activity_id'),
+        Activities.id.label('id'),  # Ensure activity ID is passed to the HTML page
         Activities.media_type,
         Activities.media_subtype,
         Activities.media_name,
@@ -58,14 +58,15 @@ def get_completed_activities(username, filters):
     """
     # Query completed activities
     query = (db.session.query(
-        Activities.id.label('activity_id'),
+        Activities.id.label('id'),
         Activities.media_type,
         Activities.media_subtype,
         Activities.media_name,
         func.sum(cast(Entries.duration, Integer)).label('total_duration'),
         func.min(Entries.date).label('start_date'),  # Get the earliest date for the activity
         func.max(Entries.date).label('end_date'),  # Get the latest date for the activity
-        Activities.rating
+        Activities.rating,
+        Activities.comment
     ).join(Activities, Activities.id == Entries.activity_id).filter(
         Activities.username == username,
         Activities.status != 'ongoing'  # Completed activities

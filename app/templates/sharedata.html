@@ -5,7 +5,8 @@
 {% block content %}
 <div class="container">
     <h1 class="page-title text-center">Share</h1>
-    <section class="section">
+    <section class="section text-center">
+        <h2 class="section-title mt-5">Share Your Data</h3>
         <div class="row justify-content-center">
             <form method="POST" action="/sharedata">
                 <div class="input-group mb-3">
@@ -15,16 +16,13 @@
                 </div>
             </form>
         </div>
-    </section>
-
-    <section class="section">
-        <h3 class="text-center mt-5">Users You Have Shared Your Data With</h3>
+        
         <div class="row justify-content-center">
             {% for shared_with_user in shared_with %}
             <div class="col-md-4">
-                <div class="card text-center">
-                    <div class="card-body">
-                        <h5 class="card-title">User: {{ shared_with_user.shared_username }}</h5>
+                <div class="shared-card text-center">
+                    <div class="shared-card-body">
+                        <h4 class="card-title">{{ shared_with_user.shared_username }}</h4>
                         <form method="POST" action="/sharedata">
                             <input type="hidden" name="delete_user" value="{{ shared_with_user.shared_username }}">
                             <button type="submit" class="btn btn-danger">Delete</button>
@@ -37,13 +35,13 @@
     </section>
 
     <section class="section">
-        <h3 class="text-center mt-5">Users Who Shared Their Data With You</h3>
+        <h1 class="text-center section-title">Shared With You</h1>
         <div class="row justify-content-center">
             {% for shared_user in shared_with_me %}
             <div class="col-md-4">
                 <div class="card text-center">
                     <div class="card-body">
-                        <h5 class="card-title">User: {{ shared_user.username }}</h5>
+                        <h4 class="card-title">{{ shared_user.username }}</h4>
                         <form method="POST" action="/view_shared_data/analysis?data_type=analysis">
                             <input type="hidden" name="target_user" value="{{ shared_user.username }}">
                             <button type="submit" class="btn btn-primary">View Analysis</button>

@@ -46,42 +46,63 @@
 
     <!-- Activities Table -->
     <section class="table-section">
-    <table class="table table-striped mt-4">
+    <table class="table mt-4">
         <thead>
             <tr>
                 <th class="wow fadeInUp" data-wow-duration="0.2s" data-wow-delay="0.05s">Media Name</th>
-                <th class="wow fadeInUp" data-wow-duration="0.2s" data-wow-delay="0.1s">Media Type</th>
-                <th class="wow fadeInUp" data-wow-duration="0.2s" data-wow-delay="0.15s">Sub-Type</th>
                 <th class="wow fadeInUp" data-wow-duration="0.2s" data-wow-delay="0.2s">Total Duration (minutes)</th>
                 <th class="wow fadeInUp" data-wow-duration="0.2s" data-wow-delay="0.25s">Start Date</th>
                 <th class="wow fadeInUp" data-wow-duration="0.2s" data-wow-delay="0.3s">End Date</th>
-                <th class="wow fadeInUp" data-wow-duration="0.2s" data-wow-delay="0.35s">Rating</th>
             </tr>
         </thead>
         <tbody>
             <!-- Uncompleted Activities -->
             {% for activity in uncompleted_activities %}
-            <tr>
+            <tr class="activity-row">
                 <td class="wow fadeInUp" data-wow-duration="0.2s" data-wow-delay="0.05s">{{ activity.media_name }}</td>
-                <td class="wow fadeInUp" data-wow-duration="0.2s" data-wow-delay="0.1s">{{ activity.media_type }}</td>
-                <td class="wow fadeInUp" data-wow-duration="0.2s" data-wow-delay="0.15s">{{ activity.media_subtype }}</td>
                 <td class="wow fadeInUp" data-wow-duration="0.2s" data-wow-delay="0.2s">{{ activity.total_duration }}</td>
-                <td class="wow fadeInUp" data-wow-duration="0.2s" data-wow-delay="0.25s">{{ activity.start_date }}</td>
-                <td class="wow fadeInUp" data-wow-duration="0.2s" data-wow-delay="0.3s">Ongoing</td>
-                <td class="wow fadeInUp" data-wow-duration="0.2s" data-wow-delay="0.25s">N/A</td>
+                <td class="wow fadeInUp" data-wow-duration="0.2s" data-wow-delay="0.3s">{{ activity.start_date }}</td>
+                <td class="wow fadeInUp" data-wow-duration="0.2s" data-wow-delay="0.4s">Ongoing</td>
+            </tr>
+            <tr class="activity-details">
+                <td>
+                    Media Type: {{ activity.media_type }}<br>
+                    Sub-Type: {{ activity.media_subtype }}
+                </td>
+                <td colspan="2">
+                    Rating: N/A<br>
+                    Comment: N/A
+                </td>
+                <td>
+                    {% if visitor == false %}
+                    <a href="{{ url_for('delete_activity', activity_id=activity.id) }}" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this activity?');">Delete Activity</a>
+                    {% endif %}
+                </td>
             </tr>
             {% endfor %}
 
             <!-- Completed Activities -->
             {% for activity in completed_activities %}
-            <tr>
+            <tr class="activity-row">
                 <td class="wow fadeInUp" data-wow-duration="0.2s" data-wow-delay="0.05s">{{ activity.media_name }}</td>
-                <td class="wow fadeInUp" data-wow-duration="0.2s" data-wow-delay="0.1s">{{ activity.media_type }}</td>
-                <td class="wow fadeInUp" data-wow-duration="0.2s" data-wow-delay="0.15s">{{ activity.media_subtype }}</td>
                 <td class="wow fadeInUp" data-wow-duration="0.2s" data-wow-delay="0.2s">{{ activity.total_duration }}</td>
-                <td class="wow fadeInUp" data-wow-duration="0.2s" data-wow-delay="0.25s">{{ activity.start_date }}</td>
-                <td class="wow fadeInUp" data-wow-duration="0.2s" data-wow-delay="0.3s">{{ activity.end_date }}</td>
-                <td class="wow fadeInUp" data-wow-duration="0.2s" data-wow-delay="0.35s">{{ activity.rating }}</td>
+                <td class="wow fadeInUp" data-wow-duration="0.2s" data-wow-delay="0.3s">{{ activity.start_date }}</td>
+                <td class="wow fadeInUp" data-wow-duration="0.2s" data-wow-delay="0.4s">{{ activity.end_date }}</td>
+            </tr>
+            <tr class="activity-details">
+                <td>
+                    Media Type: {{ activity.media_type }}<br>
+                    Sub-Type: {{ activity.media_subtype }}
+                </td>
+                <td colspan="2">
+                    Rating: {{ activity.rating }}<br>
+                    Comment: {{ activity.comment }}
+                </td>
+                <td>
+                    {% if visitor == false %}
+                    <a href="{{ url_for('delete_activity', activity_id=activity.id) }}" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this activity?');">Delete Activity</a>
+                    {% endif %}
+                </td>
             </tr>
             {% endfor %}
         </tbody>
@@ -118,4 +139,23 @@
         {% endif %}
     </section>
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // Ensure all additional activity details are hidden by default
+        document.querySelectorAll('.activity-details').forEach(detailsRow => {
+            detailsRow.style.display = 'none';
+        });
+
+        // Toggle visibility of the additional details when an activity row is clicked
+        document.querySelectorAll('.activity-row').forEach(row => {
+            row.addEventListener('click', () => {
+                const detailsRow = row.nextElementSibling;
+                if (detailsRow && detailsRow.classList.contains('activity-details')) {
+                    detailsRow.style.display = detailsRow.style.display === 'table-row' ? 'none' : 'table-row';
+                }
+            });
+        });
+    });
+</script>
 {% endblock %}

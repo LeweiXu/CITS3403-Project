@@ -1,4 +1,5 @@
 from flask import session, flash, redirect, url_for
+from werkzeug.security import generate_password_hash, check_password_hash
 from app.models import Users
 from app import db
 
@@ -9,7 +10,8 @@ def handle_login(request):
     # Query the database for the user
     user = Users.query.filter_by(username=username).first()
 
-    if user and user.password == password:  # Replace with hashed password check in production
+    # Verify the password using check_password_hash
+    if user and check_password_hash(user.password, password):
         session['username'] = username  # Store username in session
         flash('Login successful!', 'success')
         return redirect(url_for('dashboard'))
@@ -30,14 +32,16 @@ def handle_register(request):
     if Users.query.filter_by(email=email).first():
         return 'email_exists'
 
+    # Hash the password using generate_password_hash
+    hashed_password = generate_password_hash(password)
+
     # Create new user
     try:
-        new_user = Users(username=username, email=email, password=password)
+        new_user = Users(username=username, email=email, password=hashed_password)
         db.session.add(new_user)
         db.session.commit()
         flash('Registration successful! Please log in.', 'success')
         return 'success'
     except Exception as e:
-        #flash('An error occurred during registration.', 'danger')
         print(f"Error: {e}")  # Debugging output
         return 'error'

@@ -104,58 +104,7 @@
             {% endif %}
     </section>
 </div>
-{% endblock %}
 
-{% block extra_scripts %}
-<script>
-    document.addEventListener('DOMContentLoaded', () => {
-        // Toggle visibility of the advanced section
-        const toggleAdvanced = document.getElementById('toggle-advanced');
-        const advancedContent = document.getElementById('advanced-content');
-
-        toggleAdvanced.addEventListener('click', () => {
-            advancedContent.classList.toggle('hidden');
-        });
-
-        document.querySelectorAll('.entry-row').forEach(row => {
-            row.addEventListener('click', () => {
-                row.classList.toggle('active');
-            });
-        });
-    });
-
-    // Drag-and-drop functionality for CSV upload
-    const dropZone = document.getElementById('drop-zone');
-    const fileInput = document.getElementById('csvFile');
-    const browseBtn = document.getElementById('choose-file-btn');
-
-    // “Browse files” button opens native picker
-    browseBtn.addEventListener('click', () => fileInput.click());
-
-    // Highlight when dragging files over
-    ['dragenter', 'dragover'].forEach(evt =>
-        dropZone.addEventListener(evt, e => {
-            e.preventDefault();
-            dropZone.classList.add('hover');
-        })
-    );
-
-    // Remove highlight on leave or drop
-    ['dragleave', 'drop'].forEach(evt =>
-        dropZone.addEventListener(evt, e => {
-            e.preventDefault();
-            dropZone.classList.remove('hover');
-        })
-    );
-
-    // On file drop, assign to hidden input + show filename
-    dropZone.addEventListener('drop', e => {
-        const files = e.dataTransfer.files;
-        if (!files.length) return;
-        fileInput.files = files;
-        dropZone.querySelector('p').textContent = files[0].name;
-    });
-</script>
 <script>
     document.addEventListener('DOMContentLoaded', () => {
         // Ensure all comment rows are hidden by default
@@ -174,4 +123,5 @@
         });
     });
 </script>
+
 {% endblock %}

@@ -1,11 +1,12 @@
 import re
 from flask import render_template, request, redirect, url_for, flash, session, Response, jsonify
+from datetime import date
 from app import app, db
-from app.models import Entries, SharedUsers, Users
+from app.models import Entries, SharedUsers, Users, Activities
 from app.helpers.upload_handler import handle_upload
 from app.helpers.dashboard_handler import *
 from app.helpers.export_csv_handler import generate_csv
-from app.helpers.viewdata_handler import handle_viewdata
+from app.helpers.viewdata_handler import handle_viewdata, handle_reopen_entry
 from app.helpers.activities_handler import fetch_past_activities, handle_end_activity
 from app.helpers.analysis_handler import get_analysis_data
 from app.helpers.sharedata_handler import share_data_handler, search_users
@@ -345,3 +346,19 @@ def delete_activity(activity_id):
 
     flash('Activity and all related entries deleted successfully.', 'success')
     return redirect(url_for('activities'))
+@app.route('/reopen_entry', methods=['POST'])
+def reopen_entry():
+    entry_id = request.form['entry_id']
+    username = session.get('username')
+
+    if not entry_id or not username:
+        flash('Missing data for reopen.', 'danger')
+        return redirect(url_for('viewdata'))
+
+    if handle_reopen_entry(entry_id, username):
+        flash('Activity reopened.', 'success')
+        # send them back to Dashboard so they see it in Current Activities
+        return redirect(url_for('dashboard'))
+    else:
+        flash('Could not reopen that entry.', 'danger')
+        return redirect(url_for('viewdata'))

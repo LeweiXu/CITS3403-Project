@@ -128,3 +128,25 @@ def handle_end_activity(activity_id, username, rating=None, comment=None):
         db.session.rollback()
         flash(f"An error occurred while completing the activity: {e}", "danger")
         return False
+    
+def handle_reopen_activity(activity_id, username):
+    """
+    Given an entry_id and the current username, mark its parent activity
+    back to 'ongoing' so it shows up in Current Activities.
+    Returns True if successful, False otherwise.
+    """
+    activity = Activities.query.get(activity_id)
+    if not activity:
+        return False
+
+    # Only allow the owner to reopen
+    if activity.username != username:
+        return False
+
+    activity.status = 'ongoing'
+    activity.end_date   = None
+    activity.rating     = None
+    activity.comment    = None
+
+    db.session.commit()
+    return True

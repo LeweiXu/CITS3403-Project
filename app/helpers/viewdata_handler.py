@@ -51,27 +51,3 @@ def get_filtered_entries(username, filters):
 
     # Execute the query and return the results
     return query.order_by(Entries.date.desc(),Entries.id.desc()).all()
-
-def handle_reopen_entry(entry_id, username):
-    """
-    Given an entry_id and the current username, mark its parent activity
-    back to 'ongoing' so it shows up in Current Activities.
-    Returns True if successful, False otherwise.
-    """
-    entry = Entries.query.get(entry_id)
-    if not entry:
-        return False
-
-    # Only allow the owner to reopen
-    if entry.activity.username != username:
-        return False
-
-    act = entry.activity
-    act.status     = 'ongoing'
-    act.start_date = date.today()
-    act.end_date   = None
-    act.rating     = None
-    act.comment    = None
-
-    db.session.commit()
-    return True

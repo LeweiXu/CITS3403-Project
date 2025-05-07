@@ -492,3 +492,35 @@ thead {
 .entry-row.active + .entry-comment {
     display: table-row;
 }
+/* Only keep this if you absolutely need to position something inside the empty-state */
+.empty-state {
+    position: relative;
+}
+
+/* Container for the form & arrow */
+.form-wrapper {
+    display: inline-block;   /* shrink-wrap to form width */
+    position: relative;      /* containing block for arrow */
+}
+
+/* The arrow, hidden by default */
+.arrow-hard {
+    position: absolute;
+    top: 48px;               /* vertical offset from top of form-wrapper */            
+    font-size: 2rem;
+    color: #0d6efd;          /* Bootstrap primary color */
+    cursor: pointer;
+    pointer-events: none;    /* allow clicks through to the button */
+    opacity: 0;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+/* Arrow wiggle on hover */
+.arrow-hard:hover {
+    transform: translateY(-4px);
+}
+
+/* When .show-arrow is added, fade the arrow in */
+.form-wrapper.show-arrow .arrow-hard {
+    opacity: 1;
+}

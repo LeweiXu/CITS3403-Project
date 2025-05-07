@@ -33,42 +33,62 @@
     {% else %}
     <section class="section">
         <h3 class="section-title text-center">People You’re Sharing With</h3>
-        <div class="row justify-content-center">
-            {% for shared_with_user in shared_with %}
-            <div class="col-md-4 mb-3">
-                <div class="shared-card text-center border rounded p-3">
-                    <h4 class="card-title">{{ shared_with_user.shared_username }}</h4>
-                    <form method="POST" action="/sharedata">
-                        <input type="hidden" name="delete_user" value="{{ shared_with_user.shared_username }}">
-                        <button type="submit" class="btn btn-danger btn-sm mt-2">Delete</button>
-                    </form>
-                </div>
+      
+        <!-- new flex container -->
+        <div class="share-container">
+          {% for shared_with_user in shared_with %}
+          <div class="share-icon-container">
+            <!-- Username above the avatar -->
+            <span class="share-username">{{ shared_with_user.shared_username }}</span>
+      
+            <!-- avatar -->
+            <div class="share-avatar">
+              <img src="{{ url_for('static', filename='images/mini-human.gif') }}" alt="User avatar" class="share-avatar-img"/>
             </div>
-            {% endfor %}
+      
+            <!-- Tiny delete button -->
+            <form method="POST" action="/sharedata">
+              <input type="hidden" name="delete_user" value="{{ shared_with_user.shared_username }}">
+              <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+            </form>
+          </div>
+          {% endfor %}
         </div>
-    </section>
+      </section>
 
     <section class="section">
         <h3 class="text-center section-title">Shared With You</h3>
-        <div class="row justify-content-center">
+        <div class="share-container">
             {% for shared_user in shared_with_me %}
-            <div class="col-md-4 mb-3">
-                <div class="card border rounded p-3 text-center">
-                        <h4 class="card-title">{{ shared_user.username }}</h4>
-                        <div class="btn-group" role="group">
+            <div class="share-icon-container">
+                <span class="share-username">{{ shared_user.username }}</span>
+
+                <div class="share-avatar">
+                    <img src="{{ url_for('static', filename='images/mini-human.gif') }}" alt="Avatar for {{ shared_user.username }}" class="share-avatar-img"/>
+                </div>
+                <div class="dropdown">
+                    <button class="btn btn-outline-primary btn-sm dropdown-toggle" type="button" id="shareActionsDropdown-{{ shared_user.username }}" data-bs-toggle="dropdown" 
+                    aria-expanded="false" > Actions </button>
+                    <ul class="dropdown-menu" aria-labelledby="shareActionsDropdown-{{ shared_user.username }}">
+                        <li>
                             <form method="POST" action="/view_shared_data/analysis?data_type=analysis">
                                 <input type="hidden" name="target_user" value="{{ shared_user.username }}">
-                                <button type="submit" class="btn btn-outline-primary btn-sm">View Analysis</button>
+                                <button type="submit" class="dropdown-item">View Analysis</button>
                             </form>
+                        </li>
+                        <li>
                             <form method="POST" action="/view_shared_data/activities?data_type=activities">
                                 <input type="hidden" name="target_user" value="{{ shared_user.username }}">
-                                <button type="submit" class="btn btn-outline-secondary btn-sm">View Activities</button>
+                                <button type="submit" class="dropdown-item">View Activities</button>
                             </form>
+                        </li>
+                        <li>
                             <form method="POST" action="/view_shared_data/history?data_type=history">
                                 <input type="hidden" name="target_user" value="{{ shared_user.username }}">
-                                <button type="submit" class="btn btn-outline-info btn-sm">View History</button>
+                                <button type="submit" class="dropdown-item">View History</button>
                             </form>
-                        </div>
+                        </li>
+                    </ul>
                 </div>
             </div>
             {% endfor %}

@@ -1,5 +1,7 @@
 from app.models import Entries, Activities
 from sqlalchemy import cast, Integer
+from app import db
+from datetime import date
 
 def handle_viewdata(username, request):
     """
@@ -48,4 +50,4 @@ def get_filtered_entries(username, filters):
         query = query.filter(cast(Entries.duration, Integer) <= int(max_duration))
 
     # Execute the query and return the results
-    return query.order_by(Entries.date.desc()).all()
+    return query.order_by(Entries.date.desc(),Entries.id.desc()).all()

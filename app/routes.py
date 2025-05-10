@@ -1,7 +1,7 @@
 from flask import render_template, request, redirect, url_for, flash, session, Response, jsonify
 from flask_login import logout_user, login_required, current_user
 from app import app, db
-from app.forms import LoginForm
+from app.forms import LoginForm, RegisterForm
 from app.models import Entries, SharedUsers, Users, Activities
 from app.helpers.upload_handler import handle_upload
 from app.helpers.dashboard_handler import *
@@ -16,53 +16,29 @@ import re
 @app.route('/')
 @app.route('/index')
 def index():
-    form = LoginForm()  # Create an instance of the LoginForm
-    return render_template('index.html', form=form)  # Pass the form to the template
+    # Index page also contains login/register information
+    login_form = LoginForm()  # Create an instance of the LoginForm
+    register_form = RegisterForm()
+    return render_template('index.html', login_form=login_form, register_form=register_form)  # Pass the form to the template
 
-@app.route('/login', methods=['GET', 'POST'])
+@app.route('/login', methods=['POST'])
 def login():
     form = LoginForm()  # Create a new instance of the LoginForm
     if form.validate_on_submit():  # Check if the form is submitted and valid
         result = handle_login(request)
-        if result:
-            return result  # Redirect to dashboard if login is successful
-        flash("Invalid credentials", "danger")  # Show error message
-    return render_template('index.html', form=form)  # Render the index page with the form
+        if result: return result  # Redirect to dashboard if login is successful
+
+@app.route('/register', methods=['POST'])
+def register():
+    register_form = RegisterForm()  # Create a new instance of the RegisterForm
+    if register_form.validate_on_submit():  # Check if the form is submitted and valid
+        result = handle_register(request)
+        if result: return result
 
 @app.route('/logout')
 def logout():
     logout_user()
-    session.clear()
     return redirect(url_for('index'))  # Redirect to the home page
-
-@app.route('/register', methods=['GET', 'POST'])
-def register():
-    username = request.form.get('username')
-    email = request.form.get('email')
-    password = request.form.get('password')
-
-    # Server-side validation for registration
-
-    # Username validation
-    if len(username) < 3 or len(username) > 20:
-        return jsonify({'error': 'username', 'message': 'Username must be between 3 and 20 characters.'}), 400
-    
-    # Email validation
-    if not re.match(r'^[^\s@]+@[^\s@]+\.[^\s@]+$', email):
-        return jsonify({'error': 'email', 'message': 'Invalid email address.'}), 400
-    
-    # Password validation
-    if not re.match(r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*(),.?":{}|<>])[A-Za-z\d!@#$%^&*(),.?":{}|<>]{8,}$', password):
-        return jsonify({'error': 'password', 'message': 'Password must contain at least 8 characters, one uppercase letter, one lowercase letter, and one number.'}), 400
-
-    # Check for existing users
-    if Users.query.filter_by(username=username).first():
-        return jsonify({'error': 'username', 'message': 'Username already exists'}), 400
-    if Users.query.filter_by(email=email).first():
-        return jsonify({'error': 'email', 'message': 'Email already exists'}), 400
-
-    result = handle_register(request)
-    return result
 
 @app.route('/dashboard', methods=['GET', 'POST'])
 @login_required

@@ -13,6 +13,6 @@ app.debug = True  # Set to False in production
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 login = LoginManager(app)
-login.login_view = 'login'  # Redirect to login page if not logged in
+login.login_view = 'index'  # Redirect to login page if not logged in
 
 from app import routes

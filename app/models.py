@@ -10,6 +10,9 @@ class Users(UserMixin, db.Model):
 
     media_entries = db.relationship('Activities', backref='user')
 
+    def get_id(self):
+        return self.username
+
 # Activities table, each Activity is associated with a user (Users.username)
 # Each activity has a start and end entry, rating and comment
 # The idea is that a user can start an activity, add multiple media entries to it, then finally end an activity (by setting the end entry_id)

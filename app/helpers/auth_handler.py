@@ -1,4 +1,5 @@
 from flask import session, flash, redirect, url_for
+from flask_login import login_user
 from werkzeug.security import generate_password_hash, check_password_hash
 from app.models import Users
 from app import db
@@ -12,13 +13,14 @@ def handle_login(request):
 
     # Verify the password using check_password_hash
     if user and check_password_hash(user.password, password):
+        login_user(user)  # Log the user in with Flask-Login
         session['username'] = username  # Store username in session
         flash('Login successful!', 'success')
         return redirect(url_for('dashboard'))
     else:
         flash('Invalid username or password.', 'danger')
-        return None  # Return None to indicate an error
-
+        return None
+    
 def handle_register(request):
     username = request.form.get('username')
     email = request.form.get('email')

@@ -1,7 +1,7 @@
-import re
 from flask import render_template, request, redirect, url_for, flash, session, Response, jsonify
-from datetime import date
+from flask_login import logout_user, login_required, current_user
 from app import app, db
+from app.forms import LoginForm
 from app.models import Entries, SharedUsers, Users, Activities
 from app.helpers.upload_handler import handle_upload
 from app.helpers.dashboard_handler import *
@@ -10,22 +10,30 @@ from app.helpers.viewdata_handler import handle_viewdata
 from app.helpers.activities_handler import fetch_past_activities, handle_end_activity, handle_reopen_activity
 from app.helpers.analysis_handler import get_analysis_data
 from app.helpers.sharedata_handler import share_data_handler, search_users
+from app.helpers.auth_handler import handle_login, handle_register
+import re
 
 @app.route('/')
 @app.route('/index')
 def index():
-    return render_template('index.html')
-
-from app.helpers.auth_handler import handle_login, handle_register
+    form = LoginForm()  # Create an instance of the LoginForm
+    return render_template('index.html', form=form)  # Pass the form to the template
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
-    if request.method == 'POST':
+    form = LoginForm()  # Create a new instance of the LoginForm
+    if form.validate_on_submit():  # Check if the form is submitted and valid
         result = handle_login(request)
         if result:
             return result  # Redirect to dashboard if login is successful
-        return render_template('login.html', error="Invalid credentials")  # Render login page with error
-    return render_template('login.html')
+        flash("Invalid credentials", "danger")  # Show error message
+    return render_template('index.html', form=form)  # Render the index page with the form
+
+@app.route('/logout')
+def logout():
+    logout_user()
+    session.clear()
+    return redirect(url_for('index'))  # Redirect to the home page
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -56,19 +64,9 @@ def register():
     result = handle_register(request)
     return result
 
-@app.route('/advanced', methods=['GET', 'POST'])
-def advanced():
-    if 'username' not in session:
-        flash('Please log in to access this page.', 'danger')
-        return redirect(url_for('index'))
-    return render_template('advanced.html')
-
 @app.route('/dashboard', methods=['GET', 'POST'])
+@login_required
 def dashboard():
-    if 'username' not in session:
-        flash('Please log in to view your dashboard.', 'danger')
-        return redirect(url_for('index'))
-
     username = session['username']
 
     # Handle form submissions
@@ -89,11 +87,8 @@ def dashboard():
     )
 
 @app.route('/end_activity', methods=['POST'])
+@login_required
 def end_activity():
-    if 'username' not in session:
-        flash('Please log in to perform this action.', 'danger')
-        return redirect(url_for('index'))
-
     username = session['username']
     activity_id = request.form.get('activity_id')
     rating = request.form.get('rating')  # Get the rating from the form
@@ -113,6 +108,7 @@ def end_activity():
     return redirect(url_for('dashboard'))
 
 @app.route('/upload', methods=['GET', 'POST'])
+@login_required
 def upload():
     if request.method == 'POST':
         result = handle_upload(request, app)
@@ -121,11 +117,8 @@ def upload():
     return render_template('upload.html')
 
 @app.route('/viewdata', methods=['GET'])
+@login_required
 def viewdata():
-    if 'username' not in session:
-        flash('Please log in to view your data.', 'danger')
-        return redirect(url_for('index'))
-
     username = session['username']
     # Fetch all entries for the logged-in user
     all_entries = handle_viewdata(username, request)
@@ -151,6 +144,7 @@ def viewdata():
     )
 
 @app.route('/delete_entry/<int:entry_id>')
+@login_required
 def delete_entry(entry_id):
     entry = Entries.query.get(entry_id)
     if entry:
@@ -167,41 +161,14 @@ def delete_entry(entry_id):
     return redirect(url_for('viewdata'))
 
 @app.route('/sharedata', methods=['GET', 'POST'])
+@login_required
 def sharedata():
-    if 'username' not in session:
-        flash('Please log in to access this page.', 'danger')
-        return redirect(url_for('index'))
-
-    username = session['username']
-
-    shared_with_me, shared_with = share_data_handler(username, request)
-
+    shared_with_me, shared_with = share_data_handler(session['username'], request)
     return render_template('sharedata.html', shared_with_me=shared_with_me, shared_with=shared_with)
 
-@app.route('/logout')
-def logout():
-    session.clear()  # Clear all session data
-    flash('You have been logged out successfully.', 'success')
-    return redirect(url_for('index'))  # Redirect to the home page
-
-@app.route('/export_csv', methods=['GET'])
-def export_csv():
-    if 'username' not in session:
-        flash('Please log in to export your data.', 'danger')
-        return redirect(url_for('index'))
-    
-    entries = Entries.query.filter_by(username=session['username']).all()
-    return Response(
-        generate_csv(entries),
-        mimetype='text/csv',
-        headers={'Content-Disposition': 'attachment;filename=media_entries.csv'}
-    )
-
 @app.route('/activities', methods=['GET'])
+@login_required
 def activities():
-    if 'username' not in session:
-        flash('Please log in to view your activities.', 'danger')
-        return redirect(url_for('index'))
     username = session['username']
     data     = fetch_past_activities(username, request)
     uncompleted = data["uncompleted_activities"]
@@ -232,31 +199,24 @@ def activities():
         request_args=args,
         visitor=False
     )
-@app.route('/analysis', methods=['GET'])
-def analysis():
-    if 'username' not in session:
-        flash('Please log in to view the analysis page.', 'danger')
-        return redirect(url_for('index'))
 
-    username = session['username']
-    analysis_data = get_analysis_data(username)
+@app.route('/analysis', methods=['GET'])
+@login_required
+def analysis():
+    analysis_data = get_analysis_data(session['username'])
     return render_template('analysis.html', analysis_data=analysis_data)
 
 # Pass the username internally to defend against users editing the URL to see other users' data
 @app.route('/view_shared_data/<data_type>', methods=['GET','POST'])
+@login_required
 def view_shared_data(data_type):
-    if 'username' not in session:
-        flash('Please log in to access this page.', 'danger')
-        return redirect(url_for('index'))
-
-    username = session['username']
     # 1) grab target_user from form (POST) or args (GET)
     if request.method == 'POST':
         target_user = request.form.get('target_user')
     else:
         target_user = request.args.get('target_user')
     # Check if the target_user has shared their data with the current user
-    shared_entry = SharedUsers.query.filter_by(username=target_user, shared_username=username).first()
+    shared_entry = SharedUsers.query.filter_by(username=target_user, shared_username=session['username']).first()
     if not shared_entry:
         flash('You do not have permission to view this user’s data.', 'danger')
         return redirect(url_for('sharedata'))
@@ -313,6 +273,7 @@ def view_shared_data(data_type):
     )
 
 @app.route('/search_users', methods=['GET'])
+@login_required
 def search_users_route():
     query = request.args.get('query', '')
     if query:
@@ -321,16 +282,9 @@ def search_users_route():
     return jsonify([])
 
 @app.route('/delete_activity/<int:activity_id>')
+@login_required
 def delete_activity(activity_id):
-    if 'username' not in session:
-        flash('Please log in to perform this action.', 'danger')
-        return redirect(url_for('index'))
-
-    username = session['username']
-
-    # Fetch the activity to ensure it belongs to the logged-in user
-    print(activity_id, username)
-    activity = Activities.query.filter_by(id=activity_id, username=username).first()
+    activity = Activities.query.filter_by(id=activity_id, username=session['username']).first()
     if not activity:
         flash('Activity not found or unauthorized.', 'danger')
         return redirect(url_for('activities'))
@@ -363,3 +317,8 @@ def reopen_activity():
     else:
         flash('Could not reopen that activity.', 'danger')
         return redirect(url_for('viewdata'))
+    
+@app.route('/advanced', methods=['GET', 'POST'])
+@login_required
+def advanced():
+    return render_template('advanced.html')

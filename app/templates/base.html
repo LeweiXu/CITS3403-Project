@@ -28,6 +28,7 @@
                             <li class="dropdown">
                                 <a href="#" class="dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">Profile</a>
                                 <ul class="dropdown-menu">
+                                    <li><a class="dropdown-item">User: {{ session.get('username') }}</a></li>
                                     <li><a class="dropdown-item" href="/advanced">Advanced</a></li>
                                     <li><a class="dropdown-item" href="/logout">Logout</a></li>
                                 </ul>
@@ -51,8 +52,10 @@
 
 
     <!-- Make sure the modals for login and register is included in this page -->
-    {% include 'components/login_modal.html' %}
-    {% include 'components/register_modal.html' %}
+    {% if not session.get('username') %}
+        {% include 'components/login_modal.html' %}
+        {% include 'components/register_modal.html' %}
+    {% endif %}
 
     <footer role =  "contentinfo">
         <div class="footer-container">

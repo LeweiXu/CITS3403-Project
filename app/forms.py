@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField, TextAreaField
-from wtforms.validators import DataRequired, Length, Optional
+from wtforms import StringField, PasswordField, SubmitField, TextAreaField, HiddenField, IntegerField
+from wtforms.validators import DataRequired, Length, Optional, NumberRange
 
 class LoginForm(FlaskForm):
     username = StringField('Username', validators=[DataRequired(), Length(min=3, max=20)])
@@ -18,3 +18,7 @@ class AddActivityForm(FlaskForm):
     description = TextAreaField('Description', validators=[Optional()])
     submit = SubmitField('Add Activity')
 
+class AddEntryForm(FlaskForm):
+    activity_id = HiddenField('Activity ID', validators=[DataRequired()])
+    duration = IntegerField('Duration (minutes)', validators=[DataRequired(), NumberRange(min=1)])
+    submit = SubmitField('Add Entry')

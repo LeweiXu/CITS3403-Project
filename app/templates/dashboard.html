@@ -61,8 +61,8 @@
                 <tr>
                     <th>Media Name</th>
                     <th>Total Duration (minutes)</th>
-                    <th>Add Duration</th>
                     <th>Actions</th>
+                    <th></th>
                 </tr>
             </thead>
             <tbody>
@@ -71,11 +71,7 @@
                     <td>{{ activity.media_name }}</td>
                     <td>{{ activity.total_duration }}</td>
                     <td>
-                        <form action="{{ url_for('add_entry') }}" method="POST" class="d-inline">
-                            <input type="hidden" name="activity_id" value="{{ activity.activity_id }}">
-                            <input type="number" name="duration" class="form-control d-inline w-50" placeholder="Minutes" required>
-                            <button type="submit" name="add_duration" class="btn btn-success btn-sm">Add</button>
-                        </form>
+                        <button class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#addEntryModal" data-activity-id="{{ activity.activity_id }}">Add Entry</button>
                     </td>
                     <td>
                         <!-- End Activity Button -->
@@ -160,6 +156,35 @@
             </div>
         </div>
     </div>
+
+    <!-- Add Entry Modal -->
+    <div class="modal" id="addEntryModal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form id="addEntryForm" action="{{ url_for('add_entry') }}" method="POST">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Add Entry</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <input type="hidden" id="entry-activity-id" name="activity_id" value="">
+                        <div class="mb-3">
+                            <label for="duration" class="form-label">Duration (Minutes)</label>
+                            <input type="number" id="duration" name="duration" class="form-control" placeholder="Minutes" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="comment" class="form-label">Comment</label>
+                            <input type="text" id="comment" name="comment" class="form-control" placeholder="Comment (optional)">
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary">Submit</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 </div>
 
 <script>
@@ -214,6 +239,17 @@
                 defaultOption.textContent = 'None';
                 mediaSubtypeSelect.appendChild(defaultOption);
             }
+        });
+
+        const addEntryButtons = document.querySelectorAll('[data-bs-target="#addEntryModal"]');
+        const entryActivityIdInput = document.getElementById('entry-activity-id');
+
+        // Set the activity ID when the Add Entry modal is opened
+        addEntryButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const activityId = button.getAttribute('data-activity-id');
+                entryActivityIdInput.value = activityId;
+            });
         });
     });
 </script>

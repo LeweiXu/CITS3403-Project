@@ -211,7 +211,8 @@ def handle_add_activity(username, request):
 def handle_add_entry(username, request):
     activity_id = request.form.get('activity_id')
     duration = request.form.get('duration')
-    comment = None
+    comment = request.form.get('comment')
+    comment = comment if comment else None
     if activity_id and duration:
         activity = Activities.query.filter_by(id=activity_id, username=username).first()
         new_entry = Entries(

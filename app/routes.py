@@ -63,6 +63,12 @@ def logout():
     logout_user()
     return redirect(url_for('index'))  # Redirect to the home page
 
+@app.route('/search_users', methods=['GET'])
+@login_required
+def search_users_route():
+    result = search_users(request)
+    if result: return result
+
 # <------------ FORM ROUTES ------------>
 # All routes that are not GET requests, uses WTForms for CSRF protection
 @app.route('/login', methods=['POST'])
@@ -120,12 +126,6 @@ def upload():
 def delete_entry():
     result = handle_delete_entry(request)
     if result: return result 
-
-@app.route('/search_users', methods=['GET'])
-@login_required
-def search_users_route():
-    result = search_users(request)
-    if result: return result
 
 @app.route('/view_shared_data', methods=['POST'])
 @login_required

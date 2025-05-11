@@ -73,7 +73,7 @@
                     Rating: N/A<br>
                     Comment: N/A
                 </td>
-                {% if visitor == false %}
+                {% if current_user.username == username %}
                 <td>
                     <button class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#endActivityModal" data-activity-id="{{ activity.id }}">End Activity</button>
                 </td>
@@ -101,7 +101,7 @@
                     Rating: {{ activity.rating }}<br>
                     Comment: {{ activity.comment }}
                 </td>
-                    {% if visitor == false %}
+                    {% if current_user.username == username %}
                     <td>
                         <form method="POST" action="{{ url_for('reopen_activity') }}" style="display:inline;">
                             <input type="hidden" name="activity_id" value="{{ activity.id }}">

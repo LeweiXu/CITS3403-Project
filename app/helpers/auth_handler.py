@@ -15,7 +15,6 @@ def handle_login(request):
     # Verify the password using check_password_hash
     if user and check_password_hash(user.password, password):
         login_user(user)  # Log the user in with Flask-Login
-        session['username'] = username  # Store username in session
         flash('Login successful!', 'success')
         return redirect(url_for('dashboard'))
     else:
@@ -63,7 +62,6 @@ def handle_register(request):
         db.session.add(new_user)
         db.session.commit()
         login_user(new_user)
-        session['username'] = username  # Store username in session
         flash('Registration successful! Please log in.', 'success')
         return 'success'
     except Exception as e:

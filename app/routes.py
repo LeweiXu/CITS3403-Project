@@ -61,7 +61,6 @@ def advanced():
 @app.route('/logout', methods=['GET'])
 def logout():
     logout_user()
-    session['username'] = None  # Clear the session
     return redirect(url_for('index'))  # Redirect to the home page
 
 # <------------ FORM ROUTES ------------>

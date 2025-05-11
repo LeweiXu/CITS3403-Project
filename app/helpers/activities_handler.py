@@ -46,7 +46,7 @@ def get_activities(username, request):
         page=page,
         total_pages=total_pages,
         request_args=args,
-        visitor=False
+        username=username
     )
 
 def get_uncompleted_activities(username, filters):

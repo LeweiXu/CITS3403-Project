@@ -38,7 +38,7 @@ def get_entries(username, request):
         page=page,
         total_pages=total_pages,
         request_args=args,
-        visitor=False
+        username=username
     )
 
 def get_filtered_entries(username, filters):

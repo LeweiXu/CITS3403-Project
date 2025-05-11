@@ -1,47 +1,11 @@
 from app.models import Users, SharedUsers
 from app import db
-from flask import flash, render_template
+from flask import flash, render_template, jsonify, redirect, url_for
+from app.helpers.viewdata_handler import get_entries
+from app.helpers.activities_handler import get_activities
+from app.helpers.analysis_handler import get_analysis_page
 
 def share_data_handler(username, request):
-    """
-    Handle sharing and deleting shared data entries.
-    """
-    if request.method == 'POST':
-        if 'target_user' in request.form:
-            # Handle sharing data with another user
-            target_user = request.form.get('target_user')
-            if target_user:
-                # Check if the target user exists in the Users table
-                user_exists = Users.query.filter_by(username=target_user).first()
-                if user_exists:
-                    # Check if the sharing entry already exists
-                    existing_entry = SharedUsers.query.filter_by(username=username, shared_username=target_user).first()
-                    if not existing_entry:
-                        # Add the tuple (username, target_user) to the SharedUsers table
-                        new_shared_user = SharedUsers(username=username, shared_username=target_user)
-                        db.session.add(new_shared_user)
-                        db.session.commit()
-                        flash(f'Data shared with {target_user} successfully.', 'success')
-                    else:
-                        flash(f'You have already shared your data with {target_user}.', 'info')
-                else:
-                    flash(f'User {target_user} does not exist.', 'danger')
-        elif 'delete_user' in request.form:
-            # Handle deleting a shared user
-            target_user = request.form.get('delete_user')
-            print(f"Deleting shared user: {target_user}")
-            if target_user:
-                # Find the shared user entry
-                shared_user_entry = SharedUsers.query.filter_by(username=username, shared_username=target_user).first()
-                if shared_user_entry:
-                    db.session.delete(shared_user_entry)
-                    db.session.commit()
-                    flash(f'Shared data with {target_user} has been removed.', 'success')
-                else:
-                    flash(f'No shared data found with {target_user}.', 'danger')
-            else:
-                flash('Invalid user specified.', 'danger')
-
     # Fetch users who shared their data with the current user
     shared_with_me = SharedUsers.query.filter_by(shared_username=username).all()
     # Fetch users you have shared your data with
@@ -49,9 +13,65 @@ def share_data_handler(username, request):
 
     return render_template('sharedata.html', shared_with_me=shared_with_me, shared_with=shared_with)
 
-def search_users(query):
+def search_users(request):
     """
     Fetch users whose usernames match the query.
     """
+    query = request.args.get('query', '')
     matching_users = Users.query.filter(Users.username.ilike(f"%{query}%")).all()
-    return [user.username for user in matching_users]
+    if matching_users:
+        return jsonify([user.username for user in matching_users])
+    return jsonify([])
+
+def view_shared_data_handler(username, request):
+    target_user = request.form.get('target_user')
+    data_type = request.form.get('data_type')
+    # Check if the target_user has shared their data with the current user
+    shared_entry = SharedUsers.query.filter_by(username=target_user, shared_username=username).first()
+    if not shared_entry:
+        flash('You do not have permission to view this user’s data.', 'danger')
+        return redirect(url_for('sharedata'))
+
+    if data_type == 'analysis':
+        result = get_analysis_page(target_user)
+    if data_type == 'activities':
+        result = get_activities(target_user, request)
+    elif data_type == 'history':
+        result = get_entries(target_user, request)
+
+    return result
+
+def delete_shared_user_handler(username, request):
+    target_user = request.form.get('target_user')
+    if target_user:
+        # Find the shared user entry
+        shared_user_entry = SharedUsers.query.filter_by(username=username, shared_username=target_user).first()
+        if shared_user_entry:
+            db.session.delete(shared_user_entry)
+            db.session.commit()
+            flash(f'Shared data with {target_user} has been removed.', 'success')
+        else:
+            flash(f'No shared data found with {target_user}.', 'danger')
+    else:
+        flash('Invalid user specified.', 'danger')
+    return redirect(url_for('sharedata'))
+
+def share_with_user_handler(username, request):
+    target_user = request.form.get('target_user')
+    if target_user:
+        # Check if the target user exists in the Users table
+        user_exists = Users.query.filter_by(username=target_user).first()
+        if user_exists:
+            # Check if the sharing entry already exists
+            existing_entry = SharedUsers.query.filter_by(username=username, shared_username=target_user).first()
+            if not existing_entry:
+                # Add the tuple (username, target_user) to the SharedUsers table
+                new_shared_user = SharedUsers(username=username, shared_username=target_user)
+                db.session.add(new_shared_user)
+                db.session.commit()
+                flash(f'Data shared with {target_user} successfully.', 'success')
+            else:
+                flash(f'You have already shared your data with {target_user}.', 'info')
+        else:
+            flash(f'User {target_user} does not exist.', 'danger')
+    return redirect(url_for('sharedata'))

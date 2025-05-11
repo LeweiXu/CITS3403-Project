@@ -2,7 +2,7 @@ from app.models import Entries, Activities
 from sqlalchemy import cast, Integer
 from flask import render_template
 from app import db
-from flask import flash, redirect, url_for, session
+from flask import flash, redirect, url_for
 
 def get_entries(username, request):
     """
@@ -41,7 +41,6 @@ def get_entries(username, request):
         visitor=False
     )
 
-
 def get_filtered_entries(username, filters):
     """
     Fetch and filter media entries based on the provided filters.
@@ -78,17 +77,13 @@ def get_filtered_entries(username, filters):
     # Execute the query and return the results
     return query.order_by(Entries.date.desc(),Entries.id.desc()).all()
 
-def handle_delete_entry(entry_id, username):
+def handle_delete_entry(request):
+    entry_id = request.form.get('entry_id')
     entry = Entries.query.get(entry_id)
     if entry:
-        # Check if the entry belongs to the logged-in user
-        activity = Activities.query.filter_by(id=entry.activity_id, username=username).first()
-        if activity:
-            db.session.delete(entry)
-            db.session.commit()
-            flash('Entry deleted successfully.', 'success')
-        else:
-            flash('Entry not found or unauthorized.', 'danger')
+        db.session.delete(entry)
+        db.session.commit()
+        flash('Entry deleted successfully.', 'success')
     else:
         flash('Entry not found.', 'danger')
     return redirect(url_for('viewdata'))

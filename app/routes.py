@@ -1,15 +1,14 @@
-from flask import render_template, request, redirect, url_for, flash, session, jsonify
+from flask import render_template, request, redirect, url_for, session
 from flask_login import logout_user, login_required, current_user
-from app import app, db
+from app import app
 from app.forms import LoginForm, RegisterForm, AddActivityForm
-from app.models import Entries, SharedUsers, Activities
-from app.helpers.upload_handler import handle_upload
+from app.helpers.upload_handler import *
 from app.helpers.dashboard_handler import *
-from app.helpers.viewdata_handler import get_entries, handle_delete_entry
+from app.helpers.viewdata_handler import *
 from app.helpers.activities_handler import *
-from app.helpers.analysis_handler import get_analysis_data
-from app.helpers.sharedata_handler import share_data_handler, search_users
-from app.helpers.auth_handler import handle_login, handle_register
+from app.helpers.analysis_handler import *
+from app.helpers.sharedata_handler import *
+from app.helpers.auth_handler import *
 
 #<------------ PAGE ROUTES ------------>
 # All routes get render_template() from a helper function and returns the result
@@ -43,8 +42,8 @@ def activities():
 @app.route('/analysis', methods=['GET'])
 @login_required
 def analysis():
-    analysis_data = get_analysis_data(current_user.username)
-    return render_template('analysis.html', analysis_data=analysis_data)
+    result = get_analysis_page(current_user.username)
+    if result: return result
 
 @app.route('/sharedata', methods=['GET'])
 @login_required
@@ -109,94 +108,40 @@ def reopen_activity():
 @login_required
 def delete_activity():
     result = handle_delete_activity(request)
-    if result: return result  # Redirect to viewdata if activity is deleted successfully
+    if result: return result
 
 @app.route('/upload', methods=['POST'])
 @login_required
 def upload():
-    if request.method == 'POST':
-        result = handle_upload(request, app)
-        if result:  # If the function returns a redirect or flash message
-            return result
-    return render_template('upload.html')
+    result = handle_upload(request, app)
+    if result: return result
 
-@app.route('/delete_entry/<int:entry_id>')
+@app.route('/delete_entry', methods=['POST'])
 @login_required
-def delete_entry(entry_id):
-    result = handle_delete_entry(entry_id, current_user.username)
-    if result: return result  # Redirect to viewdata if deletion is successful
-
-# Pass the username internally to defend against users editing the URL to see other users' data
-@app.route('/view_shared_data/<data_type>', methods=['GET','POST'])
-@login_required
-def view_shared_data(data_type):
-    # 1) grab target_user from form (POST) or args (GET)
-    if request.method == 'POST':
-        target_user = request.form.get('target_user')
-    else:
-        target_user = request.args.get('target_user')
-    # Check if the target_user has shared their data with the current user
-    shared_entry = SharedUsers.query.filter_by(username=target_user, shared_username=session['username']).first()
-    if not shared_entry:
-        flash('You do not have permission to view this user’s data.', 'danger')
-        return redirect(url_for('sharedata'))
-
-    if data_type == 'analysis':
-        analysis_data = get_analysis_data(target_user)
-        return render_template('analysis.html', analysis_data=analysis_data, visitor=True)
-    if data_type == 'activities':
-        activities = fetch_past_activities(target_user, request)
-        combined = activities["uncompleted_activities"] + activities["completed_activities"]
-        template ='activities.html'
-    
-    elif data_type == 'history':
-        combined = handle_viewdata(target_user, request)
-        template ='viewdata.html'
-    else:
-        flash('Invalid data type requested.', 'danger')
-        return redirect(url_for('sharedata'))
-    # 5) pagination logic
-    PER_PAGE    = 20
-    page        = request.args.get('page', 1, type=int)
-    total       = len(combined)
-    total_pages = (total + PER_PAGE - 1) // PER_PAGE
-    start_idx   = (page - 1) * PER_PAGE
-    page_slice  = combined[start_idx : start_idx + PER_PAGE]
-
-    # 6) clean up args for url_for (remove any existing 'page')
-    args = request.args.to_dict()
-    args.pop('page', None)
-    args['target_user'] = target_user
-
-    # 7) render with correct context
-    if data_type == 'activities':
-        ongoing = [a for a in page_slice if a in activities["uncompleted_activities"]]
-        done    = [a for a in page_slice if a in activities["completed_activities"]]
-        return render_template(
-            template,
-            uncompleted_activities=ongoing,
-            completed_activities=done,
-            page=page,
-            total_pages=total_pages,
-            request_args=args,
-            visitor=True
-        )
-
-    # history case
-    return render_template(
-        template,
-        entries=page_slice,
-        page=page,
-        total_pages=total_pages,
-        request_args=args,
-        visitor=True
-    )
+def delete_entry():
+    result = handle_delete_entry(request)
+    if result: return result 
 
 @app.route('/search_users', methods=['GET'])
 @login_required
 def search_users_route():
-    query = request.args.get('query', '')
-    if query:
-        matching_users = search_users(query)
-        return jsonify(matching_users)
-    return jsonify([])
+    result = search_users(request)
+    if result: return result
+
+@app.route('/view_shared_data', methods=['POST'])
+@login_required
+def view_shared_data():
+    result = view_shared_data_handler(current_user.username, request)
+    if result: return result
+
+@app.route('/delete_shared_user', methods=['POST'])
+@login_required
+def delete_shared_user():
+    result = delete_shared_user_handler(current_user.username, request)
+    if result: return result
+
+@app.route('/share_with_user', methods=['POST'])
+@login_required
+def share_with_user():
+    result = share_with_user_handler(current_user.username, request)
+    if result: return result

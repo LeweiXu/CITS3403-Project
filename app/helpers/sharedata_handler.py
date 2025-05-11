@@ -1,6 +1,6 @@
 from app.models import Users, SharedUsers
 from app import db
-from flask import flash, jsonify
+from flask import flash, render_template
 
 def share_data_handler(username, request):
     """
@@ -47,7 +47,7 @@ def share_data_handler(username, request):
     # Fetch users you have shared your data with
     shared_with = SharedUsers.query.filter_by(username=username).all()
 
-    return shared_with_me, shared_with
+    return render_template('sharedata.html', shared_with_me=shared_with_me, shared_with=shared_with)
 
 def search_users(query):
     """

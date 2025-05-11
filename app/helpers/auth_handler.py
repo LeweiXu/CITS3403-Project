@@ -63,8 +63,9 @@ def handle_register(request):
         db.session.add(new_user)
         db.session.commit()
         login_user(new_user)
+        session['username'] = username  # Store username in session
         flash('Registration successful! Please log in.', 'success')
-        return redirect(url_for('dashboard'))
+        return 'success'
     except Exception as e:
         print(f"Error: {e}")  # Debugging output
         return None

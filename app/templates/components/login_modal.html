@@ -11,16 +11,16 @@
                     <h2 class="text-center">Login</h2>
                     <p class="text-center">Access your account to track your media consumption.</p>
                     <form method="POST" action="/login">
-                        {{ form.hidden_tag() }}
+                        {{ login_form.hidden_tag() }}
                         <div class="mb-3">
-                            {{ form.username.label(class="form-label") }}
-                            {{ form.username(class="form-control") }}
+                            {{ login_form.username.label(class="form-label") }}
+                            {{ login_form.username(class="form-control") }}
                         </div>
                         <div class="mb-3">
-                            {{ form.password.label(class="form-label") }}
-                            {{ form.password(class="form-control") }}
+                            {{ login_form.password.label(class="form-label") }}
+                            {{ login_form.password(class="form-control") }}
                         </div>
-                        {{ form.submit(class="btn btn-primary w-100") }}
+                        {{ login_form.submit(class="btn btn-primary w-100") }}
                         <div class="modal-footer flex-column">
                             <p class="text-center mt-3">
                                 Don't have an account? <a href="#" data-bs-toggle="modal" data-bs-target="#registerModal" data-bs-dismiss="modal">Register</a>
@@ -34,30 +34,8 @@
 </div>
 
 <script>
-    document.querySelector('#loginModal form').addEventListener('submit', async (e) => {
-        e.preventDefault();  // Prevent the default form submission
-
-        const form = e.target;
-        const formData = new FormData(form);
-
-        try {
-            const response = await fetch('/login', {
-                method: 'POST',
-                body: formData
-            });
-
-            const result = await response.json();
-
-            if (response.ok && result.success) {
-                // Redirect to the dashboard if login is successful
-                window.location.href = result.redirect_url;
-            } else {
-                // Display error message
-                alert(result.message || 'An error occurred. Please try again.');
-            }
-        } catch (error) {
-            console.error('Error:', error);
-            alert('An error occurred. Please try again.');
-        }
+    document.querySelector('#loginModal form').addEventListener('submit', (e) => {
+        // Allow the form to submit normally by removing the default prevention
+        // This will let the server handle the redirection
     });
 </script>

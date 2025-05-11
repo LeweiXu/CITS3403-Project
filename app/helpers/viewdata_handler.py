@@ -1,9 +1,10 @@
 from app.models import Entries, Activities
 from sqlalchemy import cast, Integer
+from flask import render_template
 from app import db
-from datetime import date
+from flask import flash, redirect, url_for, session
 
-def handle_viewdata(username, request):
+def get_entries(username, request):
     """
     Fetch filtered entries for the given user based on query parameters.
     """
@@ -19,7 +20,27 @@ def handle_viewdata(username, request):
 
     # Get filtered entries
     entries = get_filtered_entries(username, filters)
-    return entries
+    ## 2) pagination parameters
+    PER_PAGE    = 20
+    page        = request.args.get('page', 1, type=int)
+    total       = len(entries)
+    total_pages = (total + PER_PAGE - 1) // PER_PAGE
+    start_idx   = (page - 1) * PER_PAGE
+    # 3) slice out just this page
+    entries = entries[start_idx : start_idx + PER_PAGE]
+    # Build a copy of request.args **without** the 'page' key
+    args = request.args.to_dict()
+    args.pop('page', None)
+
+    return render_template(
+        'viewdata.html',
+        entries=entries,
+        page=page,
+        total_pages=total_pages,
+        request_args=args,
+        visitor=False
+    )
+
 
 def get_filtered_entries(username, filters):
     """
@@ -51,3 +72,18 @@ def get_filtered_entries(username, filters):
 
     # Execute the query and return the results
     return query.order_by(Entries.date.desc(),Entries.id.desc()).all()
+
+def handle_delete_entry(entry_id, username):
+    entry = Entries.query.get(entry_id)
+    if entry:
+        # Check if the entry belongs to the logged-in user
+        activity = Activities.query.filter_by(id=entry.activity_id, username=username).first()
+        if activity:
+            db.session.delete(entry)
+            db.session.commit()
+            flash('Entry deleted successfully.', 'success')
+        else:
+            flash('Entry not found or unauthorized.', 'danger')
+    else:
+        flash('Entry not found.', 'danger')
+    return redirect(url_for('viewdata'))

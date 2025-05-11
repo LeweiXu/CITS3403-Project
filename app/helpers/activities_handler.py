@@ -1,10 +1,10 @@
 from app.models import Entries, Activities
 from app import db
-from flask import flash
+from flask import flash, render_template, redirect, url_for
 from datetime import datetime
 from sqlalchemy import func, cast, Integer
 
-def fetch_past_activities(username, request):
+def get_activities(username, request):
     """
     Fetch uncompleted and completed activities for the given user based on query parameters.
     """
@@ -22,10 +22,32 @@ def fetch_past_activities(username, request):
     uncompleted_activities = get_uncompleted_activities(username, filters)
     completed_activities = get_completed_activities(username, filters)
 
-    return {
-        "uncompleted_activities": uncompleted_activities,
-        "completed_activities": completed_activities
-    }
+    # Combine for simple pagination
+    combined    = uncompleted_activities + completed_activities
+    PER_PAGE    = 20
+    page        = request.args.get('page', 1, type=int)
+    total       = len(combined)
+    total_pages = (total + PER_PAGE - 1) // PER_PAGE
+    start_idx   = (page - 1) * PER_PAGE
+
+    page_slice = combined[start_idx : start_idx + PER_PAGE]
+    # split back
+    uncompleted_activities   = [a for a in page_slice if a in uncompleted_activities]
+    completed_activities = [a for a in page_slice if a in completed_activities]
+
+    # **strip** the 'page' param before passing into template
+    args = request.args.to_dict()
+    args.pop('page', None)
+
+    return render_template(
+        'activities.html',
+        uncompleted_activities=uncompleted_activities,
+        completed_activities=completed_activities,
+        page=page,
+        total_pages=total_pages,
+        request_args=args,
+        visitor=False
+    )
 
 def get_uncompleted_activities(username, filters):
     """
@@ -98,10 +120,25 @@ def apply_activity_filters(query, filters):
         query = query.having(func.sum(cast(Entries.duration, Integer)) <= max_d)
     return query
 
-def handle_end_activity(activity_id, username, rating=None, comment=None):
+def handle_end_activity(username, request):
     """
     Handle ending an activity by setting its status to 'completed', updating the rating, comment, and end_date fields.
     """
+    activity_id = request.form.get('activity_id')
+    rating = request.form.get('rating')  # Get the rating from the form
+    comment = request.form.get('comment')  # Get the comment from the form
+
+    # Convert empty strings to None
+    rating = float(rating) if rating else None
+    comment = comment if comment else None
+
+    if activity_id:
+        success = handle_end_activity(activity_id, username, rating=rating, comment=comment)
+        if success:
+            flash('Activity ended successfully.', 'success')
+        else:
+            flash('Failed to end activity.', 'danger')
+
     # Fetch the activity
     activity = Activities.query.filter_by(id=activity_id, username=username).first()
     if not activity:
@@ -123,11 +160,11 @@ def handle_end_activity(activity_id, username, rating=None, comment=None):
     try:
         db.session.commit()
         flash(f"Activity {activity_id} marked as completed successfully.", "success")
-        return True
+        return redirect(url_for('dashboard'))
     except Exception as e:
         db.session.rollback()
         flash(f"An error occurred while completing the activity: {e}", "danger")
-        return False
+        return None
     
 def handle_reopen_activity(activity_id, username):
     """

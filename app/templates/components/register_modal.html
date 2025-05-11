@@ -1,4 +1,4 @@
- <!-- Register Modal -->
+<!-- Register Modal -->
  <div class="modal fade" id="registerModal" tabindex="-1" aria-labelledby="registerModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-dialog-centered">
@@ -10,22 +10,23 @@
                     <h2 class="text-center">Register</h2>
                     <p class="text-center">Create an account to start tracking your media consumption.</p>
                     <form id="registerForm" method="POST" action="/register">
+                        {{ register_form.hidden_tag() }}
                         <div class="mb-3">
-                            <label for="reg-username" class="form-label">Username</label>
-                            <input type="text" class="form-control" id="reg-username" name="username" required>
+                            {{ register_form.username.label(class="form-label", for="reg-username") }}
+                            {{ register_form.username(class="form-control", id="reg-username") }}
                             <div id="username-error" class="invalid-feedback"></div>
                         </div>
                         <div class="mb-3">
-                            <label for="reg-email" class="form-label">Email</label>
-                            <input type="email" class="form-control" id="reg-email" name="email" required>
+                            {{ register_form.email.label(class="form-label", for="reg-email") }}
+                            {{ register_form.email(class="form-control", id="reg-email") }}
                             <div id="email-error" class="invalid-feedback"></div>
                         </div>
                         <div class="mb-3">
-                            <label for="reg-password" class="form-label">Password</label>
-                            <input type="password" class="form-control" id="reg-password" name="password" required>
+                            {{ register_form.password.label(class="form-label", for="reg-password") }}
+                            {{ register_form.password(class="form-control", id="reg-password") }}
                             <div id="password-error" class="invalid-feedback"></div>
                         </div>
-                        <button type="submit" class="btn btn-primary w-100">Register</button>
+                        {{ register_form.submit(class="btn btn-primary w-100") }}
                         <div class="modal-footer flex-column">
                             <p class="text-center mt-3">
                                 Already have an account? <a href="#" data-bs-toggle="modal" data-bs-target="#loginModal" data-bs-dismiss="modal">Login</a>
@@ -40,7 +41,7 @@
 
 <script>
     document.getElementById('registerForm').addEventListener('submit', async (e) => {
-        e.preventDefault();
+        e.preventDefault(); // Prevent form submission by default
 
         // Reset previous error states
         const inputs = ['username', 'email', 'password'];
@@ -50,41 +51,45 @@
         });
 
         let isValid = true;
-        
+
         // Validation variables
         const username = document.getElementById('reg-username').value;
         const email = document.getElementById('reg-email').value;
         const password = document.getElementById('reg-password').value;
 
         // Username validation
+        console.log('Validating username:', username);
         if (username.length < 3 || username.length > 20) {
+            console.log('Username validation failed');
             document.getElementById('reg-username').classList.add('is-invalid');
             document.getElementById('username-error').innerHTML = '<small>Username must be between 3 and 20 characters.</small>';
             isValid = false;
+        } else {
+            console.log('Username validation passed');
         }
 
         // Email validation
+        console.log('Validating email:', email);
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        // [^\s@] - not a whitespace or @, any characters but those
-        // + @ and [^\s@] again
-        // + \. - at least one dot and [^\s@] again
         if (!emailRegex.test(email)) {
+            console.log('Email validation failed');
             document.getElementById('reg-email').classList.add('is-invalid');
             document.getElementById('email-error').innerHTML = '<small>Please enter a valid email address.</small>';
             isValid = false;
+        } else {
+            console.log('Email validation passed');
         }
 
         // Password validation
+        console.log('Validating password:', password);
         const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*(),.?":{}|<>])[A-Za-z\d!@#$%^&*(),.?":{}|<>]{8,}$/;
-        // (?=.*[a-z]) - at least one lowercase letter
-        // (?=.*[A-Z]) - at least one uppercase letter
-        // (?=.*\d) - at least one number
-        // (?=.*[!@#$%^&*(),.?":{}|<>]) - at least one special character
-        // [A-Za-z\d!@#$%^&*(),.?":{}|<>]{8,} - total length of 8 or more characters
         if (!passwordRegex.test(password)) {
+            console.log('Password validation failed');
             document.getElementById('reg-password').classList.add('is-invalid');
             document.getElementById('password-error').innerHTML = '<small>Password must contain:<br>• At least 8 characters<br>• At least one uppercase letter<br>• At least one lowercase letter<br>• At least one number<br>• At least one special character (!@# etc.)</small>';
             isValid = false;
+        } else {
+            console.log('Password validation passed');
         }
 
         // If any validation fails, do not proceed
@@ -128,6 +133,5 @@
         } else {
             alert('Registration failed. Please try again.');
         }
-
     });
 </script>

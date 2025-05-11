@@ -1,26 +1,71 @@
-from flask import render_template, request, redirect, url_for, flash, session, Response, jsonify
+from flask import render_template, request, redirect, url_for, flash, session, jsonify
 from flask_login import logout_user, login_required, current_user
 from app import app, db
 from app.forms import LoginForm, RegisterForm
-from app.models import Entries, SharedUsers, Users, Activities
+from app.models import Entries, SharedUsers, Activities
 from app.helpers.upload_handler import handle_upload
 from app.helpers.dashboard_handler import *
-from app.helpers.export_csv_handler import generate_csv
-from app.helpers.viewdata_handler import handle_viewdata
-from app.helpers.activities_handler import fetch_past_activities, handle_end_activity, handle_reopen_activity
+from app.helpers.viewdata_handler import get_entries, handle_delete_entry
+from app.helpers.activities_handler import get_activities, handle_end_activity, handle_reopen_activity
 from app.helpers.analysis_handler import get_analysis_data
 from app.helpers.sharedata_handler import share_data_handler, search_users
 from app.helpers.auth_handler import handle_login, handle_register
-import re
 
+#<------------ PAGE ROUTES ------------>
+# All routes get render_template() from a helper function and returns the result
 @app.route('/')
-@app.route('/index')
+@app.route('/index', methods=['GET'])
 def index():
     # Index page also contains login/register information
     login_form = LoginForm()  # Create an instance of the LoginForm
     register_form = RegisterForm()
     return render_template('index.html', login_form=login_form, register_form=register_form)  # Pass the form to the template
 
+@app.route('/dashboard', methods=['GET'])
+@login_required
+def dashboard():
+    result = get_dashboard_data(current_user.username)
+    if result: return result  # Render the dashboard with the data
+
+@app.route('/viewdata', methods=['GET'])
+@login_required
+def viewdata():
+    result = get_entries(current_user.username, request)
+    if result: return result
+
+@app.route('/activities', methods=['GET'])
+@login_required
+def activities():
+    result = get_activities(current_user.username, request)
+    if result: return result
+
+@app.route('/analysis', methods=['GET'])
+@login_required
+def analysis():
+    analysis_data = get_analysis_data(current_user.username)
+    return render_template('analysis.html', analysis_data=analysis_data)
+
+@app.route('/sharedata', methods=['GET'])
+@login_required
+def sharedata():
+    result = share_data_handler(current_user.username, request)
+    if result: return result
+
+@app.route('/advanced', methods=['GET'])
+@login_required
+def advanced():
+    return render_template('advanced.html')
+
+# <------------ BUTTON ROUTES ------------>
+# Routes for GET button requests that don't require CSRF protection
+@app.route('/logout', methods=['GET'])
+def logout():
+    logout_user()
+    session['username'] = None  # Clear the session
+    return redirect(url_for('index'))  # Redirect to the home page
+
+# <------------ FORM ROUTES ------------>
+# All routes that are not GET requests, uses WTForms for CSRF protection
 @app.route('/login', methods=['POST'])
 def login():
     form = LoginForm()  # Create a new instance of the LoginForm
@@ -35,55 +80,13 @@ def register():
         result = handle_register(request)
         if result: return result
 
-@app.route('/logout')
-def logout():
-    logout_user()
-    return redirect(url_for('index'))  # Redirect to the home page
-
-@app.route('/dashboard', methods=['GET', 'POST'])
-@login_required
-def dashboard():
-    username = session['username']
-
-    # Handle form submissions
-    if request.method == 'POST':
-        handle_dashboard_form(username, request.form)
-        return redirect(url_for('dashboard'))
-
-    # Fetch statistics and current activities
-    stats = get_user_statistics(username)
-    current_activities = get_current_activities(username)
-
-    return render_template(
-        'dashboard.html',
-        total_time=stats['total_time'],
-        most_consumed_media=stats['most_consumed_media'],
-        daily_average_time=stats['daily_average_time'],
-        current_activities=current_activities
-    )
-
 @app.route('/end_activity', methods=['POST'])
 @login_required
 def end_activity():
-    username = session['username']
-    activity_id = request.form.get('activity_id')
-    rating = request.form.get('rating')  # Get the rating from the form
-    comment = request.form.get('comment')  # Get the comment from the form
+    result = handle_end_activity(current_user.username, request)
+    if result: return result
 
-    # Convert empty strings to None
-    rating = float(rating) if rating else None
-    comment = comment if comment else None
-
-    if activity_id:
-        success = handle_end_activity(activity_id, username, rating=rating, comment=comment)
-        if success:
-            flash('Activity ended successfully.', 'success')
-        else:
-            flash('Failed to end activity.', 'danger')
-
-    return redirect(url_for('dashboard'))
-
-@app.route('/upload', methods=['GET', 'POST'])
+@app.route('/upload', methods=['POST'])
 @login_required
 def upload():
     if request.method == 'POST':
@@ -92,95 +95,11 @@ def upload():
             return result
     return render_template('upload.html')
 
-@app.route('/viewdata', methods=['GET'])
-@login_required
-def viewdata():
-    username = session['username']
-    # Fetch all entries for the logged-in user
-    all_entries = handle_viewdata(username, request)
-    ## 2) pagination parameters
-    PER_PAGE    = 20
-    page        = request.args.get('page', 1, type=int)
-    total       = len(all_entries)
-    total_pages = (total + PER_PAGE - 1) // PER_PAGE
-    start_idx   = (page - 1) * PER_PAGE
-    # 3) slice out just this page
-    entries = all_entries[start_idx : start_idx + PER_PAGE]
-    # Build a copy of request.args **without** the 'page' key
-    args = request.args.to_dict()
-    args.pop('page', None)
-
-    return render_template(
-        'viewdata.html',
-        entries=entries,
-        page=page,
-        total_pages=total_pages,
-        request_args=args,
-        visitor=False
-    )
-
 @app.route('/delete_entry/<int:entry_id>')
 @login_required
 def delete_entry(entry_id):
-    entry = Entries.query.get(entry_id)
-    if entry:
-        # Check if the entry belongs to the logged-in user
-        activity = Activities.query.filter_by(id=entry.activity_id, username=session.get('username')).first()
-        if activity:
-            db.session.delete(entry)
-            db.session.commit()
-            flash('Entry deleted successfully.', 'success')
-        else:
-            flash('Entry not found or unauthorized.', 'danger')
-    else:
-        flash('Entry not found.', 'danger')
-    return redirect(url_for('viewdata'))
-
-@app.route('/sharedata', methods=['GET', 'POST'])
-@login_required
-def sharedata():
-    shared_with_me, shared_with = share_data_handler(session['username'], request)
-    return render_template('sharedata.html', shared_with_me=shared_with_me, shared_with=shared_with)
-
-@app.route('/activities', methods=['GET'])
-@login_required
-def activities():
-    username = session['username']
-    data     = fetch_past_activities(username, request)
-    uncompleted = data["uncompleted_activities"]
-    completed   = data["completed_activities"]
-    # Combine for simple pagination
-    combined    = uncompleted + completed
-    PER_PAGE    = 20
-    page        = request.args.get('page', 1, type=int)
-    total       = len(combined)
-    total_pages = (total + PER_PAGE - 1) // PER_PAGE
-    start_idx   = (page - 1) * PER_PAGE
-
-    page_slice = combined[start_idx : start_idx + PER_PAGE]
-    # split back
-    ongoing_page   = [a for a in page_slice if a in uncompleted]
-    completed_page = [a for a in page_slice if a in completed]
-
-    # **strip** the 'page' param before passing into template
-    args = request.args.to_dict()
-    args.pop('page', None)
-
-    return render_template(
-        'activities.html',
-        uncompleted_activities=ongoing_page,
-        completed_activities=completed_page,
-        page=page,
-        total_pages=total_pages,
-        request_args=args,
-        visitor=False
-    )
-
-@app.route('/analysis', methods=['GET'])
-@login_required
-def analysis():
-    analysis_data = get_analysis_data(session['username'])
-    return render_template('analysis.html', analysis_data=analysis_data)
+    result = handle_delete_entry(entry_id, current_user.username)
+    if result: return result  # Redirect to viewdata if deletion is successful
 
 # Pass the username internally to defend against users editing the URL to see other users' data
 @app.route('/view_shared_data/<data_type>', methods=['GET','POST'])
@@ -293,8 +212,3 @@ def reopen_activity():
     else:
         flash('Could not reopen that activity.', 'danger')
         return redirect(url_for('viewdata'))
-    
-@app.route('/advanced', methods=['GET', 'POST'])
-@login_required
-def advanced():
-    return render_template('advanced.html')

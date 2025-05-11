@@ -2,7 +2,18 @@ from app.models import Entries, Activities
 from app import db
 from sqlalchemy import func
 from datetime import datetime
-from flask import flash
+from flask import flash, render_template
+
+def get_dashboard_data(username):
+    stats = get_user_statistics(username)
+    current_activities = get_current_activities(username)
+    return render_template(
+        'dashboard.html',
+        total_time=stats['total_time'],
+        most_consumed_media=stats['most_consumed_media'],
+        daily_average_time=stats['daily_average_time'],
+        current_activities=current_activities
+    )
 
 def get_user_statistics(username):
     # Query all activities for the current user
@@ -44,13 +55,28 @@ def get_user_statistics(username):
     }
 
 def get_current_activities(username):
-    # Fetch current activities grouped by media_name and media_type
-    return db.session.query(
-        Activities.media_name,
-        Activities.media_type,
-        Activities.activity_id,
-        func.sum(Entries.duration).label('total_duration')
-    ).join(Entries).filter(Activities.username == username).group_by(Activities.media_name, Activities.media_type).all()
+    """
+    Fetch all current activities (where status = 'in_progress') for the given user.
+    """
+    # Query activities with status = 'in_progress'
+    current_activities = Activities.query.filter_by(username=username, status='ongoing').all()
+
+    activities = []
+    for activity in current_activities:
+        # Calculate the total duration for the activity
+        total_duration = db.session.query(
+            func.sum(Entries.duration)
+        ).filter_by(activity_id=activity.id).scalar()
+        # Append the activity details to the list
+        activities.append({
+            "media_name": activity.media_name,
+            "media_type": activity.media_type,
+            "total_duration": total_duration or 0,
+            "activity_id": activity.id
+        })
+
+    return activities
+
 
 def handle_dashboard_form(username, form):
     """
@@ -109,25 +135,11 @@ def handle_add_duration(username, activity_id, duration, comment=None):
         flash(f"An error occurred while adding the duration: {e}", "danger")
         return False
 
-def get_current_activities(username):
-    """
-    Fetch all current activities (where status = 'in_progress') for the given user.
-    """
-    # Query activities with status = 'in_progress'
-    current_activities = Activities.query.filter_by(username=username, status='ongoing').all()
-
-    activities = []
-    for activity in current_activities:
-        # Calculate the total duration for the activity
-        total_duration = db.session.query(
-            func.sum(Entries.duration)
-        ).filter_by(activity_id=activity.id).scalar()
-        # Append the activity details to the list
-        activities.append({
-            "media_name": activity.media_name,
-            "media_type": activity.media_type,
-            "total_duration": total_duration or 0,
-            "activity_id": activity.id
-        })
-
-    return activities
+# def get_current_activities(username):
+#     # Fetch current activities grouped by media_name and media_type
+#     return db.session.query(
+#         Activities.media_name,
+#         Activities.media_type,
+#         Activities.activity_id,
+#         func.sum(Entries.duration).label('total_duration')
+#     ).join(Entries).filter(Activities.username == username).group_by(Activities.media_name, Activities.media_type).all()

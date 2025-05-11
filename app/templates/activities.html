@@ -105,13 +105,14 @@
                     <td>
                         <form method="POST" action="{{ url_for('reopen_activity') }}" style="display:inline;">
                             <input type="hidden" name="activity_id" value="{{ activity.id }}">
-                            <button type="submit" class="btn btn-success btn-sm">
-                                Re-open
-                            </button>
+                            <button type="submit" class="btn btn-success btn-sm">Re-open</button>
                         </form>
                     </td>
                     <td>
-                        <a href="{{ url_for('delete_activity', activity_id=activity.id) }}" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this activity?');">Delete Activity</a>
+                        <form method="POST" action="{{ url_for('delete_activity') }}" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete this activity?');">
+                            <input type="hidden" name="activity_id" value="{{ activity.id }}">
+                            <button type="submit" class="btn btn-danger btn-sm">Delete Activity</button>
+                        </form>
                     </td>
                     {% endif %}
             </tr>

@@ -111,7 +111,13 @@ def apply_activity_filters(query, filters):
     if filters.get('media_name'):
         query = query.filter(Activities.media_name.ilike(f"%{filters['media_name']}%"))
     if filters.get('media_type'):
-        query = query.filter(Activities.media_type.ilike(f"%{filters['media_type']}%"))
+        media_type_filter = filters['media_type']
+        query = query.filter(
+            db.or_(
+                Activities.media_type.ilike(f"%{media_type_filter}%"),
+                Activities.media_subtype.ilike(f"%{media_type_filter}%")
+            )
+        )
     if filters.get('min_duration'):
         min_d = int(filters['min_duration'])
         query = query.having(func.sum(cast(Entries.duration, Integer)) >= min_d)
@@ -131,13 +137,6 @@ def handle_end_activity(username, request):
     # Convert empty strings to None
     rating = float(rating) if rating else None
     comment = comment if comment else None
-
-    if activity_id:
-        success = handle_end_activity(activity_id, username, rating=rating, comment=comment)
-        if success:
-            flash('Activity ended successfully.', 'success')
-        else:
-            flash('Failed to end activity.', 'danger')
 
     # Fetch the activity
     activity = Activities.query.filter_by(id=activity_id, username=username).first()
@@ -166,24 +165,87 @@ def handle_end_activity(username, request):
         flash(f"An error occurred while completing the activity: {e}", "danger")
         return None
     
-def handle_reopen_activity(activity_id, username):
-    """
-    Given an entry_id and the current username, mark its parent activity
-    back to 'ongoing' so it shows up in Current Activities.
-    Returns True if successful, False otherwise.
-    """
+def handle_reopen_activity(request):
+    activity_id = request.form.get('activity_id')
+    if not activity_id:
+        flash('Missing data for reopen.', 'danger')
+        return redirect(url_for('viewdata'))
+
     activity = Activities.query.get(activity_id)
     if not activity:
-        return False
-
-    # Only allow the owner to reopen
-    if activity.username != username:
-        return False
+        flash('Activity not found.', 'danger')
+        return redirect(url_for('viewdata'))
 
     activity.status = 'ongoing'
     activity.end_date   = None
     activity.rating     = None
     activity.comment    = None
-
     db.session.commit()
-    return True
+
+    flash('Activity reopened.', 'success')
+    return redirect(url_for('dashboard'))
+
+def handle_add_activity(username, request):
+    """
+    Handle adding a new activity.
+    """
+    media_name = request.form.get('media_name')
+    media_type = request.form.get('media_type')
+    media_subtype = request.form.get('media_subtype')
+
+    # Create a new activity
+    new_activity = Activities(
+        username=username,
+        media_name=media_name,
+        media_type=media_type,
+        media_subtype=media_subtype,
+        status='ongoing',
+        start_date=datetime.now().date()
+    )
+
+    db.session.add(new_activity)
+    db.session.commit()
+    flash(f"Activity '{media_name}' added successfully.", "success")
+    return redirect(url_for('dashboard'))
+
+def handle_add_entry(username, request):
+    activity_id = request.form.get('activity_id')
+    duration = request.form.get('duration')
+    comment = None
+    if activity_id and duration:
+        activity = Activities.query.filter_by(id=activity_id, username=username).first()
+        new_entry = Entries(
+            activity_id=activity.id,
+            date=datetime.now().date(),
+            duration=duration,
+            comment=comment
+        )
+        db.session.add(new_entry)
+
+        try:
+            db.session.commit()
+            flash(f"Duration added to activity '{activity.media_name}' successfully.", "success")
+            return redirect(url_for('dashboard'))
+        except Exception as e:
+            db.session.rollback()
+            flash(f"An error occurred while adding the duration: {e}", "danger")
+            return None
+        
+def handle_delete_activity(request):
+    activity_id = request.form.get('activity_id')
+    activity = Activities.query.filter_by(id=activity_id).first()
+    if not activity:
+        flash('Activity not found or unauthorized.', 'danger')
+        return redirect(url_for('activities'))
+
+    # Delete all related entries in the Entries table
+    related_entries = Entries.query.filter_by(activity_id=activity.id).all()
+    for entry in related_entries:
+        db.session.delete(entry)
+
+    # Delete the activity itself
+    db.session.delete(activity)
+    db.session.commit()
+    
+    flash('Activity and all related entries deleted successfully.', 'success')
+    return redirect(url_for('activities'))

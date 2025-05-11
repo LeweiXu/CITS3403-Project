@@ -1,12 +1,12 @@
 from flask import render_template, request, redirect, url_for, flash, session, jsonify
 from flask_login import logout_user, login_required, current_user
 from app import app, db
-from app.forms import LoginForm, RegisterForm
+from app.forms import LoginForm, RegisterForm, AddActivityForm
 from app.models import Entries, SharedUsers, Activities
 from app.helpers.upload_handler import handle_upload
 from app.helpers.dashboard_handler import *
 from app.helpers.viewdata_handler import get_entries, handle_delete_entry
-from app.helpers.activities_handler import get_activities, handle_end_activity, handle_reopen_activity
+from app.helpers.activities_handler import *
 from app.helpers.analysis_handler import get_analysis_data
 from app.helpers.sharedata_handler import share_data_handler, search_users
 from app.helpers.auth_handler import handle_login, handle_register
@@ -24,7 +24,8 @@ def index():
 @app.route('/dashboard', methods=['GET'])
 @login_required
 def dashboard():
-    result = get_dashboard_data(current_user.username)
+    add_activity_form = AddActivityForm()  # Create an instance of the AddActivityForm
+    result = get_dashboard_data(current_user.username, add_activity_form)
     if result: return result  # Render the dashboard with the data
 
 @app.route('/viewdata', methods=['GET'])
@@ -80,11 +81,35 @@ def register():
         result = handle_register(request)
         if result: return result
 
+@app.route('/add_activity', methods=['POST'])
+@login_required
+def add_activity():
+    result = handle_add_activity(current_user.username, request)
+    if result: return result  # Redirect to dashboard if activity is added successfully
+
 @app.route('/end_activity', methods=['POST'])
 @login_required
 def end_activity():
     result = handle_end_activity(current_user.username, request)
     if result: return result
+
+@app.route('/add_entry', methods=['POST'])
+@login_required
+def add_entry():
+    result = handle_add_entry(current_user.username, request)
+    if result: return result  # Redirect to viewdata if entry is added successfully
+
+@app.route('/reopen_activity', methods=['POST'])
+@login_required
+def reopen_activity():
+    result = handle_reopen_activity(request)
+    if result: return result  # Redirect to viewdata if activity is reopened successfully
+
+@app.route('/delete_activity', methods=['POST'])
+@login_required
+def delete_activity():
+    result = handle_delete_activity(request)
+    if result: return result  # Redirect to viewdata if activity is deleted successfully
 
 @app.route('/upload', methods=['POST'])
 @login_required
@@ -175,40 +200,3 @@ def search_users_route():
         matching_users = search_users(query)
         return jsonify(matching_users)
     return jsonify([])
-
-@app.route('/delete_activity/<int:activity_id>')
-@login_required
-def delete_activity(activity_id):
-    activity = Activities.query.filter_by(id=activity_id, username=session['username']).first()
-    if not activity:
-        flash('Activity not found or unauthorized.', 'danger')
-        return redirect(url_for('activities'))
-
-    # Delete all related entries in the Entries table
-    related_entries = Entries.query.filter_by(activity_id=activity.id).all()
-    for entry in related_entries:
-        db.session.delete(entry)
-
-    # Delete the activity itself
-    db.session.delete(activity)
-    db.session.commit()
-
-    flash('Activity and all related entries deleted successfully.', 'success')
-    return redirect(url_for('activities'))
-
-@app.route('/reopen_activity', methods=['POST'])
-def reopen_activity():
-    entry_id = request.form['activity_id']
-    username = session.get('username')
-
-    if not entry_id or not username:
-        flash('Missing data for reopen.', 'danger')
-        return redirect(url_for('viewdata'))
-
-    if handle_reopen_activity(entry_id, username):
-        flash('Activity reopened.', 'success')
-        # send them back to Dashboard so they see it in Current Activities
-        return redirect(url_for('dashboard'))
-    else:
-        flash('Could not reopen that activity.', 'danger')
-        return redirect(url_for('viewdata'))

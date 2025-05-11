@@ -64,7 +64,12 @@ def get_filtered_entries(username, filters):
     if media_name:
         query = query.filter(Activities.media_name.ilike(f"%{media_name}%"))
     if media_type:
-        query = query.filter(Activities.media_type.ilike(f"%{media_type}%"))
+        query = query.filter(
+            db.or_(
+                Activities.media_type.ilike(f"%{media_type}%"),
+                Activities.media_subtype.ilike(f"%{media_type}%")
+            )
+        )
     if min_duration:
         query = query.filter(cast(Entries.duration, Integer) >= int(min_duration))
     if max_duration:

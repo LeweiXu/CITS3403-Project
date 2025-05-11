@@ -4,7 +4,7 @@ from sqlalchemy import func
 from datetime import datetime
 from flask import flash, render_template
 
-def get_dashboard_data(username):
+def get_dashboard_data(username, add_activity_form):
     stats = get_user_statistics(username)
     current_activities = get_current_activities(username)
     return render_template(
@@ -12,7 +12,8 @@ def get_dashboard_data(username):
         total_time=stats['total_time'],
         most_consumed_media=stats['most_consumed_media'],
         daily_average_time=stats['daily_average_time'],
-        current_activities=current_activities
+        current_activities=current_activities,
+        add_activity_form=add_activity_form
     )
 
 def get_user_statistics(username):
@@ -76,64 +77,6 @@ def get_current_activities(username):
         })
 
     return activities
-
-
-def handle_dashboard_form(username, form):
-    """
-    Handle form submissions for the dashboard route.
-    """
-    if 'add_duration' in form:  # Add duration to an existing media
-        activity_id = form.get('activity_id')
-        duration = form.get('duration')
-        if activity_id and duration:
-            handle_add_duration(username, activity_id, duration)
-            flash(f'Duration added to activity ID {activity_id}.', 'success')
-    elif 'add_new_entry' in form:  # Add a new media entry
-        media_type = form.get('media_type')
-        media_subtype = form.get('media_subtype')
-        media_name = form.get('media_name')
-        if media_type and media_name:
-            # Add a new activity and its first media entry
-            new_activity = Activities(
-                username=username,
-                media_type=media_type,
-                media_subtype=media_subtype if media_subtype else None,
-                media_name=media_name,
-                start_date=datetime.now().date(),
-                rating=None,
-                comment=None
-            )
-            db.session.add(new_activity)
-            db.session.commit()
-            flash(f'New media entry "{media_name}" added.', 'success')
-
-def handle_add_duration(username, activity_id, duration, comment=None):
-    """
-    Add a new media entry (duration and optional comment) to an existing activity.
-    """
-    # Fetch the activity
-    activity = Activities.query.filter_by(id=activity_id, username=username).first()
-    if not activity:
-        flash(f"Activity with id {activity_id} not found or unauthorized.", "danger")
-        return False
-
-    # Create a new entry
-    new_entry = Entries(
-        activity_id=activity.id,
-        date=datetime.now().date(),
-        duration=duration,
-        comment=comment
-    )
-    db.session.add(new_entry)
-
-    try:
-        db.session.commit()
-        flash(f"Duration added to activity '{activity.media_name}' successfully.", "success")
-        return True
-    except Exception as e:
-        db.session.rollback()
-        flash(f"An error occurred while adding the duration: {e}", "danger")
-        return False
 
 # def get_current_activities(username):
 #     # Fetch current activities grouped by media_name and media_type

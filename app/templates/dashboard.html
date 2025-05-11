@@ -71,7 +71,7 @@
                     <td>{{ activity.media_name }}</td>
                     <td>{{ activity.total_duration }}</td>
                     <td>
-                        <form action="{{ url_for('dashboard') }}" method="POST" class="d-inline">
+                        <form action="{{ url_for('add_entry') }}" method="POST" class="d-inline">
                             <input type="hidden" name="activity_id" value="{{ activity.activity_id }}">
                             <input type="number" name="duration" class="form-control d-inline w-50" placeholder="Minutes" required>
                             <button type="submit" name="add_duration" class="btn btn-success btn-sm">Add</button>
@@ -125,7 +125,7 @@
     <div class="modal" id="addActivityModal">
         <div class="modal-dialog">
             <div class="modal-content">
-                <form action="{{ url_for('dashboard') }}" method="POST">
+                <form action="{{ url_for('add_activity') }}" method="POST">
                     <div class="modal-header">
                         <h5 class="modal-title">Add New Activity</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>

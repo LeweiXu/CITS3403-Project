@@ -3,5 +3,3 @@ flask_sqlalchemy
 flask_migrate
 pandas
 matplotlib
-selenium
-webdriver-manager

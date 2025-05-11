@@ -62,7 +62,7 @@ class ViewSharedDataForm(FlaskForm):
 
 class DeleteSharedUserForm(FlaskForm):
     target_user = StringField('Target User', validators=[DataRequired(), Length(min=3, max=50)])
-    submit = SubmitField('Delete Shared User')
+    submit = SubmitField('Delete')
 
 class ShareWithUserForm(FlaskForm):
     target_user = StringField('Target User', validators=[DataRequired(), Length(min=3, max=50)])

@@ -117,26 +117,36 @@ def delete_activity():
 @app.route('/delete_entry', methods=['POST'])
 @login_required
 def delete_entry():
-    result = handle_delete_entry(request)
-    if result: return result 
+    delete_entry_form = DeleteEntryForm()
+    if delete_entry_form.validate_on_submit():
+        result = handle_delete_entry(request)
+        if result: return result 
 
 @app.route('/view_shared_data', methods=['POST'])
 @login_required
 def view_shared_data():
-    result = view_shared_data_handler(current_user.username, request)
-    if result: return result
+    view_shared_data_form = ViewSharedDataForm()
+    if view_shared_data_form.validate_on_submit():
+        result = view_shared_data_handler(current_user.username, request)
+        if result: return result
 
 @app.route('/delete_shared_user', methods=['POST'])
 @login_required
 def delete_shared_user():
-    result = delete_shared_user_handler(current_user.username, request)
-    if result: return result
+    delete_shared_user_form = DeleteSharedUserForm()
+    print(delete_shared_user_form.data)
+    if delete_shared_user_form.validate_on_submit():
+        result = delete_shared_user_handler(current_user.username, request)
+        if result: return result
 
 @app.route('/share_with_user', methods=['POST'])
 @login_required
 def share_with_user():
-    result = share_with_user_handler(current_user.username, request)
-    if result: return result
+    share_with_user_form = ShareWithUserForm()
+    print(share_with_user_form.data)
+    if share_with_user_form.validate_on_submit():
+        result = share_with_user_handler(current_user.username, request)
+        if result: return result
 
 # <------------ BUTTON ROUTES ------------>
 # Routes that don't really need to be protected by CSRF, but are still protected by Flask-Login

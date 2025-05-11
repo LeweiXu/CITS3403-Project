@@ -4,6 +4,7 @@ from flask import flash, render_template, jsonify, redirect, url_for
 from app.helpers.viewdata_handler import get_entries
 from app.helpers.activities_handler import get_activities
 from app.helpers.analysis_handler import get_analysis_page
+from app.forms import ShareWithUserForm, DeleteSharedUserForm, ViewSharedDataForm
 
 def share_data_handler(username, request):
     # Fetch users who shared their data with the current user
@@ -11,7 +12,24 @@ def share_data_handler(username, request):
     # Fetch users you have shared your data with
     shared_with = SharedUsers.query.filter_by(username=username).all()
 
-    return render_template('sharedata.html', shared_with_me=shared_with_me, shared_with=shared_with)
+    delete_shared_user_forms = {user.shared_username: DeleteSharedUserForm(target_user=user.shared_username) for user in shared_with}
+    view_shared_data_forms = {
+        (user.username, dtype): ViewSharedDataForm(
+            target_user=user.username,
+            data_type=dtype
+        )
+        for user in shared_with_me
+        for dtype in ['analysis', 'activities', 'history']
+    }
+    share_with_user_form = ShareWithUserForm()
+    
+    return render_template('sharedata.html', 
+                            shared_with_me=shared_with_me, 
+                            shared_with=shared_with,
+                            delete_shared_user_forms=delete_shared_user_forms,
+                            share_with_user_form=share_with_user_form,
+                            view_shared_data_forms=view_shared_data_forms
+    )
 
 def search_users(request):
     """

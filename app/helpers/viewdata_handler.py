@@ -3,6 +3,7 @@ from sqlalchemy import cast, Integer
 from flask import render_template
 from app import db
 from flask import flash, redirect, url_for
+from app.forms import DeleteEntryForm
 
 def get_entries(username, request):
     """
@@ -32,13 +33,16 @@ def get_entries(username, request):
     args = request.args.to_dict()
     args.pop('page', None)
 
+    delete_entry_forms = {entry.id: DeleteEntryForm(entry_id=entry.id) for entry in entries}
+
     return render_template(
         'viewdata.html',
         entries=entries,
         page=page,
         total_pages=total_pages,
         request_args=args,
-        username=username
+        username=username,
+        delete_entry_forms=delete_entry_forms
     )
 
 def get_filtered_entries(username, filters):

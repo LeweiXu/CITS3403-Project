@@ -1,7 +1,7 @@
 from flask import render_template, request, redirect, url_for, session
 from flask_login import logout_user, login_required, current_user
 from app import app
-from app.forms import LoginForm, RegisterForm, AddActivityForm
+from app.forms import *
 from app.helpers.upload_handler import *
 from app.helpers.dashboard_handler import *
 from app.helpers.viewdata_handler import *
@@ -23,8 +23,7 @@ def index():
 @app.route('/dashboard', methods=['GET'])
 @login_required
 def dashboard():
-    add_activity_form = AddActivityForm()  # Create an instance of the AddActivityForm
-    result = get_dashboard_data(current_user.username, add_activity_form)
+    result = get_dashboard_data(current_user.username)
     if result: return result  # Render the dashboard with the data
 
 @app.route('/viewdata', methods=['GET'])
@@ -56,21 +55,8 @@ def sharedata():
 def advanced():
     return render_template('advanced.html')
 
-# <------------ BUTTON ROUTES ------------>
-# Routes for GET button requests that don't require CSRF protection
-@app.route('/logout', methods=['GET'])
-def logout():
-    logout_user()
-    return redirect(url_for('index'))  # Redirect to the home page
-
-@app.route('/search_users', methods=['GET'])
-@login_required
-def search_users_route():
-    result = search_users(request)
-    if result: return result
-
 # <------------ FORM ROUTES ------------>
-# All routes that are not GET requests, uses WTForms for CSRF protection
+# POST routes that are protected from CSRF attacks by Flask-WTF
 @app.route('/login', methods=['POST'])
 def login():
     form = LoginForm()  # Create a new instance of the LoginForm
@@ -88,20 +74,28 @@ def register():
 @app.route('/add_activity', methods=['POST'])
 @login_required
 def add_activity():
-    result = handle_add_activity(current_user.username, request)
-    if result: return result  # Redirect to dashboard if activity is added successfully
+    add_activity_form = AddActivityForm()  # Create an instance of the AddActivityForm
+    if not add_activity_form.validate_on_submit():
+        print("Form errors:", add_activity_form.errors)
+    if add_activity_form.validate_on_submit():  # Check if the form is submitted and valid
+        result = handle_add_activity(current_user.username, request)
+        if result: return result  # Redirect to dashboard if activity is added successfully
 
 @app.route('/end_activity', methods=['POST'])
 @login_required
 def end_activity():
-    result = handle_end_activity(current_user.username, request)
-    if result: return result
+    end_activity_form = EndActivityForm()  # Create an instance of the EndActivityForm
+    if end_activity_form.validate_on_submit():  # Check if the form is submitted and valid
+        result = handle_end_activity(current_user.username, request)
+        if result: return result
 
 @app.route('/add_entry', methods=['POST'])
 @login_required
 def add_entry():
-    result = handle_add_entry(current_user.username, request)
-    if result: return result  # Redirect to viewdata if entry is added successfully
+    add_entry_form = AddEntryForm()  # Create an instance of the AddEntryForm
+    if add_entry_form.validate_on_submit():  # Check if the form is submitted and valid
+        result = handle_add_entry(current_user.username, request)
+        if result: return result  # Redirect to viewdata if entry is added successfully
 
 @app.route('/reopen_activity', methods=['POST'])
 @login_required
@@ -113,12 +107,6 @@ def reopen_activity():
 @login_required
 def delete_activity():
     result = handle_delete_activity(request)
-    if result: return result
-
-@app.route('/upload', methods=['POST'])
-@login_required
-def upload():
-    result = handle_upload(request, app)
     if result: return result
 
 @app.route('/delete_entry', methods=['POST'])
@@ -143,4 +131,23 @@ def delete_shared_user():
 @login_required
 def share_with_user():
     result = share_with_user_handler(current_user.username, request)
+    if result: return result
+
+# <------------ BUTTON ROUTES ------------>
+# Routes that don't really need to be protected by CSRF, but are still protected by Flask-Login
+@app.route('/logout', methods=['GET'])
+def logout():
+    logout_user()
+    return redirect(url_for('index'))  # Redirect to the home page
+
+@app.route('/search_users', methods=['GET'])
+@login_required
+def search_users_route():
+    result = search_users(request)
+    if result: return result
+
+@app.route('/upload', methods=['POST'])
+@login_required
+def upload():
+    result = handle_upload(request, app)
     if result: return result

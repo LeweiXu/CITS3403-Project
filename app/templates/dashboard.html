@@ -92,65 +92,25 @@
     <div class="modal" id="endActivityModal">
         <div class="modal-dialog">
             <div class="modal-content">
-                <form id="endActivityForm" action="{{ url_for('end_activity') }}" method="POST">
+                <form id="endActivityForm" method="POST" action="{{ url_for('end_activity') }}">
+                    {{ end_activity_form.hidden_tag() }}
                     <div class="modal-header">
                         <h5 class="modal-title">End Activity</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                     </div>
                     <div class="modal-body">
-                        <input type="hidden" id="modal-activity-id" name="activity_id" value="">
                         <div class="mb-3">
-                            <label for="rating" class="form-label">Rating (1.0-10.0)</label>
-                            <input type="number" id="rating" name="rating" class="form-control" min="1.0" max="10.0" step="0.1" placeholder="Optional">
+                            {{ end_activity_form.rating.label(class="form-label") }}
+                            {{ end_activity_form.rating(class="form-control", id="rating", placeholder="Optional") }}
                         </div>
                         <div class="mb-3">
-                            <label for="comment" class="form-label">Comment</label>
-                            <textarea id="comment" name="comment" class="form-control" placeholder="Optional"></textarea>
+                            {{ end_activity_form.comment.label(class="form-label") }}
+                            {{ end_activity_form.comment(class="form-control", id="comment", placeholder="Optional") }}
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="submit" class="btn btn-primary" id="submitButton">Submit</button>
+                        {{ end_activity_form.submit(class="btn btn-primary", id="submitButton") }}
                         <button type="button" class="btn btn-secondary" id="skipButton" data-bs-dismiss="modal">Skip</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-
-    <!-- Add New Activity Modal -->
-    <div class="modal" id="addActivityModal">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <form action="{{ url_for('add_activity') }}" method="POST">
-                    <div class="modal-header">
-                        <h5 class="modal-title">Add New Activity</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                    </div>
-                    <div class="modal-body">
-                        <div class="mb-3">
-                            <label for="media_type" class="form-label">Media Type</label>
-                            <select id="media_type" name="media_type" class="form-select" required>
-                                <option value="">Select Media Type</option>
-                                <option value="Visual Media">Visual Media</option>
-                                <option value="Audio Media">Audio Media</option>
-                                <option value="Text Media">Text Media</option>
-                                <option value="Interactive Media">Interactive Media</option>
-                            </select>
-                        </div>
-                        <div class="mb-3">
-                            <label for="media_subtype" class="form-label">Media Subtype</label>
-                            <select id="media_subtype" name="media_subtype" class="form-select" disabled>
-                                <option value="">None</option>
-                            </select>
-                        </div>
-                        <div class="mb-3">
-                            <label for="media_name" class="form-label">Media Name</label>
-                            <input type="text" id="media_name" name="media_name" class="form-control" placeholder="Enter media name" required>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="submit" name="add_new_entry" class="btn btn-primary">Add Activity</button>
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                     </div>
                 </form>
             </div>
@@ -161,24 +121,62 @@
     <div class="modal" id="addEntryModal">
         <div class="modal-dialog">
             <div class="modal-content">
-                <form id="addEntryForm" action="{{ url_for('add_entry') }}" method="POST">
+                <form id="addEntryForm" method="POST" action="{{ url_for('add_entry') }}">
+                    {{ add_entry_form.hidden_tag() }}
+
                     <div class="modal-header">
                         <h5 class="modal-title">Add Entry</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                     </div>
+
                     <div class="modal-body">
-                        <input type="hidden" id="entry-activity-id" name="activity_id" value="">
+
                         <div class="mb-3">
-                            <label for="duration" class="form-label">Duration (Minutes)</label>
-                            <input type="number" id="duration" name="duration" class="form-control" placeholder="Minutes" required>
+                            {{ add_entry_form.duration.label(class="form-label") }}
+                            {{ add_entry_form.duration(class="form-control", placeholder="Minutes", id="duration") }}
+                        </div>
+
+                        <div class="mb-3">
+                            {{ add_entry_form.comment.label(class="form-label") }}
+                            {{ add_entry_form.comment(class="form-control", placeholder="Comment (optional)", id="comment") }}
+                        </div>
+                    </div>
+
+                    <div class="modal-footer">
+                        {{ add_entry_form.submit(class="btn btn-primary") }}
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add New Activity Modal -->
+    <div class="modal" id="addActivityModal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form id="addActivityForm" method="POST" action="{{ url_for('add_activity') }}">
+                    {{ add_activity_form.hidden_tag() }}
+                    <div class="modal-header">
+                        <h5 class="modal-title">Add New Activity</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            {{ add_activity_form.media_type.label(class="form-label") }}
+                            {{ add_activity_form.media_type(class="form-select", id="media_type") }}
                         </div>
                         <div class="mb-3">
-                            <label for="comment" class="form-label">Comment</label>
-                            <input type="text" id="comment" name="comment" class="form-control" placeholder="Comment (optional)">
+                            {{ add_activity_form.media_subtype.label(class="form-label") }}
+                            {{ add_activity_form.media_subtype(class="form-select", id="media_subtype", disabled="disabled") }}
+                        </div>
+                        <div class="mb-3">
+                            {{ add_activity_form.media_name.label(class="form-label") }}
+                            {{ add_activity_form.media_name(class="form-control", id="media_name", placeholder="Enter media name") }}
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="submit" class="btn btn-primary">Submit</button>
+                        {{ add_activity_form.submit(class="btn btn-primary") }}
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                     </div>
                 </form>
@@ -190,15 +188,24 @@
 <script>
     document.addEventListener('DOMContentLoaded', () => {
         const endActivityButtons = document.querySelectorAll('[data-bs-target="#endActivityModal"]');
-        const activityIdInput = document.getElementById('modal-activity-id');
+        const activityIdInput = document.querySelector('#endActivityForm input[name="activity_id"]')
         const skipButton = document.getElementById('skipButton');
         const endActivityForm = document.getElementById('endActivityForm');
+
+        console.log('End Activity Buttons:', endActivityButtons);
+        console.log('Activity ID Input:', activityIdInput);
+        console.log('Skip Button:', skipButton);
+        console.log('End Activity Form:', endActivityForm);
 
         // Set the activity ID when the modal is opened
         endActivityButtons.forEach(button => {
             button.addEventListener('click', () => {
                 const activityId = button.getAttribute('data-activity-id');
+                console.log('Button Clicked:', button);
+                console.log('Activity ID:', activityId);
                 activityIdInput.value = activityId;
+                console.log('Activity ID Input:', activityIdInput);
+                console.log('Updated Activity ID Input Value:', activityIdInput.value);
             });
         });
 
@@ -242,13 +249,20 @@
         });
 
         const addEntryButtons = document.querySelectorAll('[data-bs-target="#addEntryModal"]');
-        const entryActivityIdInput = document.getElementById('entry-activity-id');
+        const entryActivityIdInput = document.querySelector('#addEntryForm input[name="activity_id"]');
+
+        console.log('Add Entry Buttons:', addEntryButtons);
+        console.log('Entry Activity ID Input:', entryActivityIdInput);
 
         // Set the activity ID when the Add Entry modal is opened
         addEntryButtons.forEach(button => {
             button.addEventListener('click', () => {
                 const activityId = button.getAttribute('data-activity-id');
-                entryActivityIdInput.value = activityId;
+                console.log('Button Clicked:', button);
+                console.log('Activity ID:', activityId);
+                entryActivityIdInput.value = activityId; // Set the value correctly
+                console.log('Entry Activity ID Input:', entryActivityIdInput);
+                console.log('Updated Entry Activity ID Input Value:', entryActivityIdInput.value);
             });
         });
     });

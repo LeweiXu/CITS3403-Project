@@ -98,7 +98,7 @@ class MediaTrackerTests(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertIn(b'Test Movie', response.data)
 
-    def test_unauthorized_access(self):
+    def test_unauthorised_access(self):
         """Test accessing protected routes without login"""
         response = self.client.get('/dashboard')
         self.assertEqual(response.status_code, 302)  # Redirect to login

@@ -8,6 +8,8 @@ class MediaTrackerTests(unittest.TestCase):
         # Configure app for testing, runs before each tests
         app.config['TESTING'] = True
         app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///:memory:'        # Use database in memory
+        app.config['SERVER_NAME'] = 'localhost'  # Add server name
+
         self.client = app.test_client()     # Create test client for requests
         
         # Create tables in test database
@@ -36,6 +38,70 @@ class MediaTrackerTests(unittest.TestCase):
             user = Users.query.filter_by(username='testuser').first()
             self.assertIsNotNone(user)
             self.assertEqual(user.email, 'test@example.com')
+
+    def test_successful_login(self):
+        """Test login with valid account"""
+        # Create user first
+        self.client.post('/register', data={
+            'username': 'testuser',
+            'email': 'test@example.com',
+            'password': 'Test123!@#'
+        })
+
+        response = self.client.post('/login', data={
+            'username': 'testuser',
+            'password': 'Test123!@#'
+        })
+        self.assertEqual(response.status_code, 302)
+
+    def test_invalid_login(self):
+        """Test login with invalid credentials"""
+        with self.client.session_transaction() as session:
+            session.clear()  # Clear any existing session data
+        
+        response = self.client.post('/login', data={
+            'username': 'testuser',
+            'password': 'wrongpassword'
+        }, follow_redirects=True)
+        
+        # Response should redirect to index (200) and contain login modal
+        self.assertEqual(response.status_code, 200)
+        # Check if redirected to index page
+        self.assertIn(b'Track Your Media Consumption', response.data)
+        # Check if login modal exists
+        self.assertIn(b'loginModal', response.data)
+        # Check if flash messages are handled
+        with self.client.session_transaction() as session:
+            flashes = dict(session.get('_flashes', []))
+            self.assertIn('danger', flashes)
+            self.assertEqual(flashes['danger'], 'Invalid username or password')
+
+    def test_get_user_activities(self):
+        """Test retrieving user's activities"""
+        # Setup user and activity
+        with app.app_context():
+            user = Users(username='testuser', email='test@example.com', password='Test123!@#')
+            activity = Activities(
+                username='testuser',
+                media_type='Visual Media',
+                media_name='Test Movie',
+                start_date=date.today()
+            )
+            db.session.add(user)
+            db.session.add(activity)
+            db.session.commit()
+
+        with self.client.session_transaction() as session:
+            session['username'] = 'testuser'
+            
+        response = self.client.get('/dashboard')
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(b'Test Movie', response.data)
+
+    def test_unauthorized_access(self):
+        """Test accessing protected routes without login"""
+        response = self.client.get('/dashboard')
+        self.assertEqual(response.status_code, 302)  # Redirect to login
 
     def test_activity_creation(self):
         """Test creating a new activity"""

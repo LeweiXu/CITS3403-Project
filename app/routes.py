@@ -24,8 +24,9 @@ def login():
         result = handle_login(request)
         if result:
             return result  # Redirect to dashboard if login is successful
-        return render_template('login.html', error="Invalid credentials")  # Render login page with error
-    return render_template('login.html')
+        flash('Invalid username or password', 'danger')
+        return redirect(url_for('index'))
+    return redirect(url_for('index'))
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():

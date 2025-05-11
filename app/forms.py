@@ -25,14 +25,6 @@ class EndActivityForm(FlaskForm):
     comment = TextAreaField('Comment', validators=[Optional()])
     submit = SubmitField('Submit')
 
-class ShareDataForm(FlaskForm):
-    target_user = StringField('Target User', validators=[DataRequired(), Length(min=3, max=50)])
-    submit = SubmitField('Search and Share')
-
-from wtforms import SelectField, StringField, SubmitField
-from flask_wtf import FlaskForm
-from wtforms.validators import DataRequired, Optional
-
 class AddActivityForm(FlaskForm):
     media_type = SelectField('Media Type', choices=[
         ('', 'Select Media Type'),
@@ -47,3 +39,31 @@ class AddActivityForm(FlaskForm):
 
     media_name = StringField('Media Name', validators=[DataRequired()])
     submit = SubmitField('Add Activity')
+
+class ReopenActivityForm(FlaskForm):
+    activity_id = HiddenField('Activity ID', validators=[DataRequired()])
+    submit = SubmitField('Reopen Activity')
+
+class DeleteActivityForm(FlaskForm):
+    activity_id = HiddenField('Activity ID', validators=[DataRequired()])
+    submit = SubmitField('Delete Activity')
+
+class DeleteEntryForm(FlaskForm):
+    entry_id = HiddenField('Entry ID', validators=[DataRequired()])
+    submit = SubmitField('Delete Entry')
+
+class ViewSharedDataForm(FlaskForm):
+    target_user = StringField('Target User', validators=[DataRequired(), Length(min=3, max=50)])
+    data_type = SelectField('Data Type', choices=[
+        ('analysis', 'Analysis'),
+        ('activities', 'Activities'),
+        ('history', 'History')
+    ], validators=[DataRequired()])
+
+class DeleteSharedUserForm(FlaskForm):
+    target_user = StringField('Target User', validators=[DataRequired(), Length(min=3, max=50)])
+    submit = SubmitField('Delete Shared User')
+
+class ShareWithUserForm(FlaskForm):
+    target_user = StringField('Target User', validators=[DataRequired(), Length(min=3, max=50)])
+    submit = SubmitField('Share with User')

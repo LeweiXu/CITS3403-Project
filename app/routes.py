@@ -100,14 +100,19 @@ def add_entry():
 @app.route('/reopen_activity', methods=['POST'])
 @login_required
 def reopen_activity():
-    result = handle_reopen_activity(request)
-    if result: return result  # Redirect to viewdata if activity is reopened successfully
+    reopen_activity_form = ReopenActivityForm()
+    if reopen_activity_form.validate_on_submit():
+        result = handle_reopen_activity(request)
+        if result: return result  # Redirect to viewdata if activity is reopened successfully
 
 @app.route('/delete_activity', methods=['POST'])
 @login_required
 def delete_activity():
-    result = handle_delete_activity(request)
-    if result: return result
+    delete_activity_form = DeleteActivityForm()
+    print(delete_activity_form.data)
+    if delete_activity_form.validate_on_submit():
+        result = handle_delete_activity(request)
+        if result: return result
 
 @app.route('/delete_entry', methods=['POST'])
 @login_required

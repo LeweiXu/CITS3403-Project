@@ -3,7 +3,7 @@ from app import db
 from flask import flash, render_template, redirect, url_for
 from datetime import datetime
 from sqlalchemy import func, cast, Integer
-
+from app.forms import EndActivityForm, ReopenActivityForm, DeleteActivityForm
 def get_activities(username, request):
     """
     Fetch uncompleted and completed activities for the given user based on query parameters.
@@ -39,6 +39,15 @@ def get_activities(username, request):
     args = request.args.to_dict()
     args.pop('page', None)
 
+    end_activity_form = EndActivityForm()  # Create an instance of the EndActivityForm
+    reopen_activity_forms = {
+        activity.id: ReopenActivityForm(activity_id=activity.id) for activity in completed_activities
+    }
+    delete_activity_forms = {
+        activity.id: DeleteActivityForm(activity_id=activity.id)
+        for activity in uncompleted_activities + completed_activities
+    }
+
     return render_template(
         'activities.html',
         uncompleted_activities=uncompleted_activities,
@@ -46,7 +55,10 @@ def get_activities(username, request):
         page=page,
         total_pages=total_pages,
         request_args=args,
-        username=username
+        username=username,
+        end_activity_form=end_activity_form,
+        reopen_activity_forms=reopen_activity_forms,
+        delete_activity_forms=delete_activity_forms
     )
 
 def get_uncompleted_activities(username, filters):
@@ -133,7 +145,7 @@ def handle_end_activity(username, request):
     activity_id = request.form.get('activity_id')
     rating = request.form.get('rating')  # Get the rating from the form
     comment = request.form.get('comment')  # Get the comment from the form
-
+    print(activity_id, rating, comment)
     # Convert empty strings to None
     rating = float(rating) if rating else None
     comment = comment if comment else None

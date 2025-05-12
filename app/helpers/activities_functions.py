@@ -138,13 +138,13 @@ def apply_activity_filters(query, filters):
         query = query.having(func.sum(cast(Entries.duration, Integer)) <= max_d)
     return query
 
-def handle_end_activity(username, request):
+def handle_end_activity(username, form):
     """
     Handle ending an activity by setting its status to 'completed', updating the rating, comment, and end_date fields.
     """
-    activity_id = request.form.get('activity_id')
-    rating = request.form.get('rating')  # Get the rating from the form
-    comment = request.form.get('comment')  # Get the comment from the form
+    activity_id = form.activity_id.data  # Get the activity ID from the form
+    rating = form.rating.data  # Get the rating from the form
+    comment = form.comment.data  # Get the comment from the form
     print(activity_id, rating, comment)
     # Convert empty strings to None
     rating = float(rating) if rating else None
@@ -177,8 +177,8 @@ def handle_end_activity(username, request):
         flash(f"An error occurred while completing the activity: {e}", "danger")
         return None
     
-def handle_reopen_activity(request):
-    activity_id = request.form.get('activity_id')
+def handle_reopen_activity(form):
+    activity_id = form.activity_id.data
     if not activity_id:
         flash('Missing data for reopen.', 'danger')
         return redirect(url_for('viewdata'))
@@ -197,13 +197,13 @@ def handle_reopen_activity(request):
     flash('Activity reopened.', 'success')
     return redirect(url_for('dashboard'))
 
-def handle_add_activity(username, request):
+def handle_add_activity(username, form):
     """
     Handle adding a new activity.
     """
-    media_name = request.form.get('media_name')
-    media_type = request.form.get('media_type')
-    media_subtype = request.form.get('media_subtype')
+    media_name = form.media_name.data
+    media_type = form.media_type.data
+    media_subtype = form.media_subtype.data
 
     # Create a new activity
     new_activity = Activities(
@@ -219,33 +219,9 @@ def handle_add_activity(username, request):
     db.session.commit()
     flash(f"Activity '{media_name}' added successfully.", "success")
     return redirect(url_for('dashboard'))
-
-def handle_add_entry(username, request):
-    activity_id = request.form.get('activity_id')
-    duration = request.form.get('duration')
-    comment = request.form.get('comment')
-    comment = comment if comment else None
-    if activity_id and duration:
-        activity = Activities.query.filter_by(id=activity_id, username=username).first()
-        new_entry = Entries(
-            activity_id=activity.id,
-            date=datetime.now().date(),
-            duration=duration,
-            comment=comment
-        )
-        db.session.add(new_entry)
-
-        try:
-            db.session.commit()
-            flash(f"Duration added to activity '{activity.media_name}' successfully.", "success")
-            return redirect(url_for('dashboard'))
-        except Exception as e:
-            db.session.rollback()
-            flash(f"An error occurred while adding the duration: {e}", "danger")
-            return None
         
-def handle_delete_activity(request):
-    activity_id = request.form.get('activity_id')
+def handle_delete_activity(form):
+    activity_id = form.activity_id.data
     activity = Activities.query.filter_by(id=activity_id).first()
     if not activity:
         flash('Activity not found or unauthorized.', 'danger')

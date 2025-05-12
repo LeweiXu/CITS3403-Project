@@ -96,15 +96,16 @@ def handle_delete_entry(form):
 def handle_add_entry(username, form):
     activity_id = form.activity_id.data
     duration = form.duration.data
+    date = form.date.data
     comment = form.comment.data
     comment = comment if comment else None
     if activity_id and duration:
         activity = Activities.query.filter_by(id=activity_id, username=username).first()
         new_entry = Entries(
             activity_id=activity.id,
-            date=datetime.now().date(),
+            date=date,
             duration=duration,
-            comment=comment
+            comment=comment,
         )
         db.session.add(new_entry)
 

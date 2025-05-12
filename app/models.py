@@ -1,13 +1,17 @@
-from app import db
+from app import db, login
+from flask_login import UserMixin
 
 # Users table, pretty self explanatory, username as PK makes it unique by default
-class Users(db.Model):
+class Users(UserMixin, db.Model):
     __tablename__ = 'Users'
     username = db.Column(db.String(80), primary_key=True, nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
     password = db.Column(db.String(128), nullable=False)
 
     media_entries = db.relationship('Activities', backref='user')
+
+    def get_id(self):
+        return self.username
 
 # Activities table, each Activity is associated with a user (Users.username)
 # Each activity has a start and end entry, rating and comment
@@ -46,3 +50,7 @@ class SharedUsers(db.Model):
 
     user = db.relationship('Users', foreign_keys=[username], backref='shared_by')
     shared_user = db.relationship('Users', foreign_keys=[shared_username], backref='shared_with')
+
+@login.user_loader
+def load_user(username):
+    return Users.query.get(username)

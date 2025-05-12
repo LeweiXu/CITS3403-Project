@@ -50,7 +50,7 @@ def handle_upload(request, app):
 
         db.session.commit()
         flash('CSV data uploaded successfully!', 'success')
-        return redirect(url_for('viewdata'))
+        return redirect(url_for('upload'))
 
     elif 'mediaType' in request.form:
         # Handle individual media entry submission

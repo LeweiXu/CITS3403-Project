@@ -4,8 +4,11 @@
 
 {% block content %}
 <div class="page-container">
-    <h2 class="text-center page-title">Activities</h2>
-
+    {% if current_user.username == username %}
+        <h2 class="text-center page-title">Your Activities</h2>
+    {% else %}
+        <h2 class="text-center page-title">{{ username }}'s Activities</h2>
+    {% endif %}
     <!-- Filter Form -->
     <section class="section wow fadeInUp" data-wow-duration="0.2s" data-wow-delay="0.05s">
     <form action="{{ url_for('activities') }}" method="GET" class="mb-4">
@@ -49,20 +52,20 @@
     <table class="table mt-4">
         <thead>
             <tr>
-                <th class="wow fadeInUp" data-wow-duration="0.2s" data-wow-delay="0.05s">Media Name</th>
-                <th class="wow fadeInUp" data-wow-duration="0.2s" data-wow-delay="0.2s">Total Duration (minutes)</th>
-                <th class="wow fadeInUp" data-wow-duration="0.2s" data-wow-delay="0.25s">Start Date</th>
-                <th class="wow fadeInUp" data-wow-duration="0.2s" data-wow-delay="0.3s">End Date</th>
+                <th class="wow fadeInUp" data-wow-duration="0.2s" data-wow-delay="0.1s">Media Name</th>
+                <th class="wow fadeInUp" data-wow-duration="0.2s" data-wow-delay="0.15s">Total Duration (minutes)</th>
+                <th class="wow fadeInUp" data-wow-duration="0.2s" data-wow-delay="0.2s">Start Date</th>
+                <th class="wow fadeInUp" data-wow-duration="0.2s" data-wow-delay="0.25s">End Date</th>
             </tr>
         </thead>
         <tbody>
             <!-- Uncompleted Activities -->
             {% for activity in uncompleted_activities %}
             <tr class="activity-row">
-                <td class="wow fadeInUp" data-wow-duration="0.2s" data-wow-delay="0.05s">{{ activity.media_name }}</td>
-                <td class="wow fadeInUp" data-wow-duration="0.2s" data-wow-delay="0.2s">{{ activity.total_duration }}</td>
-                <td class="wow fadeInUp" data-wow-duration="0.2s" data-wow-delay="0.3s">{{ activity.start_date }}</td>
-                <td class="wow fadeInUp" data-wow-duration="0.2s" data-wow-delay="0.4s">Ongoing</td>
+                <td class="wow fadeInUp" data-wow-duration="0.2s" data-wow-delay="0.1s">{{ activity.media_name }}</td>
+                <td class="wow fadeInUp" data-wow-duration="0.2s" data-wow-delay="0.15s">{{ activity.total_duration }}</td>
+                <td class="wow fadeInUp" data-wow-duration="0.2s" data-wow-delay="0.2s">{{ activity.start_date }}</td>
+                <td class="wow fadeInUp" data-wow-duration="0.2s" data-wow-delay="0.25s">Ongoing</td>
             </tr>
             <tr class="activity-details">
                 <td>
@@ -73,12 +76,16 @@
                     Rating: N/A<br>
                     Comment: N/A
                 </td>
-                {% if visitor == false %}
+                {% if current_user.username == username %}
                 <td>
                     <button class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#endActivityModal" data-activity-id="{{ activity.id }}">End Activity</button>
                 </td>
                 <td>
-                    <a href="{{ url_for('delete_activity', activity_id=activity.id) }}" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this activity?');">Delete Activity</a>
+                    <form method="POST" action="{{ url_for('delete_activity') }}" onsubmit="return confirm('Are you sure you want to delete this activity?');">
+                        {{ delete_activity_forms[activity.id].hidden_tag() }}
+                        {{ delete_activity_forms[activity.id].activity_id() }}
+                        {{ delete_activity_forms[activity.id].submit(class="btn btn-danger btn-sm") }}
+                    </form>
                 </td>
                 {% endif %}
             </tr>
@@ -87,10 +94,10 @@
             <!-- Completed Activities -->
             {% for activity in completed_activities %}
             <tr class="activity-row">
-                <td class="wow fadeInUp" data-wow-duration="0.2s" data-wow-delay="0.05s">{{ activity.media_name }}</td>
-                <td class="wow fadeInUp" data-wow-duration="0.2s" data-wow-delay="0.2s">{{ activity.total_duration }}</td>
-                <td class="wow fadeInUp" data-wow-duration="0.2s" data-wow-delay="0.3s">{{ activity.start_date }}</td>
-                <td class="wow fadeInUp" data-wow-duration="0.2s" data-wow-delay="0.4s">{{ activity.end_date }}</td>
+                <td class="wow fadeInUp" data-wow-duration="0.2s" data-wow-delay="0.1s">{{ activity.media_name }}</td>
+                <td class="wow fadeInUp" data-wow-duration="0.2s" data-wow-delay="0.15s">{{ activity.total_duration }}</td>
+                <td class="wow fadeInUp" data-wow-duration="0.2s" data-wow-delay="0.2s">{{ activity.start_date }}</td>
+                <td class="wow fadeInUp" data-wow-duration="0.2s" data-wow-delay="0.25s">{{ activity.end_date }}</td>
             </tr>
             <tr class="activity-details">
                 <td>
@@ -101,17 +108,20 @@
                     Rating: {{ activity.rating }}<br>
                     Comment: {{ activity.comment }}
                 </td>
-                    {% if visitor == false %}
+                    {% if current_user.username == username %}
                     <td>
-                        <form method="POST" action="{{ url_for('reopen_activity') }}" style="display:inline;">
-                            <input type="hidden" name="activity_id" value="{{ activity.id }}">
-                            <button type="submit" class="btn btn-success btn-sm">
-                                Re-open
-                            </button>
+                        <form method="POST" action="{{ url_for('reopen_activity') }}">
+                            {{ reopen_activity_forms[activity.id].hidden_tag() }}
+                            {{ reopen_activity_forms[activity.id].activity_id() }}
+                            {{ reopen_activity_forms[activity.id].submit(class="btn btn-primary btn-sm") }}
                         </form>
                     </td>
                     <td>
-                        <a href="{{ url_for('delete_activity', activity_id=activity.id) }}" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this activity?');">Delete Activity</a>
+                        <form method="POST" action="{{ url_for('delete_activity') }}" onsubmit="return confirm('Are you sure you want to delete this activity?');">
+                            {{ delete_activity_forms[activity.id].hidden_tag() }}
+                            {{ delete_activity_forms[activity.id].activity_id() }}
+                            {{ delete_activity_forms[activity.id].submit(class="btn btn-danger btn-sm") }}
+                        </form>
                     </td>
                     {% endif %}
             </tr>
@@ -154,24 +164,24 @@
     <div class="modal" id="endActivityModal">
         <div class="modal-dialog">
             <div class="modal-content">
-                <form id="endActivityForm" action="{{ url_for('end_activity') }}" method="POST">
+                <form id="endActivityForm" method="POST" action="{{ url_for('end_activity') }}">
+                    {{ end_activity_form.hidden_tag() }}
                     <div class="modal-header">
                         <h5 class="modal-title">End Activity</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                     </div>
                     <div class="modal-body">
-                        <input type="hidden" id="modal-activity-id" name="activity_id" value="">
                         <div class="mb-3">
-                            <label for="rating" class="form-label">Rating (1.0-10.0)</label>
-                            <input type="number" id="rating" name="rating" class="form-control" min="1.0" max="10.0" step="0.1" placeholder="Optional">
+                            {{ end_activity_form.rating.label(class="form-label") }}
+                            {{ end_activity_form.rating(class="form-control", id="rating", placeholder="Optional") }}
                         </div>
                         <div class="mb-3">
-                            <label for="comment" class="form-label">Comment</label>
-                            <textarea id="comment" name="comment" class="form-control" placeholder="Optional"></textarea>
+                            {{ end_activity_form.comment.label(class="form-label") }}
+                            {{ end_activity_form.comment(class="form-control", id="comment", placeholder="Optional") }}
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="submit" class="btn btn-primary" id="submitButton">Submit</button>
+                        {{ end_activity_form.submit(class="btn btn-primary", id="submitButton") }}
                         <button type="button" class="btn btn-secondary" id="skipButton" data-bs-dismiss="modal">Skip</button>
                     </div>
                 </form>
@@ -203,18 +213,26 @@
 <script>
     document.addEventListener('DOMContentLoaded', () => {
         const endActivityButtons = document.querySelectorAll('[data-bs-target="#endActivityModal"]');
-        const activityIdInput = document.getElementById('modal-activity-id');
+        const activityIdInput = document.querySelector('#endActivityForm input[name="activity_id"]')
         const skipButton = document.getElementById('skipButton');
         const endActivityForm = document.getElementById('endActivityForm');
+
+        console.log('End Activity Buttons:', endActivityButtons);
+        console.log('Activity ID Input:', activityIdInput);
+        console.log('Skip Button:', skipButton);
+        console.log('End Activity Form:', endActivityForm);
 
         // Set the activity ID when the modal is opened
         endActivityButtons.forEach(button => {
             button.addEventListener('click', () => {
                 const activityId = button.getAttribute('data-activity-id');
+                console.log('Button Clicked:', button);
+                console.log('Activity ID:', activityId);
                 activityIdInput.value = activityId;
+                console.log('Activity ID Input:', activityIdInput);
+                console.log('Updated Activity ID Input Value:', activityIdInput.value);
             });
         });
-
         // Handle the Skip button behavior
         skipButton.addEventListener('click', () => {
             // Clear the rating and comment fields before submitting

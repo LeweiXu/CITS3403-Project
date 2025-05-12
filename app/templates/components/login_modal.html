@@ -10,16 +10,17 @@
                 <div class="modal-body" style="padding: 0;">
                     <h2 class="text-center">Login</h2>
                     <p class="text-center">Access your account to track your media consumption.</p>
-                    <form id="loginForm" method="POST" action="/login">
+                    <form method="POST" action="/login">
+                        {{ login_form.hidden_tag() }}
                         <div class="mb-3">
-                            <label for="username" class="form-label">Username</label>
-                            <input type="text" class="form-control" id="username" name="username" required>
+                            {{ login_form.username.label(class="form-label") }}
+                            {{ login_form.username(class="form-control") }}
                         </div>
                         <div class="mb-3">
-                            <label for="password" class="form-label">Password</label>
-                            <input type="password" class="form-control" id="password" name="password" required>
+                            {{ login_form.password.label(class="form-label") }}
+                            {{ login_form.password(class="form-control") }}
                         </div>
-                        <button type="submit" class="btn btn-primary w-100">Login</button>
+                        {{ login_form.submit(class="btn btn-primary w-100") }}
                         <div class="modal-footer flex-column">
                             <p class="text-center mt-3">
                                 Don't have an account? <a href="#" data-bs-toggle="modal" data-bs-target="#registerModal" data-bs-dismiss="modal">Register</a>
@@ -33,22 +34,8 @@
 </div>
 
 <script>
-    document.getElementById('loginForm').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        
-        const formData = new FormData(e.target);
-        const response = await fetch('/login', {
-            method: 'POST',
-            body: formData
-        });
-
-        if (response.redirected) {
-            window.location.href = response.url;
-        } else {
-            const result = await response.text();
-            if (result.includes('error')) {
-                alert('Invalid credentials');
-            }
-        }
+    document.querySelector('#loginModal form').addEventListener('submit', (e) => {
+        // Allow the form to submit normally by removing the default prevention
+        // This will let the server handle the redirection
     });
 </script>

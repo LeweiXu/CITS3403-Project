@@ -3,8 +3,12 @@
 {% block title %}MediaTracker - Analysis{% endblock %}
 
 {% block content %}
-<div class="container">
-    <h1 class="page-title text-center">Analysis</h1>
+<div class="page-container">
+    {% if current_user.username == username %}
+        <h2 class="text-center page-title">Your Analysis</h2>
+    {% else %}
+        <h2 class="text-center page-title">{{ username }}'s Analysis</h2>
+    {% endif %}
     <!-- Overall Statistics Section -->
     <section class="section wow fadeInUp" data-wow-duration="0.2s" data-wow-delay="0.05s">
         <h2 class="section-header">Overall Statistics</h2>

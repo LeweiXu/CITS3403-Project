@@ -1,11 +1,11 @@
-from app.helpers.media_types import get_main_media_type
 from app.models import Activities, Entries
 from app import db
 from sqlalchemy.sql import func
 from datetime import datetime, timedelta
 from sqlalchemy import case
+from flask import render_template
 
-def get_analysis_data(username):
+def get_analysis_page(username):
     """
     Fetch data for the analysis page, including statistics, rankings, and graph data.
     """
@@ -184,7 +184,7 @@ def get_analysis_data(username):
         } for d in daily_category_past_week
     ]
 
-    return {
+    return render_template('analysis.html', analysis_data={
         "statistics": {
             "total_visual_media": round(total_visual_media / 60, 2),
             "total_audio_media": round(total_audio_media / 60, 2),
@@ -210,4 +210,5 @@ def get_analysis_data(username):
             "weekly_average_past_10_weeks": weekly_average_past_10_weeks,
             "daily_category_past_week": daily_category_past_week
         }
-    }
+    }, 
+    username=username)

@@ -19,7 +19,7 @@
                 <h1>MediaTracker</h1>
                 <nav role="navigation" aria-label="Main navigation">
                     <ul>
-                        {% if session.get('username') %}
+                        {% if current_user.is_authenticated %}
                             <li><a href="/dashboard">Dashboard</a></li>
                             <li><a href="/analysis">Analysis</a></li>
                             <li><a href="/activities">Activities</a></li>
@@ -28,6 +28,7 @@
                             <li class="dropdown">
                                 <a href="#" class="dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">Profile</a>
                                 <ul class="dropdown-menu">
+                                    <li><a class="dropdown-item">User: {{ current_user.username }}</a></li>
                                     <li><a class="dropdown-item" href="/advanced">Advanced</a></li>
                                     <li><a class="dropdown-item" href="/logout">Logout</a></li>
                                 </ul>
@@ -51,8 +52,10 @@
 
 
     <!-- Make sure the modals for login and register is included in this page -->
-    {% include 'components/login_modal.html' %}
-    {% include 'components/register_modal.html' %}
+    {% if not current_user.is_authenticated %}
+        {% include 'components/login_modal.html' %}
+        {% include 'components/register_modal.html' %}
+    {% endif %}
 
     <footer role =  "contentinfo">
         <div class="footer-container">

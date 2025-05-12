@@ -1,10 +1,10 @@
 from app.models import Entries, Activities
 from app import db
-from flask import flash
+from flask import flash, render_template, redirect, url_for
 from datetime import datetime
 from sqlalchemy import func, cast, Integer
-
-def fetch_past_activities(username, request):
+from app.forms import EndActivityForm, ReopenActivityForm, DeleteActivityForm
+def get_activities(username, request):
     """
     Fetch uncompleted and completed activities for the given user based on query parameters.
     """
@@ -22,10 +22,44 @@ def fetch_past_activities(username, request):
     uncompleted_activities = get_uncompleted_activities(username, filters)
     completed_activities = get_completed_activities(username, filters)
 
-    return {
-        "uncompleted_activities": uncompleted_activities,
-        "completed_activities": completed_activities
+    # Combine for simple pagination
+    combined    = uncompleted_activities + completed_activities
+    PER_PAGE    = 20
+    page        = request.args.get('page', 1, type=int)
+    total       = len(combined)
+    total_pages = (total + PER_PAGE - 1) // PER_PAGE
+    start_idx   = (page - 1) * PER_PAGE
+
+    page_slice = combined[start_idx : start_idx + PER_PAGE]
+    # split back
+    uncompleted_activities   = [a for a in page_slice if a in uncompleted_activities]
+    completed_activities = [a for a in page_slice if a in completed_activities]
+
+    # **strip** the 'page' param before passing into template
+    args = request.args.to_dict()
+    args.pop('page', None)
+
+    end_activity_form = EndActivityForm()  # Create an instance of the EndActivityForm
+    reopen_activity_forms = {
+        activity.id: ReopenActivityForm(activity_id=activity.id) for activity in completed_activities
     }
+    delete_activity_forms = {
+        activity.id: DeleteActivityForm(activity_id=activity.id)
+        for activity in uncompleted_activities + completed_activities
+    }
+
+    return render_template(
+        'activities.html',
+        uncompleted_activities=uncompleted_activities,
+        completed_activities=completed_activities,
+        page=page,
+        total_pages=total_pages,
+        request_args=args,
+        username=username,
+        end_activity_form=end_activity_form,
+        reopen_activity_forms=reopen_activity_forms,
+        delete_activity_forms=delete_activity_forms
+    )
 
 def get_uncompleted_activities(username, filters):
     """
@@ -89,7 +123,13 @@ def apply_activity_filters(query, filters):
     if filters.get('media_name'):
         query = query.filter(Activities.media_name.ilike(f"%{filters['media_name']}%"))
     if filters.get('media_type'):
-        query = query.filter(Activities.media_type.ilike(f"%{filters['media_type']}%"))
+        media_type_filter = filters['media_type']
+        query = query.filter(
+            db.or_(
+                Activities.media_type.ilike(f"%{media_type_filter}%"),
+                Activities.media_subtype.ilike(f"%{media_type_filter}%")
+            )
+        )
     if filters.get('min_duration'):
         min_d = int(filters['min_duration'])
         query = query.having(func.sum(cast(Entries.duration, Integer)) >= min_d)
@@ -98,10 +138,18 @@ def apply_activity_filters(query, filters):
         query = query.having(func.sum(cast(Entries.duration, Integer)) <= max_d)
     return query
 
-def handle_end_activity(activity_id, username, rating=None, comment=None):
+def handle_end_activity(username, form):
     """
     Handle ending an activity by setting its status to 'completed', updating the rating, comment, and end_date fields.
     """
+    activity_id = form.activity_id.data  # Get the activity ID from the form
+    rating = form.rating.data  # Get the rating from the form
+    comment = form.comment.data  # Get the comment from the form
+    print(activity_id, rating, comment)
+    # Convert empty strings to None
+    rating = float(rating) if rating else None
+    comment = comment if comment else None
+
     # Fetch the activity
     activity = Activities.query.filter_by(id=activity_id, username=username).first()
     if not activity:
@@ -123,30 +171,70 @@ def handle_end_activity(activity_id, username, rating=None, comment=None):
     try:
         db.session.commit()
         flash(f"Activity {activity_id} marked as completed successfully.", "success")
-        return True
+        return redirect(url_for('dashboard'))
     except Exception as e:
         db.session.rollback()
         flash(f"An error occurred while completing the activity: {e}", "danger")
-        return False
+        return None
     
-def handle_reopen_activity(activity_id, username):
-    """
-    Given an entry_id and the current username, mark its parent activity
-    back to 'ongoing' so it shows up in Current Activities.
-    Returns True if successful, False otherwise.
-    """
+def handle_reopen_activity(form):
+    activity_id = form.activity_id.data
+    if not activity_id:
+        flash('Missing data for reopen.', 'danger')
+        return redirect(url_for('viewdata'))
+
     activity = Activities.query.get(activity_id)
     if not activity:
-        return False
-
-    # Only allow the owner to reopen
-    if activity.username != username:
-        return False
+        flash('Activity not found.', 'danger')
+        return redirect(url_for('viewdata'))
 
     activity.status = 'ongoing'
     activity.end_date   = None
     activity.rating     = None
     activity.comment    = None
-
     db.session.commit()
-    return True
+
+    flash('Activity reopened.', 'success')
+    return redirect(url_for('dashboard'))
+
+def handle_add_activity(username, form):
+    """
+    Handle adding a new activity.
+    """
+    media_name = form.media_name.data
+    media_type = form.media_type.data
+    media_subtype = form.media_subtype.data
+
+    # Create a new activity
+    new_activity = Activities(
+        username=username,
+        media_name=media_name,
+        media_type=media_type,
+        media_subtype=media_subtype,
+        status='ongoing',
+        start_date=datetime.now().date()
+    )
+
+    db.session.add(new_activity)
+    db.session.commit()
+    flash(f"Activity '{media_name}' added successfully.", "success")
+    return redirect(url_for('dashboard'))
+        
+def handle_delete_activity(form):
+    activity_id = form.activity_id.data
+    activity = Activities.query.filter_by(id=activity_id).first()
+    if not activity:
+        flash('Activity not found or unauthorized.', 'danger')
+        return redirect(url_for('activities'))
+
+    # Delete all related entries in the Entries table
+    related_entries = Entries.query.filter_by(activity_id=activity.id).all()
+    for entry in related_entries:
+        db.session.delete(entry)
+
+    # Delete the activity itself
+    db.session.delete(activity)
+    db.session.commit()
+    
+    flash('Activity and all related entries deleted successfully.', 'success')
+    return redirect(url_for('activities'))

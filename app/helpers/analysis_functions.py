@@ -210,4 +210,5 @@ def get_analysis_page(username):
             "weekly_average_past_10_weeks": weekly_average_past_10_weeks,
             "daily_category_past_week": daily_category_past_week
         }
-    })
+    }, 
+    username=username)

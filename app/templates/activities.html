@@ -4,8 +4,11 @@
 
 {% block content %}
 <div class="page-container">
-    <h2 class="text-center page-title">Activities</h2>
-
+    {% if current_user.username == username %}
+        <h2 class="text-center page-title">Your Activities</h2>
+    {% else %}
+        <h2 class="text-center page-title">{{ username }}'s Activities</h2>
+    {% endif %}
     <!-- Filter Form -->
     <section class="section wow fadeInUp" data-wow-duration="0.2s" data-wow-delay="0.05s">
     <form action="{{ url_for('activities') }}" method="GET" class="mb-4">
@@ -49,20 +52,20 @@
     <table class="table mt-4">
         <thead>
             <tr>
-                <th class="wow fadeInUp" data-wow-duration="0.2s" data-wow-delay="0.05s">Media Name</th>
-                <th class="wow fadeInUp" data-wow-duration="0.2s" data-wow-delay="0.2s">Total Duration (minutes)</th>
-                <th class="wow fadeInUp" data-wow-duration="0.2s" data-wow-delay="0.25s">Start Date</th>
-                <th class="wow fadeInUp" data-wow-duration="0.2s" data-wow-delay="0.3s">End Date</th>
+                <th class="wow fadeInUp" data-wow-duration="0.2s" data-wow-delay="0.1s">Media Name</th>
+                <th class="wow fadeInUp" data-wow-duration="0.2s" data-wow-delay="0.15s">Total Duration (minutes)</th>
+                <th class="wow fadeInUp" data-wow-duration="0.2s" data-wow-delay="0.2s">Start Date</th>
+                <th class="wow fadeInUp" data-wow-duration="0.2s" data-wow-delay="0.25s">End Date</th>
             </tr>
         </thead>
         <tbody>
             <!-- Uncompleted Activities -->
             {% for activity in uncompleted_activities %}
             <tr class="activity-row">
-                <td class="wow fadeInUp" data-wow-duration="0.2s" data-wow-delay="0.05s">{{ activity.media_name }}</td>
-                <td class="wow fadeInUp" data-wow-duration="0.2s" data-wow-delay="0.2s">{{ activity.total_duration }}</td>
-                <td class="wow fadeInUp" data-wow-duration="0.2s" data-wow-delay="0.3s">{{ activity.start_date }}</td>
-                <td class="wow fadeInUp" data-wow-duration="0.2s" data-wow-delay="0.4s">Ongoing</td>
+                <td class="wow fadeInUp" data-wow-duration="0.2s" data-wow-delay="0.1s">{{ activity.media_name }}</td>
+                <td class="wow fadeInUp" data-wow-duration="0.2s" data-wow-delay="0.15s">{{ activity.total_duration }}</td>
+                <td class="wow fadeInUp" data-wow-duration="0.2s" data-wow-delay="0.2s">{{ activity.start_date }}</td>
+                <td class="wow fadeInUp" data-wow-duration="0.2s" data-wow-delay="0.25s">Ongoing</td>
             </tr>
             <tr class="activity-details">
                 <td>
@@ -91,10 +94,10 @@
             <!-- Completed Activities -->
             {% for activity in completed_activities %}
             <tr class="activity-row">
-                <td class="wow fadeInUp" data-wow-duration="0.2s" data-wow-delay="0.05s">{{ activity.media_name }}</td>
-                <td class="wow fadeInUp" data-wow-duration="0.2s" data-wow-delay="0.2s">{{ activity.total_duration }}</td>
-                <td class="wow fadeInUp" data-wow-duration="0.2s" data-wow-delay="0.3s">{{ activity.start_date }}</td>
-                <td class="wow fadeInUp" data-wow-duration="0.2s" data-wow-delay="0.4s">{{ activity.end_date }}</td>
+                <td class="wow fadeInUp" data-wow-duration="0.2s" data-wow-delay="0.1s">{{ activity.media_name }}</td>
+                <td class="wow fadeInUp" data-wow-duration="0.2s" data-wow-delay="0.15s">{{ activity.total_duration }}</td>
+                <td class="wow fadeInUp" data-wow-duration="0.2s" data-wow-delay="0.2s">{{ activity.start_date }}</td>
+                <td class="wow fadeInUp" data-wow-duration="0.2s" data-wow-delay="0.25s">{{ activity.end_date }}</td>
             </tr>
             <tr class="activity-details">
                 <td>

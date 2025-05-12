@@ -41,6 +41,10 @@ h1 {
     margin-bottom: 1.5rem;
 }
 
+h4 + p {
+    margin-top: 15px; /* Adjust the value as needed */
+}
+
 /* Navigation Styles */
 nav ul {
     display: flex;

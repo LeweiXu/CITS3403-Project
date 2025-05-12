@@ -110,7 +110,7 @@
                     </div>
                     <div class="modal-footer">
                         {{ end_activity_form.submit(class="btn btn-primary", id="submitButton") }}
-                        <button type="button" class="btn btn-secondary" id="skipButton" data-bs-dismiss="modal">Skip</button>
+                        <button type="submit" class="btn btn-secondary" id="skipButton">Skip</button>
                     </div>
                 </form>
             </div>
@@ -139,6 +139,11 @@
                         <div class="mb-3">
                             {{ add_entry_form.comment.label(class="form-label") }}
                             {{ add_entry_form.comment(class="form-control", placeholder="Comment (optional)", id="comment") }}
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="date" class="form-label">Date</label>
+                            {{ add_entry_form.date(class_='form-control', id='date') }}
                         </div>
                     </div>
 
@@ -173,6 +178,10 @@
                         <div class="mb-3">
                             {{ add_activity_form.media_name.label(class="form-label") }}
                             {{ add_activity_form.media_name(class="form-control", id="media_name", placeholder="Enter media name") }}
+                        </div>
+                        <div class="mb-3">
+                            <label for="date" class="form-label">Date</label>
+                            {{ add_activity_form.date(class_='form-control') }}
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -250,6 +259,7 @@
 
         const addEntryButtons = document.querySelectorAll('[data-bs-target="#addEntryModal"]');
         const entryActivityIdInput = document.querySelector('#addEntryForm input[name="activity_id"]');
+        const addEntryDateField = document.getElementById('date');
 
         console.log('Add Entry Buttons:', addEntryButtons);
         console.log('Entry Activity ID Input:', entryActivityIdInput);
@@ -258,12 +268,32 @@
         addEntryButtons.forEach(button => {
             button.addEventListener('click', () => {
                 const activityId = button.getAttribute('data-activity-id');
+                const activityStartDate = button.getAttribute('data-activity-start-date');
                 console.log('Button Clicked:', button);
                 console.log('Activity ID:', activityId);
+                console.log('Activity Start Date:', activityStartDate);
                 entryActivityIdInput.value = activityId; // Set the value correctly
+                addEntryDateField.setAttribute('min', activityStartDate); // Set the minimum date
                 console.log('Entry Activity ID Input:', entryActivityIdInput);
                 console.log('Updated Entry Activity ID Input Value:', entryActivityIdInput.value);
             });
+        });
+
+        const addEntryModal = document.getElementById('addEntryModal');
+        addEntryModal.addEventListener('show.bs.modal', () => {
+            const now = new Date();
+            now.setDate(now.getDate() + 1); // Add one day
+            const today = now.toISOString().split('T')[0];
+            addEntryDateField.value = today;
+        });
+
+        const addActivityModal = document.getElementById('addActivityModal');
+        const addActivityDateField = document.querySelector('#addActivityForm input[name="date"]');
+        addActivityModal.addEventListener('show.bs.modal', () => {
+            const now = new Date();
+            now.setDate(now.getDate() + 1); // Add one day
+            const today = now.toISOString().split('T')[0];
+            addActivityDateField.value = today;
         });
     });
 </script>

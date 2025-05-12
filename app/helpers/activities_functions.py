@@ -61,7 +61,7 @@ def get_activities(username, request):
         delete_activity_forms=delete_activity_forms
     )
 
-def get_uncompleted_activities(username, filters):
+def get_uncompleted_activities(username, filters=None):
     """
     Fetch uncompleted activities (status = 'in_progress') for the given user.
     Include activities even if there are no corresponding entries.
@@ -72,8 +72,8 @@ def get_uncompleted_activities(username, filters):
         Activities.media_type,
         Activities.media_subtype,
         Activities.media_name,
+        Activities.start_date,
         func.coalesce(func.sum(cast(Entries.duration, Integer)), 0).label('total_duration'),
-        func.min(Entries.date).label('start_date')  # Get the earliest date for the activity
     ).outerjoin(Entries, Activities.id == Entries.activity_id).filter(
         Activities.username == username,
         Activities.status == 'ongoing'  # Uncompleted activities
@@ -81,7 +81,8 @@ def get_uncompleted_activities(username, filters):
         Activities.id, Activities.media_type, Activities.media_name
     )
     )
-    query = apply_activity_filters(query, filters)
+    if filters:
+        query = apply_activity_filters(query, filters)
     results = query.order_by(Activities.id.desc()).all()
     return results
 
@@ -97,8 +98,8 @@ def get_completed_activities(username, filters):
         Activities.media_subtype,
         Activities.media_name,
         func.sum(cast(Entries.duration, Integer)).label('total_duration'),
-        func.min(Entries.date).label('start_date'),  # Get the earliest date for the activity
-        func.max(Entries.date).label('end_date'),  # Get the latest date for the activity
+        Activities.start_date,
+        Activities.end_date,
         Activities.rating,
         Activities.comment
     ).join(Activities, Activities.id == Entries.activity_id).filter(
@@ -204,6 +205,7 @@ def handle_add_activity(username, form):
     media_name = form.media_name.data
     media_type = form.media_type.data
     media_subtype = form.media_subtype.data
+    start_date = form.date.data
 
     # Create a new activity
     new_activity = Activities(
@@ -212,7 +214,7 @@ def handle_add_activity(username, form):
         media_type=media_type,
         media_subtype=media_subtype,
         status='ongoing',
-        start_date=datetime.now().date()
+        start_date=start_date
     )
 
     db.session.add(new_activity)

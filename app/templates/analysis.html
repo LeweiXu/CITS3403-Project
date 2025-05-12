@@ -43,24 +43,32 @@
             <select id="ranking-select" class="form-select">
                 <option value="activities-duration">Activities by Duration</option>
                 <option value="entries-duration">Entries by Duration</option>
-                <option value="activities-start-date">Activities by Start Date</option>
                 <option value="entries-media-subtype">Entries by Media Subtype</option>
+                <option value="activities-days-spent">Activities by Days Spent</option>
             </select>
         </div>
         <div id="ranking-view">
-            <h4>Entries Ranked by Media Subtype</h4>
+            <h4>Activities Ranked by Duration</h4>
             <table class="table">
                 <thead>
                     <tr>
-                        <th>Media Subtype</th>
-                        <th>Total Duration</th>
+                        <th>#</th>
+                        <th>Media Name</th>
+                        <th>Type</th>
+                        <th>Duration</th>
+                        <th>Start Date</th>
+                        <th>End Date</th>
                     </tr>
                 </thead>
                 <tbody>
-                    {% for entry in analysis_data.rankings.entries_by_media_subtype %}
+                    {% for activity in analysis_data.rankings.activities_by_duration %}
                     <tr>
-                        <td>{{ entry.media_subtype }}</td>
-                        <td>{{ entry.total_duration }}</td>
+                        <td>{{ loop.index }}</td>
+                        <td>{{ activity.media_name }}</td>
+                        <td>{{ activity.media_type }}</td>
+                        <td>{{ activity.total_duration }}</td>
+                        <td>{{ activity.start_date }}</td>
+                        <td>{{ activity.end_date }}</td>
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -77,6 +85,7 @@
                 <option value="daily-time">Total Time Spent Daily (Past Week)</option>
                 <option value="weekly-average">Weekly Average Time (Past 10 Weeks)</option>
                 <option value="daily-category">Daily Time by Category (Past Week)</option>
+                <option value="weekly-total">Total Time Spent Weekly (Past 10 Weeks)</option>
             </select>
         </div>
         <div id="graph-view">
@@ -102,6 +111,7 @@
                     <table class="table">
                         <thead>
                             <tr>
+                                <th>#</th>
                                 <th>Media Name</th>
                                 <th>Type</th>
                                 <th>Duration</th>
@@ -112,6 +122,7 @@
                         <tbody>
                             {% for activity in analysis_data.rankings.activities_by_duration %}
                             <tr>
+                                <td>{{ loop.index }}</td>
                                 <td>{{ activity.media_name }}</td>
                                 <td>{{ activity.media_type }}</td>
                                 <td>{{ activity.total_duration }}</td>
@@ -128,6 +139,7 @@
                     <table class="table">
                         <thead>
                             <tr>
+                                <th>#</th>
                                 <th>Media Name</th>
                                 <th>Type</th>
                                 <th>Duration</th>
@@ -136,33 +148,10 @@
                         <tbody>
                             {% for entry in analysis_data.rankings.entries_by_duration %}
                             <tr>
+                                <td>{{ loop.index }}</td>
                                 <td>{{ entry.media_name }}</td>
                                 <td>{{ entry.media_type }}</td>
                                 <td>{{ entry.duration }}</td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                `;
-            } else if (selectedRanking === 'activities-start-date') {
-                rankingView.innerHTML = `
-                    <h4>Activities Ranked by Start Date</h4>
-                    <table class="table">
-                        <thead>
-                            <tr>
-                                <th>Media Name</th>
-                                <th>Type</th>
-                                <th>Start Date</th>
-                                <th>Duration</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for activity in analysis_data.rankings.activities_by_start_date %}
-                            <tr>
-                                <td>{{ activity.media_name }}</td>
-                                <td>{{ activity.media_type }}</td>
-                                <td>{{ activity.start_date }}</td>
-                                <td>{{ activity.total_duration }}</td>
                             </tr>
                             {% endfor %}
                         </tbody>
@@ -174,6 +163,7 @@
                     <table class="table">
                         <thead>
                             <tr>
+                                <th>#</th>
                                 <th>Media Type</th>
                                 <th>Total Duration</th>
                             </tr>
@@ -181,8 +171,37 @@
                         <tbody>
                             {% for entry in analysis_data.rankings.entries_by_media_subtype %}
                             <tr>
+                                <td>{{ loop.index }}</td>
                                 <td>{{ entry.media_subtype }}</td>
                                 <td>{{ entry.total_duration }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                `;
+            } else if (selectedRanking === 'activities-days-spent') {
+                rankingView.innerHTML = `
+                    <h4>Activities Ranked by Days Spent</h4>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Media Name</th>
+                                <th>Type</th>
+                                <th>Days Spent</th>
+                                <th>Start Date</th>
+                                <th>End Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for activity in analysis_data.rankings.activities_by_days_spent %}
+                            <tr>
+                                <td>{{ loop.index }}</td>
+                                <td>{{ activity.media_name }}</td>
+                                <td>{{ activity.media_type }}</td>
+                                <td>{{ activity.days_spent }}</td>
+                                <td>{{ activity.start_date }}</td>
+                                <td>{{ activity.end_date }}</td>
                             </tr>
                             {% endfor %}
                         </tbody>
@@ -338,9 +357,37 @@
                         }
                     }
                 });
+            } else if (selectedGraph === 'weekly-total') {
+                const weeklyData = analysisData.graphs.weekly_average_past_10_weeks;
+                currentChart = new Chart(graphCanvas, {
+                    type: 'bar',
+                    data: {
+                        labels: weeklyData.map(w => w.week),
+                        datasets: [{
+                            label: 'Total Time Spent Weekly (Hours)',
+                            data: weeklyData.map(w => w.average_duration / 60), // Convert minutes to hours
+                            backgroundColor: 'rgba(153, 102, 255, 0.2)',
+                            borderColor: 'rgba(153, 102, 255, 1)',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                title: {
+                                    display: true,
+                                    text: 'Hours'
+                                }
+                            }
+                        }
+                    }
+                });
             }
 
         });
     });
 </script>
+
 {% endblock %}

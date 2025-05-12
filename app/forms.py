@@ -1,6 +1,7 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField, TextAreaField, HiddenField, IntegerField, SelectField
 from wtforms.validators import DataRequired, Length, Optional, NumberRange
+from wtforms.fields import DateField
 
 class LoginForm(FlaskForm):
     username = StringField('Username', validators=[DataRequired(), Length(min=3, max=20)])
@@ -17,6 +18,7 @@ class AddEntryForm(FlaskForm):
     activity_id = HiddenField('Activity ID', validators=[DataRequired()])
     duration = IntegerField('Duration (minutes)', validators=[DataRequired(), NumberRange(min=1)])
     comment = TextAreaField('Comment', validators=[Optional()])
+    date = DateField('Date', format='%Y-%m-%d', validators=[Optional()])
     submit = SubmitField('Add Entry')
 
 class EndActivityForm(FlaskForm):
@@ -38,6 +40,7 @@ class AddActivityForm(FlaskForm):
     media_subtype = SelectField('Media Subtype', validate_choice=False, validators=[Optional()])
 
     media_name = StringField('Media Name', validators=[DataRequired()])
+    date = DateField('Date', format='%Y-%m-%d', validators=[Optional()])
     submit = SubmitField('Add Activity')
 
 class ReopenActivityForm(FlaskForm):

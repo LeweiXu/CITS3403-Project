@@ -182,39 +182,45 @@ class MediaTrackerTests(unittest.TestCase):
             self.assertIsNotNone(entry)
             self.assertEqual(entry.duration, 120)
 
-    # def test_end_activity(self):
-    #     """Test ending an activity with rating and comment"""
-    #     # Setup user and activity
-    #     with app.app_context():
-    #         user = Users(username='testuser', email='test@example.com', password='Test123!@#')
-    #         activity = Activities(
-    #             username='testuser',
-    #             media_type='Visual Media',
-    #             media_name='Test Movie',
-    #             start_date=date.today()
-    #         )
-    #         db.session.add(user)
-    #         db.session.add(activity)
-    #         db.session.commit()
-    #         activity_id = activity.id
+    def test_end_activity(self):
+        """Test ending an activity with rating and comment"""
+        # Gotta register and login 
+        self.client.post('/register', data={
+            'username': 'testuser',
+            'email': 'test@example.com',
+            'password': 'Test123!@#'
+        })
+        self.client.post('/login', data={
+            'username': 'testuser',
+            'password': 'Test123!@#'
+        })
 
-    #     # Simulates logged in session
-    #     with self.client.session_transaction() as session:
-    #         session['username'] = 'testuser'
+        # Setup activity
+        with app.app_context():
+            activity = Activities(
+                username='testuser',
+                media_type='Visual Media',
+                media_subtype='Movie',
+                media_name='Test Movie',
+                start_date=date.today()
+            )
+            db.session.add(activity)
+            db.session.commit()
+            activity_id = activity.id
 
-    #     # End activity with optional stuff in it
-    #     response = self.client.post('/end_activity', data={
-    #         'activity_id': activity_id,
-    #         'rating': 8.5,
-    #         'comment': 'Great movie!'
-    #     })
+        # End activity with optional stuff in it
+        response = self.client.post('/end_activity', data={
+            'activity_id': activity_id,
+            'rating': 8.5,
+            'comment': 'Great movie!'
+        })
         
-    #     # Checks if activity has end date, all optional stuff matches
-    #     with app.app_context():
-    #         activity = Activities.query.get(activity_id)
-    #         self.assertIsNotNone(activity.end_date)
-    #         self.assertEqual(activity.rating, 8.5)
-    #         self.assertEqual(activity.comment, 'Great movie!')
+        # Checks if activity has end date, all optional stuff matches
+        with app.app_context():
+            activity = Activities.query.get(activity_id)
+            self.assertIsNotNone(activity.end_date)
+            self.assertEqual(activity.rating, 8.5)
+            self.assertEqual(activity.comment, 'Great movie!')
 
 if __name__ == '__main__':
     unittest.main()

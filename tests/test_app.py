@@ -140,38 +140,47 @@ class MediaTrackerTests(unittest.TestCase):
             self.assertIsNotNone(activity)
             self.assertEqual(activity.media_type, 'Visual Media')
     
-    # def test_add_entry(self):
-    #     """Test adding an entry to an activity"""
-    #     # Setup user and activity 
-    #     with app.app_context():
-    #         user = Users(username='testuser', email='test@example.com', password='Test123!@#')
-    #         activity = Activities(
-    #             username='testuser',
-    #             media_type='Visual Media',
-    #             media_name='Test Movie',
-    #             start_date=date.today()
-    #         )
-    #         db.session.add(user)
-    #         db.session.add(activity)
-    #         db.session.commit()
-    #         activity_id = activity.id
+    def test_add_entry(self):
+        """Test adding an entry to an activity"""
+        # Gotta register and login fr
+        self.client.post('/register', data={
+            'username': 'testuser',
+            'email': 'test@example.com',
+            'password': 'Test123!@#'
+        })
+        self.client.post('/login', data={
+            'username': 'testuser',
+            'password': 'Test123!@#'
+        })
 
-    #     # Simulate logged in session
-    #     with self.client.session_transaction() as session:
-    #         session['username'] = 'testuser'
+        # Create activity
+        with app.app_context():
+            activity = Activities(
+                username='testuser',
+                media_type='Visual Media',
+                media_subtype='Movie',
+                media_name='Test Movie',
+                start_date=date.today(),
+                status='ongoing'
+            )
+            db.session.add(activity)
+            db.session.commit()
+            activity_id = activity.id
 
-    #     # Add entry via POST to /dashboard
-    #     response = self.client.post('/dashboard', data={
-    #         'activity_id': activity_id,
-    #         'duration': 120,
-    #         'add_duration': True
-    #     })
-        
-    #     # Checks if entry exists and duration matches
-    #     with app.app_context():
-    #         entry = Entries.query.filter_by(activity_id=activity_id).first()
-    #         self.assertIsNotNone(entry)
-    #         self.assertEqual(entry.duration, 120)
+        # Add entry via POST to /add_entry (new)
+        response = self.client.post('/add_entry', data={
+            'activity_id': activity_id,
+            'duration': 120,
+            'add_duration': True
+        })
+
+        self.assertEqual(response.status_code, 302)  # Should redirect after successful add
+
+        # Checks if entry exists and duration matches
+        with app.app_context():
+            entry = Entries.query.filter_by(activity_id=activity_id).first()
+            self.assertIsNotNone(entry)
+            self.assertEqual(entry.duration, 120)
 
     # def test_end_activity(self):
     #     """Test ending an activity with rating and comment"""

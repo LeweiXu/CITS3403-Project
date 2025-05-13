@@ -4,7 +4,11 @@
 
 {% block content %}
 <div class="page-container">
-    <h2 class="text-center page-title">Your Media Entries</h2>
+    {% if current_user.username == username %}
+        <h2 class="text-center page-title">Your Media Entries</h2>
+    {% else %}
+        <h2 class="text-center page-title">{{ username }}'s Media Entries</h2>
+    {% endif %}
     <section class="section wow fadeIn" data-wow-duration="0.2s" data-wow-delay="0.05s">
         <!-- Search Bar -->
         <form action="{{ url_for('viewdata') }}" method="GET" class="mb-4">
@@ -47,27 +51,28 @@
         <table class="table">
             <thead>
                 <tr>
-                    <th class="wow fadeInUp" data-wow-duration="0.2s" data-wow-delay="0.05s">Date</th>
-                    <th class="wow fadeInUp" data-wow-duration="0.2s" data-wow-delay="0.1s">Media Type</th>
-                    <th class="wow fadeInUp" data-wow-duration="0.2s" data-wow-delay="0.15s">Media Name</th>
-                    <th class="wow fadeInUp" data-wow-duration="0.2s" data-wow-delay="0.2s">Duration (minutes)</th>
+                    <th class="wow fadeInUp" data-wow-duration="0.2s" data-wow-delay="0.1s">Date</th>
+                    <th class="wow fadeInUp" data-wow-duration="0.2s" data-wow-delay="0.15s">Media Type</th>
+                    <th class="wow fadeInUp" data-wow-duration="0.2s" data-wow-delay="0.2s">Media Name</th>
+                    <th class="wow fadeInUp" data-wow-duration="0.2s" data-wow-delay="0.25s">Duration (minutes)</th>
                 </tr>
             </thead>
             <tbody>
                 {% for entry in entries %}
                 <tr class="entry-row">
-                    <td class="wow fadeInUp" data-wow-duration="0.2s" data-wow-delay="0.05s">{{ entry.date }}</td>
-                    <td class="wow fadeInUp" data-wow-duration="0.2s" data-wow-delay="0.1s">{{ entry.activity.media_type }}</td>
-                    <td class="wow fadeInUp" data-wow-duration="0.2s" data-wow-delay="0.15s">{{ entry.activity.media_name }}</td>
-                    <td class="wow fadeInUp" data-wow-duration="0.2s" data-wow-delay="0.2s">{{ entry.duration }}</td>
+                    <td class="wow fadeInUp" data-wow-duration="0.2s" data-wow-delay="0.1s">{{ entry.date }}</td>
+                    <td class="wow fadeInUp" data-wow-duration="0.2s" data-wow-delay="0.15s">{{ entry.activity.media_type }}</td>
+                    <td class="wow fadeInUp" data-wow-duration="0.2s" data-wow-delay="0.2s">{{ entry.activity.media_name }}</td>
+                    <td class="wow fadeInUp" data-wow-duration="0.2s" data-wow-delay="0.25s">{{ entry.duration }}</td>
                 </tr>
                 <tr class="entry-comment">
                     <td colspan="3">Comment: {{ entry.comment }}</td>
                     <td>
                         {% if current_user.username == username %}
                         <form action="{{ url_for('delete_entry') }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this entry?');">
-                            <input type="hidden" name="entry_id" value="{{ entry.id }}">
-                            <button type="submit" class="btn btn-danger btn-sm">Delete Entry</button>
+                            {{ delete_entry_forms[entry.id].hidden_tag() }}
+                            {{ delete_entry_forms[entry.id].entry_id() }}
+                            {{ delete_entry_forms[entry.id].submit(class="btn btn-danger btn-sm") }}
                         </form>
                         {% endif %}
                     </td>

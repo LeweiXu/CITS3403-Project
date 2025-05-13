@@ -3,6 +3,8 @@ from sqlalchemy import cast, Integer
 from flask import render_template
 from app import db
 from flask import flash, redirect, url_for
+from app.forms import DeleteEntryForm
+from datetime import datetime
 
 def get_entries(username, request):
     """
@@ -32,13 +34,16 @@ def get_entries(username, request):
     args = request.args.to_dict()
     args.pop('page', None)
 
+    delete_entry_forms = {entry.id: DeleteEntryForm(entry_id=entry.id) for entry in entries}
+
     return render_template(
         'viewdata.html',
         entries=entries,
         page=page,
         total_pages=total_pages,
         request_args=args,
-        username=username
+        username=username,
+        delete_entry_forms=delete_entry_forms
     )
 
 def get_filtered_entries(username, filters):
@@ -77,8 +82,8 @@ def get_filtered_entries(username, filters):
     # Execute the query and return the results
     return query.order_by(Entries.date.desc(),Entries.id.desc()).all()
 
-def handle_delete_entry(request):
-    entry_id = request.form.get('entry_id')
+def handle_delete_entry(form):
+    entry_id = form.entry_id.data
     entry = Entries.query.get(entry_id)
     if entry:
         db.session.delete(entry)
@@ -87,3 +92,28 @@ def handle_delete_entry(request):
     else:
         flash('Entry not found.', 'danger')
     return redirect(url_for('viewdata'))
+
+def handle_add_entry(username, form):
+    activity_id = form.activity_id.data
+    duration = form.duration.data
+    date = form.date.data
+    comment = form.comment.data
+    comment = comment if comment else None
+    if activity_id and duration:
+        activity = Activities.query.filter_by(id=activity_id, username=username).first()
+        new_entry = Entries(
+            activity_id=activity.id,
+            date=date,
+            duration=duration,
+            comment=comment,
+        )
+        db.session.add(new_entry)
+
+        try:
+            db.session.commit()
+            flash(f"Duration added to activity '{activity.media_name}' successfully.", "success")
+            return redirect(url_for('dashboard'))
+        except Exception as e:
+            db.session.rollback()
+            flash(f"An error occurred while adding the duration: {e}", "danger")
+            return None

@@ -5,10 +5,9 @@ from app.models import Users
 from app import db
 import re
 
-def handle_login(request):
-    username = request.form.get('username')
-    password = request.form.get('password')
-
+def handle_login(form):
+    username = form.username.data
+    password = form.password.data
     # Query the database for the user
     user = Users.query.filter_by(username=username).first()
 
@@ -21,10 +20,10 @@ def handle_login(request):
         flash('Invalid username or password.', 'danger')
         return None
     
-def handle_register(request):
-    username = request.form.get('username')
-    email = request.form.get('email')
-    password = request.form.get('password')
+def handle_register(form):
+    username = form.username.data
+    email = form.email.data
+    password = form.password.data
     # Server-side validation for registration
 
     # Username validation

@@ -1,10 +1,14 @@
 from app.models import Entries, Activities
 from app import db
 from sqlalchemy import func
-from datetime import datetime
+from app.forms import AddEntryForm, EndActivityForm, AddActivityForm
+
 from flask import flash, render_template
 
-def get_dashboard_data(username, add_activity_form):
+def get_dashboard_data(username):
+    add_entry_form = AddEntryForm()  # Create an instance of the AddEntryForm
+    end_activity_form = EndActivityForm()  # Create an instance of the EndActivityForm
+    add_activity_form = AddActivityForm()  # Create an instance of the AddActivityForm
     stats = get_user_statistics(username)
     current_activities = get_current_activities(username)
     return render_template(
@@ -13,6 +17,8 @@ def get_dashboard_data(username, add_activity_form):
         most_consumed_media=stats['most_consumed_media'],
         daily_average_time=stats['daily_average_time'],
         current_activities=current_activities,
+        add_entry_form=add_entry_form,
+        end_activity_form=end_activity_form,
         add_activity_form=add_activity_form
     )
 

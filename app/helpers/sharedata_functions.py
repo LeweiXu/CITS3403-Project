@@ -1,17 +1,35 @@
 from app.models import Users, SharedUsers
 from app import db
 from flask import flash, render_template, jsonify, redirect, url_for
-from app.helpers.viewdata_handler import get_entries
-from app.helpers.activities_handler import get_activities
-from app.helpers.analysis_handler import get_analysis_page
+from app.helpers.entries_functions import get_entries
+from app.helpers.activities_functions import get_activities
+from app.helpers.analysis_functions import get_analysis_page
+from app.forms import ShareWithUserForm, DeleteSharedUserForm, ViewSharedDataForm
 
-def share_data_handler(username, request):
+def share_data_handler(username):
     # Fetch users who shared their data with the current user
     shared_with_me = SharedUsers.query.filter_by(shared_username=username).all()
     # Fetch users you have shared your data with
     shared_with = SharedUsers.query.filter_by(username=username).all()
 
-    return render_template('sharedata.html', shared_with_me=shared_with_me, shared_with=shared_with)
+    delete_shared_user_forms = {user.shared_username: DeleteSharedUserForm(target_user=user.shared_username) for user in shared_with}
+    view_shared_data_forms = {
+        (user.username, dtype): ViewSharedDataForm(
+            target_user=user.username,
+            data_type=dtype
+        )
+        for user in shared_with_me
+        for dtype in ['analysis', 'activities', 'history']
+    }
+    share_with_user_form = ShareWithUserForm()
+    
+    return render_template('sharedata.html', 
+                            shared_with_me=shared_with_me, 
+                            shared_with=shared_with,
+                            delete_shared_user_forms=delete_shared_user_forms,
+                            share_with_user_form=share_with_user_form,
+                            view_shared_data_forms=view_shared_data_forms
+    )
 
 def search_users(request):
     """
@@ -23,9 +41,9 @@ def search_users(request):
         return jsonify([user.username for user in matching_users])
     return jsonify([])
 
-def view_shared_data_handler(username, request):
-    target_user = request.form.get('target_user')
-    data_type = request.form.get('data_type')
+def view_shared_data_handler(username, request, form):
+    target_user = form.target_user.data
+    data_type = form.data_type.data
     # Check if the target_user has shared their data with the current user
     shared_entry = SharedUsers.query.filter_by(username=target_user, shared_username=username).first()
     if not shared_entry:
@@ -41,8 +59,8 @@ def view_shared_data_handler(username, request):
 
     return result
 
-def delete_shared_user_handler(username, request):
-    target_user = request.form.get('target_user')
+def delete_shared_user_handler(username, form):
+    target_user = form.target_user.data
     if target_user:
         # Find the shared user entry
         shared_user_entry = SharedUsers.query.filter_by(username=username, shared_username=target_user).first()
@@ -56,8 +74,8 @@ def delete_shared_user_handler(username, request):
         flash('Invalid user specified.', 'danger')
     return redirect(url_for('sharedata'))
 
-def share_with_user_handler(username, request):
-    target_user = request.form.get('target_user')
+def share_with_user_handler(username, form):
+    target_user = form.target_user.data
     if target_user:
         # Check if the target user exists in the Users table
         user_exists = Users.query.filter_by(username=target_user).first()

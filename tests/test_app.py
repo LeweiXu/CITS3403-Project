@@ -2,7 +2,6 @@ import unittest
 from app import app, db
 from app.models import Users, Activities, Entries
 from datetime import datetime, date
-
 class MediaTrackerTests(unittest.TestCase):
     def setUp(self):
         # Configure app for testing, runs before each tests
@@ -22,7 +21,6 @@ class MediaTrackerTests(unittest.TestCase):
         with app.app_context():
             db.session.remove()
             db.drop_all()
-
     def test_register_user(self):
         """Test user registration"""
         # Make test user, use POST request to /register
@@ -31,7 +29,6 @@ class MediaTrackerTests(unittest.TestCase):
             'email': 'test@example.com',
             'password': 'Test123!@#'
         }, follow_redirects=True)
-
         self.assertEqual(response.status_code, 200)
         
         # Check if test user exists in database and matches email
@@ -39,7 +36,6 @@ class MediaTrackerTests(unittest.TestCase):
             user = Users.query.filter_by(username='testuser').first()
             self.assertIsNotNone(user)
             self.assertEqual(user.email, 'test@example.com')
-
     def test_successful_login(self):
         """Test login with valid account"""
         # Create user first
@@ -48,13 +44,11 @@ class MediaTrackerTests(unittest.TestCase):
             'email': 'test@example.com',
             'password': 'Test123!@#'
         })
-
         response = self.client.post('/login', data={
             'username': 'testuser',
             'password': 'Test123!@#'
         })
         self.assertEqual(response.status_code, 302)
-
     def test_invalid_login(self):
         """Test login with invalid credentials"""
         with self.client.session_transaction() as session:
@@ -76,12 +70,10 @@ class MediaTrackerTests(unittest.TestCase):
             flashes = dict(session.get('_flashes', []))
             self.assertIn('danger', flashes)
             self.assertEqual(flashes['danger'], 'Invalid username or password')
-
     def test_unauthorised_access(self):
         """Test accessing protected routes without login"""
         response = self.client.get('/dashboard')
         self.assertEqual(response.status_code, 302)  # Redirect to login
-
     def test_get_user_activities(self):
         """Test retrieving user's activities"""
         # Register and login first to properly set up authentication
@@ -105,14 +97,12 @@ class MediaTrackerTests(unittest.TestCase):
             )
             db.session.add(activity)
             db.session.commit()
-
         with self.client.session_transaction() as session:
             session['username'] = 'testuser'
             
         response = self.client.get('/dashboard')
         self.assertEqual(response.status_code, 200)
         self.assertIn(b'Test Movie', response.data)
-
     def test_activity_creation(self):
         """Test creating a new activity"""
         # Register and login
@@ -152,7 +142,6 @@ class MediaTrackerTests(unittest.TestCase):
             'username': 'testuser',
             'password': 'Test123!@#'
         })
-
         # Create activity
         with app.app_context():
             activity = Activities(
@@ -166,22 +155,45 @@ class MediaTrackerTests(unittest.TestCase):
             db.session.add(activity)
             db.session.commit()
             activity_id = activity.id
-
         # Add entry via POST to /add_entry (new)
         response = self.client.post('/add_entry', data={
             'activity_id': activity_id,
             'duration': 120,
             'add_duration': True
         })
-
         self.assertEqual(response.status_code, 302)  # Should redirect after successful add
-
         # Checks if entry exists and duration matches
         with app.app_context():
             entry = Entries.query.filter_by(activity_id=activity_id).first()
             self.assertIsNotNone(entry)
             self.assertEqual(entry.duration, 120)
 
+    # def test_end_activity(self):
+    #     """Test ending an activity with rating and comment"""
+    #     # Setup user and activity
+    #     with app.app_context():
+    #         user = Users(username='testuser', email='test@example.com', password='Test123!@#')
+    #         activity = Activities(
+    #             username='testuser',
+    #             media_type='Visual Media',
+    #             media_name='Test Movie',
+    #             start_date=date.today()
+    #         )
+    #         db.session.add(user)
+    #         db.session.add(activity)
+    #         db.session.commit()
+    #         activity_id = activity.id
+
+    #     # Simulates logged in session
+    #     with self.client.session_transaction() as session:
+    #         session['username'] = 'testuser'
+
+    #     # End activity with optional stuff in it
+    #     response = self.client.post('/end_activity', data={
+    #         'activity_id': activity_id,
+    #         'rating': 8.5,
+    #         'comment': 'Great movie!'
+    #     })
     def test_end_activity(self):
         """Test ending an activity with rating and comment"""
         # Gotta register and login 
@@ -214,7 +226,13 @@ class MediaTrackerTests(unittest.TestCase):
             'rating': 8.5,
             'comment': 'Great movie!'
         })
-        
+
+    #     # Checks if activity has end date, all optional stuff matches
+    #     with app.app_context():
+    #         activity = Activities.query.get(activity_id)
+    #         self.assertIsNotNone(activity.end_date)
+    #         self.assertEqual(activity.rating, 8.5)
+    #         self.assertEqual(activity.comment, 'Great movie!')
         # Checks if activity has end date, all optional stuff matches
         with app.app_context():
             activity = Activities.query.get(activity_id)

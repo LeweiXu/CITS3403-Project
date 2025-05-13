@@ -3,7 +3,7 @@ from app import db
 from flask import flash, render_template, redirect, url_for
 from datetime import datetime
 from sqlalchemy import func, cast, Integer
-
+from app.forms import EndActivityForm, ReopenActivityForm, DeleteActivityForm
 def get_activities(username, request):
     """
     Fetch uncompleted and completed activities for the given user based on query parameters.
@@ -39,6 +39,15 @@ def get_activities(username, request):
     args = request.args.to_dict()
     args.pop('page', None)
 
+    end_activity_form = EndActivityForm()  # Create an instance of the EndActivityForm
+    reopen_activity_forms = {
+        activity.id: ReopenActivityForm(activity_id=activity.id) for activity in completed_activities
+    }
+    delete_activity_forms = {
+        activity.id: DeleteActivityForm(activity_id=activity.id)
+        for activity in uncompleted_activities + completed_activities
+    }
+
     return render_template(
         'activities.html',
         uncompleted_activities=uncompleted_activities,
@@ -46,10 +55,13 @@ def get_activities(username, request):
         page=page,
         total_pages=total_pages,
         request_args=args,
-        username=username
+        username=username,
+        end_activity_form=end_activity_form,
+        reopen_activity_forms=reopen_activity_forms,
+        delete_activity_forms=delete_activity_forms
     )
 
-def get_uncompleted_activities(username, filters):
+def get_uncompleted_activities(username, filters=None):
     """
     Fetch uncompleted activities (status = 'in_progress') for the given user.
     Include activities even if there are no corresponding entries.
@@ -60,8 +72,8 @@ def get_uncompleted_activities(username, filters):
         Activities.media_type,
         Activities.media_subtype,
         Activities.media_name,
+        Activities.start_date,
         func.coalesce(func.sum(cast(Entries.duration, Integer)), 0).label('total_duration'),
-        func.min(Entries.date).label('start_date')  # Get the earliest date for the activity
     ).outerjoin(Entries, Activities.id == Entries.activity_id).filter(
         Activities.username == username,
         Activities.status == 'ongoing'  # Uncompleted activities
@@ -69,7 +81,8 @@ def get_uncompleted_activities(username, filters):
         Activities.id, Activities.media_type, Activities.media_name
     )
     )
-    query = apply_activity_filters(query, filters)
+    if filters:
+        query = apply_activity_filters(query, filters)
     results = query.order_by(Activities.id.desc()).all()
     return results
 
@@ -85,8 +98,8 @@ def get_completed_activities(username, filters):
         Activities.media_subtype,
         Activities.media_name,
         func.sum(cast(Entries.duration, Integer)).label('total_duration'),
-        func.min(Entries.date).label('start_date'),  # Get the earliest date for the activity
-        func.max(Entries.date).label('end_date'),  # Get the latest date for the activity
+        Activities.start_date,
+        Activities.end_date,
         Activities.rating,
         Activities.comment
     ).join(Activities, Activities.id == Entries.activity_id).filter(
@@ -126,14 +139,14 @@ def apply_activity_filters(query, filters):
         query = query.having(func.sum(cast(Entries.duration, Integer)) <= max_d)
     return query
 
-def handle_end_activity(username, request):
+def handle_end_activity(username, form):
     """
     Handle ending an activity by setting its status to 'completed', updating the rating, comment, and end_date fields.
     """
-    activity_id = request.form.get('activity_id')
-    rating = request.form.get('rating')  # Get the rating from the form
-    comment = request.form.get('comment')  # Get the comment from the form
-
+    activity_id = form.activity_id.data  # Get the activity ID from the form
+    rating = form.rating.data  # Get the rating from the form
+    comment = form.comment.data  # Get the comment from the form
+    print(activity_id, rating, comment)
     # Convert empty strings to None
     rating = float(rating) if rating else None
     comment = comment if comment else None
@@ -165,8 +178,8 @@ def handle_end_activity(username, request):
         flash(f"An error occurred while completing the activity: {e}", "danger")
         return None
     
-def handle_reopen_activity(request):
-    activity_id = request.form.get('activity_id')
+def handle_reopen_activity(form):
+    activity_id = form.activity_id.data
     if not activity_id:
         flash('Missing data for reopen.', 'danger')
         return redirect(url_for('viewdata'))
@@ -185,13 +198,14 @@ def handle_reopen_activity(request):
     flash('Activity reopened.', 'success')
     return redirect(url_for('dashboard'))
 
-def handle_add_activity(username, request):
+def handle_add_activity(username, form):
     """
     Handle adding a new activity.
     """
-    media_name = request.form.get('media_name')
-    media_type = request.form.get('media_type')
-    media_subtype = request.form.get('media_subtype')
+    media_name = form.media_name.data
+    media_type = form.media_type.data
+    media_subtype = form.media_subtype.data
+    start_date = form.date.data
 
     # Create a new activity
     new_activity = Activities(
@@ -200,39 +214,16 @@ def handle_add_activity(username, request):
         media_type=media_type,
         media_subtype=media_subtype,
         status='ongoing',
-        start_date=datetime.now().date()
+        start_date=start_date
     )
 
     db.session.add(new_activity)
     db.session.commit()
     flash(f"Activity '{media_name}' added successfully.", "success")
     return redirect(url_for('dashboard'))
-
-def handle_add_entry(username, request):
-    activity_id = request.form.get('activity_id')
-    duration = request.form.get('duration')
-    comment = None
-    if activity_id and duration:
-        activity = Activities.query.filter_by(id=activity_id, username=username).first()
-        new_entry = Entries(
-            activity_id=activity.id,
-            date=datetime.now().date(),
-            duration=duration,
-            comment=comment
-        )
-        db.session.add(new_entry)
-
-        try:
-            db.session.commit()
-            flash(f"Duration added to activity '{activity.media_name}' successfully.", "success")
-            return redirect(url_for('dashboard'))
-        except Exception as e:
-            db.session.rollback()
-            flash(f"An error occurred while adding the duration: {e}", "danger")
-            return None
         
-def handle_delete_activity(request):
-    activity_id = request.form.get('activity_id')
+def handle_delete_activity(form):
+    activity_id = form.activity_id.data
     activity = Activities.query.filter_by(id=activity_id).first()
     if not activity:
         flash('Activity not found or unauthorized.', 'danger')

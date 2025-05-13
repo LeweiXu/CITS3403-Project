@@ -84,16 +84,25 @@ class MediaTrackerTests(unittest.TestCase):
 
     def test_get_user_activities(self):
         """Test retrieving user's activities"""
+        # Register and login first to properly set up authentication
+        self.client.post('/register', data={
+            'username': 'testuser',
+            'email': 'test@example.com',
+            'password': 'Test123!@#'
+        })
+        self.client.post('/login', data={
+            'username': 'testuser',
+            'password': 'Test123!@#'
+        })
+        
         # Setup user and activity
         with app.app_context():
-            user = Users(username='testuser', email='test@example.com', password='Test123!@#')
             activity = Activities(
                 username='testuser',
                 media_type='Visual Media',
                 media_name='Test Movie',
                 start_date=date.today()
             )
-            db.session.add(user)
             db.session.add(activity)
             db.session.commit()
 

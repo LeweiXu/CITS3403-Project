@@ -2,7 +2,6 @@ import unittest
 from app import app, db
 from app.models import Users, Activities, Entries
 from datetime import datetime, date
-from flask import url_for
 
 class MediaTrackerTests(unittest.TestCase):
     def setUp(self):
@@ -78,32 +77,32 @@ class MediaTrackerTests(unittest.TestCase):
             self.assertIn('danger', flashes)
             self.assertEqual(flashes['danger'], 'Invalid username or password')
 
-    # def test_get_user_activities(self):
-    #     """Test retrieving user's activities"""
-    #     # Setup user and activity
-    #     with app.app_context():
-    #         user = Users(username='testuser', email='test@example.com', password='Test123!@#')
-    #         activity = Activities(
-    #             username='testuser',
-    #             media_type='Visual Media',
-    #             media_name='Test Movie',
-    #             start_date=date.today()
-    #         )
-    #         db.session.add(user)
-    #         db.session.add(activity)
-    #         db.session.commit()
-
-    #     with self.client.session_transaction() as session:
-    #         session['username'] = 'testuser'
-            
-    #     response = self.client.get('/dashboard')
-    #     self.assertEqual(response.status_code, 200)
-    #     self.assertIn(b'Test Movie', response.data)
-
     def test_unauthorised_access(self):
         """Test accessing protected routes without login"""
         response = self.client.get('/dashboard')
         self.assertEqual(response.status_code, 302)  # Redirect to login
+
+    def test_get_user_activities(self):
+        """Test retrieving user's activities"""
+        # Setup user and activity
+        with app.app_context():
+            user = Users(username='testuser', email='test@example.com', password='Test123!@#')
+            activity = Activities(
+                username='testuser',
+                media_type='Visual Media',
+                media_name='Test Movie',
+                start_date=date.today()
+            )
+            db.session.add(user)
+            db.session.add(activity)
+            db.session.commit()
+
+        with self.client.session_transaction() as session:
+            session['username'] = 'testuser'
+            
+        response = self.client.get('/dashboard')
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(b'Test Movie', response.data)
 
     # def test_activity_creation(self):
     #     """Test creating a new activity"""

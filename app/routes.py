@@ -70,7 +70,12 @@ def login():
     form = LoginForm()  # Create a new instance of the LoginForm
     if form.validate_on_submit():  # Check if the form is submitted and valid
         result = handle_login(request)
-        if result: return result  # Redirect to dashboard if login is successful
+        if result: 
+            return result  # Redirect to dashboard if login is successful
+        flash('Invalid username or password', 'danger')
+        return redirect(url_for('index'))
+    return redirect(url_for('index'))
+
 
 @app.route('/register', methods=['POST'])
 def register():

@@ -73,7 +73,7 @@ def login():
         if result: 
             return result  # Redirect to dashboard if login is successful
         flash('Invalid username or password', 'danger')
-        return redirect(url_for('index'))
+        return redirect(url_for('index'))   # Redirect to index if unsuccessful
     return redirect(url_for('index'))
 
 

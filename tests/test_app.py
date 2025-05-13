@@ -113,31 +113,32 @@ class MediaTrackerTests(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertIn(b'Test Movie', response.data)
 
-    # def test_activity_creation(self):
-    #     """Test creating a new activity"""
-    #     # Register and login
-    #     self.client.post('/register', data={
-    #         'username': 'testuser',
-    #         'email': 'test@example.com',
-    #         'password': 'Test123!@#'
-    #     })
+    def test_activity_creation(self):
+        """Test creating a new activity"""
+        # Register and login
+        self.client.post('/register', data={
+            'username': 'testuser',
+            'email': 'test@example.com',
+            'password': 'Test123!@#'
+        })
+        self.client.post('/login', data={
+        'username': 'testuser',
+        'password': 'Test123!@#'
+        })
+        # Create new activity by POST to /add_acticity (new)
+        response = self.client.post('/add_activity', data={
+            'media_type': 'Visual Media',
+            'media_subtype': 'Movie',
+            'media_name': 'Test Movie',
+            'add_new_entry': True
+        })
+        self.assertEqual(response.status_code, 302)
         
-    #     with self.client.session_transaction() as session:
-    #         session['username'] = 'testuser'
-        
-    #     # Create new activity by POST to /dashboard
-    #     response = self.client.post('/dashboard', data={
-    #         'media_type': 'Visual Media',
-    #         'media_name': 'Test Movie',
-    #         'add_new_entry': True
-    #     })
-    #     self.assertEqual(response.status_code, 302)  # Should redirect
-        
-    #     # Checks if activity exists in database and media type matches input
-    #     with app.app_context():
-    #         activity = Activities.query.filter_by(media_name='Test Movie').first()
-    #         self.assertIsNotNone(activity)
-    #         self.assertEqual(activity.media_type, 'Visual Media')
+        # Checks if activity exists in database and media type matches input
+        with app.app_context():
+            activity = Activities.query.filter_by(media_name='Test Movie').first()
+            self.assertIsNotNone(activity)
+            self.assertEqual(activity.media_type, 'Visual Media')
     
     # def test_add_entry(self):
     #     """Test adding an entry to an activity"""

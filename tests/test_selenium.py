@@ -9,33 +9,39 @@ from selenium.webdriver.chrome.service import Service as ChromeService # Import 
 from app import app, db  # Import Flask app and SQLAlchemy instance
 
 # Configuration
+# --- IMPORTANT ---
+# Replace the placeholder path below with the ABSOLUTE path to your chromedriver executable.
+# Example for macOS if it's in your Downloads folder and then in 'chromedriver-mac-arm64':
+# driver_path = '/Users/your_username/Downloads/chromedriver-mac-arm64/chromedriver'
+# Example for Windows if it's in a 'drivers' folder on C drive:
+# driver_path = 'C:\\drivers\\chromedriver.exe'
 BASE_URL = "http://127.0.0.1:5000/" # Double check this IP, usually it's 127.0.0.1, may different in yours
+DRIVER_PATH = '/usr/bin/chromedriver'  # <-- !!! REPLACE THIS LINE !!!
 
 class AuthTests(unittest.TestCase):
+    # Define class-level variables for username, email, and password
+    username = f"testuser_{str(int(time.time()))}"
+    email = f"testuser_{str(int(time.time()))}@example.com"
+    password = "Password123!"
 
     def setUp(self):
-        # --- IMPORTANT ---
-        # Replace the placeholder path below with the ABSOLUTE path to your chromedriver executable.
-        # Example for macOS if it's in your Downloads folder and then in 'chromedriver-mac-arm64':
-        # driver_path = '/Users/your_username/Downloads/chromedriver-mac-arm64/chromedriver'
-        # Example for Windows if it's in a 'drivers' folder on C drive:
-        # driver_path = 'C:\\drivers\\chromedriver.exe'
-
-        driver_path = '/usr/bin/chromedriver' # <-- !!! REPLACE THIS LINE !!!
-
         # Initialize the WebDriver using ChromeService
         try:
-            service = ChromeService(executable_path=driver_path)
+            service = ChromeService(executable_path=DRIVER_PATH)
             self.driver = webdriver.Chrome(service=service)
         except Exception as e:
             print(f"Error initializing WebDriver: {e}")
-            print(f"Please ensure the path to chromedriver is correct: '{driver_path}'")
+            print(f"Please ensure the path to chromedriver is correct: '{DRIVER_PATH}'")
             print("And that your Flask application is running.")
             raise
 
         self.driver.implicitly_wait(10) # Implicit wait for elements
         self.driver.maximize_window()
-        self.unique_timestamp = str(int(time.time())) # For creating unique users
+
+        # Use the class-level variables for username, email, and password
+        self.username = self.__class__.username
+        self.email = self.__class__.email
+        self.password = self.__class__.password
 
         # Start a Flask app context and a database transaction
         self.app_context = app.app_context()
@@ -106,13 +112,9 @@ class AuthTests(unittest.TestCase):
         self.driver.get(BASE_URL)
         self.click_element_with_wait(By.XPATH, "//nav//a[@data-bs-target='#registerModal']")
 
-        username = f"testuser_{self.unique_timestamp}"
-        email = f"test_{self.unique_timestamp}@example.com"
-        password = "Password123!"
-
-        self.find_element_with_wait(By.ID, "reg-username").send_keys(username)
-        self.find_element_with_wait(By.ID, "reg-email").send_keys(email)
-        self.find_element_with_wait(By.ID, "reg-password").send_keys(password)
+        self.find_element_with_wait(By.ID, "reg-username").send_keys(self.username)
+        self.find_element_with_wait(By.ID, "reg-email").send_keys(self.email)
+        self.find_element_with_wait(By.ID, "reg-password").send_keys(self.password)
         
         self.click_element_with_wait(By.XPATH, "//form[@id='registerForm']//input[@type='submit']")
 
@@ -220,18 +222,10 @@ class AuthTests(unittest.TestCase):
         """Test successful user login."""
         self.driver.get(BASE_URL)
         self.click_element_with_wait(By.XPATH, "//nav//a[@data-bs-target='#loginModal']")
-
-        username = f"testuser_{self.unique_timestamp}"
-        password = "Password123!"
-
-        self.find_element_with_wait(By.ID, "username").send_keys(username)
-        self.find_element_with_wait(By.ID, "password").send_keys(password)
-
-        # Explicitly wait for the login button to be clickable and then click it
+        self.find_element_with_wait(By.ID, "username").send_keys(self.username)
+        self.find_element_with_wait(By.ID, "password").send_keys(self.password)
         self.click_element_with_wait(By.XPATH, "//form[@id='loginForm']//input[@type='submit']")
-
-        # Wait for the URL to contain '/dashboard' after login
-        WebDriverWait(self.driver, 10).until(EC.url_contains("/dashboard"))
+        WebDriverWait(self.driver, 2).until(EC.url_contains("/dashboard"))
         self.assertIn("/dashboard", self.driver.current_url, "User should be redirected to the dashboard after login.")
 
 if __name__ == "__main__":

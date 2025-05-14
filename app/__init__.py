@@ -2,7 +2,7 @@ from flask import Flask, app
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_login import LoginManager
-from app.config import Config
+from app.config import DeploymentConfig
 
 db = SQLAlchemy()
 migrate = Migrate(db)
@@ -20,6 +20,9 @@ def create_app(config):
     login.init_app(app)
 
     return app
+
+app = create_app(DeploymentConfig)
+migrate = Migrate(app, db)
 
 # from app import routes
 

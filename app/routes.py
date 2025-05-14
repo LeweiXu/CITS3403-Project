@@ -30,15 +30,18 @@ def dashboard():
 @blueprint.route('/viewdata', methods=['GET'])
 @login_required
 def viewdata():
-    result = get_entries(current_user.username, request)
+    username = request.args.get('username', current_user.username)
+    result = get_entries(username, request)
     if result: return result
 
 @blueprint.route('/activities', methods=['GET'])
 @login_required
 def activities():
-    result = get_activities(current_user.username, request)
-    if result: return result
-
+    # Get the username from the query parameters or default to the current user
+    username = request.args.get('username', current_user.username)
+    result = get_activities(username, request)
+    if result:
+        return result
 @blueprint.route('/analysis', methods=['GET'])
 @login_required
 def analysis():
@@ -118,14 +121,12 @@ def reopen_activity():
 @login_required
 def delete_activity():
     delete_activity_form = DeleteActivityForm()
-    print(delete_activity_form.data)
     if delete_activity_form.validate_on_submit():
         result = handle_delete_activity(delete_activity_form)
         if result: return result
         return redirect(url_for('main.dashboard'))  # Add fallback redirect
     return redirect(url_for('main.dashboard'))  # Add fallback redirect
     
-
 @blueprint.route('/delete_entry', methods=['POST'])
 @login_required
 def delete_entry():
@@ -150,7 +151,6 @@ def view_shared_data():
 @login_required
 def delete_shared_user():
     delete_shared_user_form = DeleteSharedUserForm()
-    print(delete_shared_user_form.data)
     if delete_shared_user_form.validate_on_submit():
         result = delete_shared_user_handler(current_user.username, delete_shared_user_form)
         if result: return result
@@ -161,7 +161,6 @@ def delete_shared_user():
 @login_required
 def share_with_user():
     share_with_user_form = ShareWithUserForm()
-    print(share_with_user_form.data)
     if share_with_user_form.validate_on_submit():
         result = share_with_user_handler(current_user.username, share_with_user_form)
         if result: return result

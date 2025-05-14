@@ -201,7 +201,7 @@ thead {
     justify-content: space-between;
     align-items: center;
     margin-bottom: 1.25rem;
-    padding-bottom: 0.75rem;
+    padding-bottom: 0.5rem;
     border-bottom: 1px solid var(--light-border);
 }
 
@@ -217,7 +217,7 @@ thead {
 .section-title {
     font-size: 2rem;
     font-weight: bold;
-    margin-bottom: 1.5rem;
+    margin-bottom: 0.75rem;
     color: var(--secondary-color);
 }
 

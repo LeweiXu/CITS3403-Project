@@ -11,7 +11,8 @@
     {% endif %}
     <section class="section wow fadeIn" data-wow-duration="0.2s" data-wow-delay="0.05s">
         <!-- Search Bar -->
-        <form action="{{ url_for('main.viewdata') }}" method="GET" class="mb-4">
+        <form action="{{ url_for('main.viewdata') }}" method="GET">
+            <input type="hidden" name="username" value="{{ username }}">
             <div class="row">
                 <div class="col-md-2">
                     <label for="start_date" class="form-label">Start Date</label>

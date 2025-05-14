@@ -21,6 +21,7 @@ class MediaTrackerTests(unittest.TestCase):
         with app.app_context():
             db.session.remove()
             db.drop_all()
+
     def test_register_user(self):
         """Test user registration"""
         # Make test user, use POST request to /register
@@ -36,6 +37,7 @@ class MediaTrackerTests(unittest.TestCase):
             user = Users.query.filter_by(username='testuser').first()
             self.assertIsNotNone(user)
             self.assertEqual(user.email, 'test@example.com')
+
     def test_successful_login(self):
         """Test login with valid account"""
         # Create user first
@@ -49,6 +51,7 @@ class MediaTrackerTests(unittest.TestCase):
             'password': 'Test123!@#'
         })
         self.assertEqual(response.status_code, 302)
+
     def test_invalid_login(self):
         """Test login with invalid credentials"""
         with self.client.session_transaction() as session:
@@ -70,10 +73,12 @@ class MediaTrackerTests(unittest.TestCase):
             flashes = dict(session.get('_flashes', []))
             self.assertIn('danger', flashes)
             self.assertEqual(flashes['danger'], 'Invalid username or password')
+
     def test_unauthorised_access(self):
         """Test accessing protected routes without login"""
         response = self.client.get('/dashboard')
         self.assertEqual(response.status_code, 302)  # Redirect to login
+
     def test_get_user_activities(self):
         """Test retrieving user's activities"""
         # Register and login first to properly set up authentication
@@ -103,6 +108,7 @@ class MediaTrackerTests(unittest.TestCase):
         response = self.client.get('/dashboard')
         self.assertEqual(response.status_code, 200)
         self.assertIn(b'Test Movie', response.data)
+
     def test_activity_creation(self):
         """Test creating a new activity"""
         # Register and login
@@ -142,6 +148,7 @@ class MediaTrackerTests(unittest.TestCase):
             'username': 'testuser',
             'password': 'Test123!@#'
         })
+
         # Create activity
         with app.app_context():
             activity = Activities(
@@ -155,14 +162,18 @@ class MediaTrackerTests(unittest.TestCase):
             db.session.add(activity)
             db.session.commit()
             activity_id = activity.id
+
         # Add entry via POST to /add_entry (new)
         response = self.client.post('/add_entry', data={
             'activity_id': activity_id,
             'duration': 120,
+            'date': date.today().strftime('%Y-%m-%d'),
             'add_duration': True
-        })
-        self.assertEqual(response.status_code, 302)  # Should redirect after successful add
+        }, follow_redirects=True)
+
+        self.assertEqual(response.status_code, 200)  # Should redirect after successful add
         # Checks if entry exists and duration matches
+        
         with app.app_context():
             entry = Entries.query.filter_by(activity_id=activity_id).first()
             self.assertIsNotNone(entry)

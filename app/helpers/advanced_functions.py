@@ -46,17 +46,17 @@ def handle_upload(request, app):
 
             else:
                 flash('Invalid CSV format.', 'danger')
-                return redirect(url_for('upload'))
+                return redirect(url_for('main.upload'))
 
         db.session.commit()
         flash('CSV data uploaded successfully!', 'success')
-        return redirect(url_for('upload'))
+        return redirect(url_for('main.upload'))
 
     elif 'mediaType' in request.form:
         # Handle individual media entry submission
         if 'username' not in session:
             flash('Please log in to add media entries.', 'danger')
-            return redirect(url_for('login'))
+            return redirect(url_for('main.login'))
 
         username = session['username']
         date_str = request.form.get('date')
@@ -64,7 +64,7 @@ def handle_upload(request, app):
             date = datetime.strptime(date_str, '%Y-%m-%d').date()
         except ValueError:
             flash('Invalid date format. Please use YYYY-MM-DD.', 'danger')
-            return redirect(url_for('upload'))
+            return redirect(url_for('main.upload'))
 
         media_type = request.form.get('mediaType')
         media_name = request.form.get('mediaName')
@@ -75,6 +75,6 @@ def handle_upload(request, app):
         db.session.commit()
 
         flash('Media entry added successfully!', 'success')
-        return redirect(url_for('viewdata'))
+        return redirect(url_for('main.viewdata'))
 
     return None

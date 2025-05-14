@@ -74,7 +74,7 @@
                     <ul class="dropdown-menu" aria-labelledby="shareActionsDropdown-{{ shared_user.username }}">
                         {% for dtype in ['analysis', 'activities', 'history'] %}
                         <li>
-                            <form method="POST" action="{{ url_for('view_shared_data') }}">
+                            <form method="POST" action="{{ url_for('main.view_shared_data') }}">
                                 {{ view_shared_data_forms[(shared_user.username, dtype)].hidden_tag() }}
                                 {{ view_shared_data_forms[(shared_user.username, dtype)].target_user(style="display:none;") }}
                                 {{ view_shared_data_forms[(shared_user.username, dtype)].data_type(style="display:none;") }}

@@ -91,7 +91,7 @@ def handle_delete_entry(form):
         flash('Entry deleted successfully.', 'success')
     else:
         flash('Entry not found.', 'danger')
-    return redirect(url_for('viewdata'))
+    return redirect(url_for('main.viewdata'))
 
 def handle_add_entry(username, form):
     activity_id = form.activity_id.data
@@ -99,21 +99,29 @@ def handle_add_entry(username, form):
     date = form.date.data
     comment = form.comment.data
     comment = comment if comment else None
-    if activity_id and duration:
-        activity = Activities.query.filter_by(id=activity_id, username=username).first()
-        new_entry = Entries(
-            activity_id=activity.id,
-            date=date,
-            duration=duration,
-            comment=comment,
-        )
-        db.session.add(new_entry)
+    
+    if not activity_id or not duration:
+        flash("Activity ID and duration are required.", "danger")
+        return redirect(url_for('main.dashboard'))
+        
+    activity = Activities.query.filter_by(id=activity_id, username=username).first()
+    if not activity:
+        flash("Activity not found or unauthorized.", "danger")
+        return redirect(url_for('main.dashboard'))
+        
+    new_entry = Entries(
+        activity_id=activity.id,
+        date=date,
+        duration=duration,
+        comment=comment,
+    )
+    db.session.add(new_entry)
 
-        try:
-            db.session.commit()
-            flash(f"Duration added to activity '{activity.media_name}' successfully.", "success")
-            return redirect(url_for('dashboard'))
-        except Exception as e:
-            db.session.rollback()
-            flash(f"An error occurred while adding the duration: {e}", "danger")
-            return None
+    try:
+        db.session.commit()
+        flash(f"Duration added to activity '{activity.media_name}' successfully.", "success")
+        return redirect(url_for('main.dashboard'))
+    except Exception as e:
+        db.session.rollback()
+        flash(f"An error occurred while adding the duration: {e}", "danger")
+        return redirect(url_for('main.dashboard'))

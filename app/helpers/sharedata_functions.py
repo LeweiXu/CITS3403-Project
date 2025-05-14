@@ -48,7 +48,7 @@ def view_shared_data_handler(username, request, form):
     shared_entry = SharedUsers.query.filter_by(username=target_user, shared_username=username).first()
     if not shared_entry:
         flash('You do not have permission to view this user’s data.', 'danger')
-        return redirect(url_for('sharedata'))
+        return redirect(url_for('main.sharedata'))
 
     if data_type == 'analysis':
         result = get_analysis_page(target_user)
@@ -72,7 +72,7 @@ def delete_shared_user_handler(username, form):
             flash(f'No shared data found with {target_user}.', 'danger')
     else:
         flash('Invalid user specified.', 'danger')
-    return redirect(url_for('sharedata'))
+    return redirect(url_for('main.sharedata'))
 
 def share_with_user_handler(username, form):
     target_user = form.target_user.data
@@ -92,4 +92,4 @@ def share_with_user_handler(username, form):
                 flash(f'You have already shared your data with {target_user}.', 'info')
         else:
             flash(f'User {target_user} does not exist.', 'danger')
-    return redirect(url_for('sharedata'))
+    return redirect(url_for('main.sharedata'))

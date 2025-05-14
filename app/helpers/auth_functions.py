@@ -16,7 +16,7 @@ def handle_login(form):
         login_user(user)  # Log the user in with Flask-Login
         return jsonify({
             'success': True,
-            'redirect_url': url_for('dashboard')
+            'redirect_url': url_for('main.dashboard')
         })
     else:
         return jsonify({

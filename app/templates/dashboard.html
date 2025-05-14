@@ -92,7 +92,7 @@
     <div class="modal" id="endActivityModal">
         <div class="modal-dialog">
             <div class="modal-content">
-                <form id="endActivityForm" method="POST" action="{{ url_for('end_activity') }}">
+                <form id="endActivityForm" method="POST" action="{{ url_for('main.end_activity') }}">
                     {{ end_activity_form.hidden_tag() }}
                     <div class="modal-header">
                         <h5 class="modal-title">End Activity</h5>
@@ -121,7 +121,7 @@
     <div class="modal" id="addEntryModal">
         <div class="modal-dialog">
             <div class="modal-content">
-                <form id="addEntryForm" method="POST" action="{{ url_for('add_entry') }}">
+                <form id="addEntryForm" method="POST" action="{{ url_for('main.add_entry') }}">
                     {{ add_entry_form.hidden_tag() }}
 
                     <div class="modal-header">
@@ -160,7 +160,7 @@
     <div class="modal" id="addActivityModal">
         <div class="modal-dialog">
             <div class="modal-content">
-                <form id="addActivityForm" method="POST" action="{{ url_for('add_activity') }}">
+                <form id="addActivityForm" method="POST" action="{{ url_for('main.add_activity') }}">
                     {{ add_activity_form.hidden_tag() }}
                     <div class="modal-header">
                         <h5 class="modal-title">Add New Activity</h5>

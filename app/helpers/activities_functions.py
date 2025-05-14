@@ -172,7 +172,7 @@ def handle_end_activity(username, form):
     try:
         db.session.commit()
         flash(f"Activity {activity_id} marked as completed successfully.", "success")
-        return redirect(url_for('dashboard'))
+        return redirect(url_for('main.dashboard'))
     except Exception as e:
         db.session.rollback()
         flash(f"An error occurred while completing the activity: {e}", "danger")
@@ -182,12 +182,12 @@ def handle_reopen_activity(form):
     activity_id = form.activity_id.data
     if not activity_id:
         flash('Missing data for reopen.', 'danger')
-        return redirect(url_for('viewdata'))
+        return redirect(url_for('main.viewdata'))
 
     activity = Activities.query.get(activity_id)
     if not activity:
         flash('Activity not found.', 'danger')
-        return redirect(url_for('viewdata'))
+        return redirect(url_for('main.viewdata'))
 
     activity.status = 'ongoing'
     activity.end_date   = None
@@ -196,7 +196,7 @@ def handle_reopen_activity(form):
     db.session.commit()
 
     flash('Activity reopened.', 'success')
-    return redirect(url_for('dashboard'))
+    return redirect(url_for('main.dashboard'))
 
 def handle_add_activity(username, form):
     """
@@ -220,14 +220,14 @@ def handle_add_activity(username, form):
     db.session.add(new_activity)
     db.session.commit()
     flash(f"Activity '{media_name}' added successfully.", "success")
-    return redirect(url_for('dashboard'))
+    return redirect(url_for('main.dashboard'))
         
 def handle_delete_activity(form):
     activity_id = form.activity_id.data
     activity = Activities.query.filter_by(id=activity_id).first()
     if not activity:
         flash('Activity not found or unauthorized.', 'danger')
-        return redirect(url_for('activities'))
+        return redirect(url_for('main.activities'))
 
     # Delete all related entries in the Entries table
     related_entries = Entries.query.filter_by(activity_id=activity.id).all()
@@ -239,4 +239,4 @@ def handle_delete_activity(form):
     db.session.commit()
     
     flash('Activity and all related entries deleted successfully.', 'success')
-    return redirect(url_for('activities'))
+    return redirect(url_for('main.activities'))

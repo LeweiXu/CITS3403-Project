@@ -44,20 +44,21 @@ def search_users(request):
 def view_shared_data_handler(username, request, form):
     target_user = form.target_user.data
     data_type = form.data_type.data
+
     # Check if the target_user has shared their data with the current user
     shared_entry = SharedUsers.query.filter_by(username=target_user, shared_username=username).first()
     if not shared_entry:
         flash('You do not have permission to view this user’s data.', 'danger')
-        return redirect(url_for('sharedata'))
+        return redirect(url_for('main.sharedata'))
 
-    if data_type == 'analysis':
-        result = get_analysis_page(target_user)
     if data_type == 'activities':
-        result = get_activities(target_user, request)
+        # Redirect to the activities route with the target user's username
+        return redirect(url_for('main.activities', username=target_user, **request.args))
+    # Handle other data types (analysis, history) as before
+    if data_type == 'analysis':
+        return get_analysis_page(target_user)
     elif data_type == 'history':
-        result = get_entries(target_user, request)
-
-    return result
+        return redirect(url_for('main.viewdata', username=target_user, **request.args))
 
 def delete_shared_user_handler(username, form):
     target_user = form.target_user.data
@@ -72,7 +73,7 @@ def delete_shared_user_handler(username, form):
             flash(f'No shared data found with {target_user}.', 'danger')
     else:
         flash('Invalid user specified.', 'danger')
-    return redirect(url_for('sharedata'))
+    return redirect(url_for('main.sharedata'))
 
 def share_with_user_handler(username, form):
     target_user = form.target_user.data
@@ -92,4 +93,4 @@ def share_with_user_handler(username, form):
                 flash(f'You have already shared your data with {target_user}.', 'info')
         else:
             flash(f'User {target_user} does not exist.', 'danger')
-    return redirect(url_for('sharedata'))
+    return redirect(url_for('main.sharedata'))

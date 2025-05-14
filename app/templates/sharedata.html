@@ -7,7 +7,7 @@
     <h1 class="page-title text-center">Share</h1>
     <section class="section text-center wow fadeInUp" data-wow-duration="0.2s" data-wow-delay="0.1">
 
-        <h2 class="section-title mt-5">Share Your Data</h2>
+        <h2 class="section-title text-center">Share Your Data</h2>
         <div class="row justify-content-center">
             <div class="form-wrapper" style="position: relative;">
                 <form id="share_form" method="POST" action="/share_with_user">
@@ -33,7 +33,7 @@
     </div>
     {% else %}
     <section class="section wow fadeInUp" data-wow-duration="0.2s" data-wow-delay="0.15">
-        <h3 class="section-title text-center">People You’re Sharing With</h3>
+        <h2 class="section-title text-center">People You’re Sharing With</h2>
       
         <!-- new flex container -->
         <div class="share-container">
@@ -59,7 +59,7 @@
       </section>
 
     <section class="section wow fadeInUp" data-wow-duration="0.2s" data-wow-delay="0.2">
-        <h3 class="text-center section-title">Shared With You</h3>
+        <h2 class="text-center section-title">Shared With You</h2>
         <div class="share-container">
             {% for shared_user in shared_with_me %}
             <div class="share-icon-container">
@@ -74,7 +74,7 @@
                     <ul class="dropdown-menu" aria-labelledby="shareActionsDropdown-{{ shared_user.username }}">
                         {% for dtype in ['analysis', 'activities', 'history'] %}
                         <li>
-                            <form method="POST" action="{{ url_for('view_shared_data') }}">
+                            <form method="POST" action="{{ url_for('main.view_shared_data') }}">
                                 {{ view_shared_data_forms[(shared_user.username, dtype)].hidden_tag() }}
                                 {{ view_shared_data_forms[(shared_user.username, dtype)].target_user(style="display:none;") }}
                                 {{ view_shared_data_forms[(shared_user.username, dtype)].data_type(style="display:none;") }}

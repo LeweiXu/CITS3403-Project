@@ -25,6 +25,11 @@ sudo apt update
 sudo apt install sqlite3
 ```
 
+Finally, to run the application, simply use `flask run`:
+```
+flask run
+```
+
 To run the selenium unit tests, chromium/chromedriver needs to be installed on your machine. To install:
 ```
 sudo apt update

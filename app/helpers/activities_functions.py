@@ -146,7 +146,6 @@ def handle_end_activity(username, form):
     activity_id = form.activity_id.data  # Get the activity ID from the form
     rating = form.rating.data  # Get the rating from the form
     comment = form.comment.data  # Get the comment from the form
-    print(activity_id, rating, comment)
     # Convert empty strings to None
     rating = float(rating) if rating else None
     comment = comment if comment else None

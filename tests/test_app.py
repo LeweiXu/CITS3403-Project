@@ -39,7 +39,9 @@ class MediaTrackerTests(unittest.TestCase):
             'username': 'testuser',
             'password': 'Test123!@#'
         })
-        self.assertEqual(response.status_code, 302)
+        # Test if login redirects to dashboard
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(b'{"redirect_url":"/dashboard","success":true}', response.data)  # Verify we see the login page
 
     def test_invalid_login(self):
         """Test login with invalid credentials"""
@@ -58,7 +60,7 @@ class MediaTrackerTests(unittest.TestCase):
         }, follow_redirects=True)
     
         self.assertEqual(login_response.status_code, 200)
-        self.assertIn(b'Track Your Media Consumption', login_response.data) # Check title to see if we went back to index
+        self.assertIn(b'Invalid username or password', login_response.data) # Check title to see if we went back to index
 
     def test_unauthorised_access(self):
         """Test accessing protected routes without login"""
@@ -196,7 +198,7 @@ class MediaTrackerTests(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
 
         # Checks if activity has end date, all optional stuff matches
-        activity = Activities.query.get(activity_id)
+        activity = db.session.get(Activities, activity_id)
         self.assertIsNotNone(activity)
         self.assertIsNotNone(activity.end_date)
         self.assertEqual(activity.rating, 8)

@@ -20,7 +20,7 @@ class AuthTests(unittest.TestCase):
         # Example for Windows if it's in a 'drivers' folder on C drive:
         # driver_path = 'C:\\drivers\\chromedriver.exe'
 
-        driver_path = '/Users/neickof/webdrivers/chromedriver-mac-arm64/chromedriver' # <-- !!! REPLACE THIS LINE !!!
+        driver_path = '/usr/bin/chromedriver' # <-- !!! REPLACE THIS LINE !!!
 
         # Initialize the WebDriver using ChromeService
         try:

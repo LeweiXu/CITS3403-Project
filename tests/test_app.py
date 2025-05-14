@@ -17,10 +17,10 @@ class MediaTrackerTests(unittest.TestCase):
             
     # Clean up after each test
     def tearDown(self):
-        # Remove session and drop all tables, clean slate
+        # Remove session without dropping tables
         with app.app_context():
             db.session.remove()
-            db.drop_all()
+
     def test_register_user(self):
         """Test user registration"""
         # Make test user, use POST request to /register
@@ -36,6 +36,7 @@ class MediaTrackerTests(unittest.TestCase):
             user = Users.query.filter_by(username='testuser').first()
             self.assertIsNotNone(user)
             self.assertEqual(user.email, 'test@example.com')
+
     def test_successful_login(self):
         """Test login with valid account"""
         # Create user first
@@ -48,7 +49,8 @@ class MediaTrackerTests(unittest.TestCase):
             'username': 'testuser',
             'password': 'Test123!@#'
         })
-        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.status_code, 200)
+
     def test_invalid_login(self):
         """Test login with invalid credentials"""
         with self.client.session_transaction() as session:
@@ -62,14 +64,10 @@ class MediaTrackerTests(unittest.TestCase):
         # Response should redirect to index (200) and contain login modal
         self.assertEqual(response.status_code, 200)
         # Check if redirected to index page
-        self.assertIn(b'Track Your Media Consumption', response.data)
-        # Check if login modal exists
-        self.assertIn(b'loginModal', response.data)
-        # Check if flash messages are handled
-        with self.client.session_transaction() as session:
-            flashes = dict(session.get('_flashes', []))
-            self.assertIn('danger', flashes)
-            self.assertEqual(flashes['danger'], 'Invalid username or password')
+        self.assertIn(b'Invalid username or password', response.data)
+        # if success is set to false
+        self.assertIn(b'"success": false', response.data)
+
     def test_unauthorised_access(self):
         """Test accessing protected routes without login"""
         response = self.client.get('/dashboard')

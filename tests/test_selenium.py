@@ -6,6 +6,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException, NoAlertPresentException
 from selenium.webdriver.chrome.service import Service as ChromeService # Import ChromeService
+from app import app, db  # Import Flask app and SQLAlchemy instance
 
 # Configuration
 BASE_URL = "http://127.0.0.1:5000/" # Double check this IP, usually it's 127.0.0.1, may different in yours
@@ -36,7 +37,22 @@ class AuthTests(unittest.TestCase):
         self.driver.maximize_window()
         self.unique_timestamp = str(int(time.time())) # For creating unique users
 
+        # Start a Flask app context and a database transaction
+        self.app_context = app.app_context()
+        self.app_context.push()
+        self.db_session = db.session
+        self.db_session.begin_nested()  # Start a nested transaction
+
     def tearDown(self):
+        # Rollback any database changes
+        if self.db_session:
+            self.db_session.rollback()  # Rollback the nested transaction
+            self.db_session.close()  # Close the session
+
+        # Pop the Flask app context
+        if hasattr(self, 'app_context'):
+            self.app_context.pop()
+
         # Close the browser window
         if hasattr(self, 'driver'): # Check if driver was initialized
             self.driver.quit()
@@ -198,7 +214,25 @@ class AuthTests(unittest.TestCase):
         WebDriverWait(self.driver, 10).until(EC.visibility_of(login_modal))
         self.assertTrue(login_modal.is_displayed(), "Login modal should be visible.")
         
-        self.find_element_with_wait(By.ID, "username") 
+        self.find_element_with_wait(By.ID, "username")
+
+    def test_07_successful_login(self):
+        """Test successful user login."""
+        self.driver.get(BASE_URL)
+        self.click_element_with_wait(By.XPATH, "//nav//a[@data-bs-target='#loginModal']")
+
+        username = f"testuser_{self.unique_timestamp}"
+        password = "Password123!"
+
+        self.find_element_with_wait(By.ID, "username").send_keys(username)
+        self.find_element_with_wait(By.ID, "password").send_keys(password)
+
+        # Explicitly wait for the login button to be clickable and then click it
+        self.click_element_with_wait(By.XPATH, "//form[@id='loginForm']//input[@type='submit']")
+
+        # Wait for the URL to contain '/dashboard' after login
+        WebDriverWait(self.driver, 10).until(EC.url_contains("/dashboard"))
+        self.assertIn("/dashboard", self.driver.current_url, "User should be redirected to the dashboard after login.")
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)

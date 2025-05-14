@@ -14,11 +14,15 @@ def handle_login(form):
     # Verify the password using check_password_hash
     if user and check_password_hash(user.password, password):
         login_user(user)  # Log the user in with Flask-Login
-        flash('Login successful!', 'success')
-        return redirect(url_for('dashboard'))
+        return jsonify({
+            'success': True,
+            'redirect_url': url_for('dashboard')
+        })
     else:
-        flash('Invalid username or password.', 'danger')
-        return None
+        return jsonify({
+            'success': False,
+            'message': 'Invalid username or password.'
+        })
     
 def handle_register(form):
     username = form.username.data

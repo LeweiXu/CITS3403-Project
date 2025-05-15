@@ -101,7 +101,7 @@ class AuthTests(unittest.TestCase):
         self.assertTrue(register_modal.is_displayed(), "Registration modal should be visible after clicking nav link.")
         self.find_element_with_wait(By.ID, "reg-username") 
 
-    def test_03_successful_registration(self):
+    def test_03_successful_registration_then_login(self):
         """Test successful user registration."""
         self.click_element_with_wait(By.XPATH, "//nav//a[@data-bs-target='#registerModal']")
 
@@ -123,6 +123,11 @@ class AuthTests(unittest.TestCase):
         WebDriverWait(self.driver, 10).until(EC.visibility_of(login_modal))
         self.assertTrue(login_modal.is_displayed(), "Login modal should be visible after successful registration.")
         
+        self.find_element_with_wait(By.ID, "username").send_keys(self.username)
+        self.find_element_with_wait(By.ID, "password").send_keys(self.password)
+        self.click_element_with_wait(By.XPATH, "//form[@id='loginForm']//input[@type='submit']")
+        WebDriverWait(self.driver, 2).until(EC.url_contains("/dashboard"))
+        self.assertIn("/dashboard", self.driver.current_url, "User should be redirected to the dashboard after login.")
     # def test_04_register_existing_username(self):
     #     """Test registration with an already existing username."""
     #     username = f"existinguser_{self.unique_timestamp}"
@@ -208,15 +213,6 @@ class AuthTests(unittest.TestCase):
         self.assertTrue(login_modal.is_displayed(), "Login modal should be visible.")
         
         self.find_element_with_wait(By.ID, "username")
-
-    def test_07_successful_login(self):
-        """Test successful user login."""
-        self.click_element_with_wait(By.XPATH, "//nav//a[@data-bs-target='#loginModal']")
-        self.find_element_with_wait(By.ID, "username").send_keys(self.username)
-        self.find_element_with_wait(By.ID, "password").send_keys(self.password)
-        self.click_element_with_wait(By.XPATH, "//form[@id='loginForm']//input[@type='submit']")
-        WebDriverWait(self.driver, 2).until(EC.url_contains("/dashboard"))
-        self.assertIn("/dashboard", self.driver.current_url, "User should be redirected to the dashboard after login.")
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)

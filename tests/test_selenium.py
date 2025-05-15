@@ -6,7 +6,9 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException, NoAlertPresentException
 from selenium.webdriver.chrome.service import Service as ChromeService # Import ChromeService
-from app import app, db  # Import Flask app and SQLAlchemy instance
+from app import create_app, db
+from app.config import TestConfig
+import multiprocessing
 
 # Configuration
 # --- IMPORTANT ---
@@ -15,7 +17,7 @@ from app import app, db  # Import Flask app and SQLAlchemy instance
 # driver_path = '/Users/your_username/Downloads/chromedriver-mac-arm64/chromedriver'
 # Example for Windows if it's in a 'drivers' folder on C drive:
 # driver_path = 'C:\\drivers\\chromedriver.exe'
-BASE_URL = "http://127.0.0.1:5000/" # Double check this IP, usually it's 127.0.0.1, may different in yours
+BASE_URL = "http://localhost:5000/" # Double check this IP, usually it's 127.0.0.1, may different in yours
 DRIVER_PATH = '/usr/bin/chromedriver'  # <-- !!! REPLACE THIS LINE !!!
 
 class AuthTests(unittest.TestCase):
@@ -25,43 +27,39 @@ class AuthTests(unittest.TestCase):
     password = "Password123!"
 
     def setUp(self):
-        # Initialize the WebDriver using ChromeService
-        try:
-            service = ChromeService(executable_path=DRIVER_PATH)
-            self.driver = webdriver.Chrome(service=service)
-        except Exception as e:
-            print(f"Error initializing WebDriver: {e}")
-            print(f"Please ensure the path to chromedriver is correct: '{DRIVER_PATH}'")
-            print("And that your Flask application is running.")
-            raise
-
-        self.driver.implicitly_wait(10) # Implicit wait for elements
-        self.driver.maximize_window()
-
         # Use the class-level variables for username, email, and password
         self.username = self.__class__.username
         self.email = self.__class__.email
         self.password = self.__class__.password
 
-        # Start a Flask app context and a database transaction
-        self.app_context = app.app_context()
+        self.testApp = create_app(TestConfig)
+        self.app_context = self.testApp.app_context()
         self.app_context.push()
-        self.db_session = db.session
-        self.db_session.begin_nested()  # Start a nested transaction
+        db.create_all()
+
+        self.server_thread = multiprocessing.Process(target=self.testApp.run)
+        self.server_thread.start()
+        
+        # Initialize the WebDriver using ChromeService
+        try:
+            service = ChromeService(executable_path=DRIVER_PATH)
+            self.driver = webdriver.Chrome(service=service)
+            self.driver.get(BASE_URL)
+            self.driver.implicitly_wait(2) # Implicit wait for elements
+            self.driver.maximize_window()
+        except Exception as e:
+            print(f"Error initializing WebDriver: {e}")
+            print(f"Please ensure the path to chromedriver is correct: '{DRIVER_PATH}'")
+            print("And that your Flask application is running.")
+            raise
+        
 
     def tearDown(self):
-        # Rollback any database changes
-        if self.db_session:
-            self.db_session.rollback()  # Rollback the nested transaction
-            self.db_session.close()  # Close the session
-
-        # Pop the Flask app context
-        if hasattr(self, 'app_context'):
-            self.app_context.pop()
-
-        # Close the browser window
-        if hasattr(self, 'driver'): # Check if driver was initialized
-            self.driver.quit()
+        self.server_thread.terminate()
+        self.driver.close()
+        db.session.remove()
+        db.drop_all()
+        self.app_context.pop()
 
     def find_element_with_wait(self, by, value, timeout=10):
         """Helper function to find an element with explicit wait."""
@@ -84,8 +82,6 @@ class AuthTests(unittest.TestCase):
 
     def test_01_open_registration_modal_from_home(self):
         """Test opening the registration modal from the 'Get Started' button on the home page."""
-        self.driver.get(BASE_URL)
-        
         get_started_button = self.find_element_with_wait(By.XPATH, "//a[@data-bs-target='#registerModal' and contains(@class, 'btn-primary')]")
         get_started_button.click()
         
@@ -97,8 +93,6 @@ class AuthTests(unittest.TestCase):
 
     def test_02_open_registration_modal_from_nav(self):
         """Test opening the registration modal from the navigation bar."""
-        self.driver.get(BASE_URL)
-
         register_nav_link = self.find_element_with_wait(By.XPATH, "//nav//a[@data-bs-target='#registerModal']")
         register_nav_link.click()
 
@@ -109,7 +103,6 @@ class AuthTests(unittest.TestCase):
 
     def test_03_successful_registration(self):
         """Test successful user registration."""
-        self.driver.get(BASE_URL)
         self.click_element_with_wait(By.XPATH, "//nav//a[@data-bs-target='#registerModal']")
 
         self.find_element_with_wait(By.ID, "reg-username").send_keys(self.username)
@@ -207,8 +200,6 @@ class AuthTests(unittest.TestCase):
 
     def test_06_open_login_modal_from_nav(self):
         """Test opening the login modal from the navigation bar."""
-        self.driver.get(BASE_URL)
-
         login_nav_link = self.find_element_with_wait(By.XPATH, "//nav//a[@data-bs-target='#loginModal']")
         login_nav_link.click()
 
@@ -220,7 +211,6 @@ class AuthTests(unittest.TestCase):
 
     def test_07_successful_login(self):
         """Test successful user login."""
-        self.driver.get(BASE_URL)
         self.click_element_with_wait(By.XPATH, "//nav//a[@data-bs-target='#loginModal']")
         self.find_element_with_wait(By.ID, "username").send_keys(self.username)
         self.find_element_with_wait(By.ID, "password").send_keys(self.password)

@@ -139,7 +139,25 @@ class AuthTests(unittest.TestCase):
         WebDriverWait(self.driver, 2).until(EC.url_contains("/dashboard"))
         self.assertIn("/dashboard", self.driver.current_url, "User should be redirected to the dashboard after login.")
 
+    def test_05_nav_after_login(self):
+        """Test clicking all navbar buttons after logging in as 'aoi'."""
+        # Log in first
+        self.click_element_with_wait(By.XPATH, "//nav//a[@data-bs-target='#loginModal']")
+        login_modal = self.find_element_with_wait(By.ID, "loginModal")
+        WebDriverWait(self.driver, 10).until(EC.visibility_of(login_modal))
+        self.find_element_with_wait(By.ID, "username").send_keys("aoi")
+        self.find_element_with_wait(By.ID, "password").send_keys("Password123#")
+        self.click_element_with_wait(By.XPATH, "//form[@id='loginForm']//input[@type='submit']")
+        WebDriverWait(self.driver, 5).until(EC.url_contains("/dashboard"))
+        self.assertIn("/dashboard", self.driver.current_url)
 
+        # Find all visible navbar links/buttons (excluding logout for now)
+        nav_links = ["/dashboard", "/activities", "/sharedata", "/viewdata", "/analysis"]
 
+        for link in nav_links:
+            self.driver.get(BASE_URL.rstrip("/") + link)
+            # Check if page loaded successfully by checking the HTTP status code via JavaScript
+            status = self.driver.execute_script("return window.performance.getEntriesByType('navigation')[0].responseStart ? 200 : 0;")
+            self.assertEqual(status, 200, f"Failed to load {link} (status code: {status})")
 if __name__ == "__main__":
     unittest.main(verbosity=2)

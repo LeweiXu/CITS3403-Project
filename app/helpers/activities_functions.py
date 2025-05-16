@@ -213,7 +213,7 @@ def handle_end_activity(username, form):
 
     try:
         db.session.commit()
-        flash(f"{activity.media_name} marked as completed successfully.", "success")
+        flash(f"Activity ended successfully.", "success")
         return redirect(url_for('main.dashboard'))
     except Exception as e:
         db.session.rollback()

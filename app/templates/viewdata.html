@@ -116,17 +116,24 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', () => {
-        // Ensure all comment rows are hidden by default
         document.querySelectorAll('.entry-comment').forEach(commentRow => {
             commentRow.style.display = 'none';
         });
 
-        // Toggle visibility of the comment section when an entry row is clicked
         document.querySelectorAll('.entry-row').forEach(row => {
             row.addEventListener('click', () => {
                 const commentRow = row.nextElementSibling;
+                // If already open, close it and return
+                if (commentRow && commentRow.classList.contains('entry-comment') && commentRow.style.display === 'table-row') {
+                    commentRow.style.display = 'none';
+                    return;
+                }
+                // Otherwise, close all and open the clicked one
+                document.querySelectorAll('.entry-comment').forEach(cr => {
+                    cr.style.display = 'none';
+                });
                 if (commentRow && commentRow.classList.contains('entry-comment')) {
-                    commentRow.style.display = commentRow.style.display === 'table-row' ? 'none' : 'table-row';
+                    commentRow.style.display = 'table-row';
                 }
             });
         });

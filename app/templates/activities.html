@@ -50,7 +50,7 @@
 
     <!-- Activities Table -->
     <section class="table-section">
-    <table class="table mt-4">
+    <table class="table hover">
         <thead>
             <tr>
                 <th class="wow fadeInUp" data-wow-duration="0.2s" data-wow-delay="0.1s">Media Name</th>
@@ -194,17 +194,24 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', () => {
-        // Ensure all additional activity details are hidden by default
-        document.querySelectorAll('.activity-details').forEach(detailsRow => {
-            detailsRow.style.display = 'none';
+        document.querySelectorAll('.activity-details').forEach(commentRow => {
+            commentRow.style.display = 'none';
         });
 
-        // Toggle visibility of the additional details when an activity row is clicked
         document.querySelectorAll('.activity-row').forEach(row => {
             row.addEventListener('click', () => {
-                const detailsRow = row.nextElementSibling;
-                if (detailsRow && detailsRow.classList.contains('activity-details')) {
-                    detailsRow.style.display = detailsRow.style.display === 'table-row' ? 'none' : 'table-row';
+                const commentRow = row.nextElementSibling;
+                // If already open, close it and return
+                if (commentRow && commentRow.classList.contains('activity-details') && commentRow.style.display === 'table-row') {
+                    commentRow.style.display = 'none';
+                    return;
+                }
+                // Otherwise, close all and open the clicked one
+                document.querySelectorAll('.activity-details').forEach(cr => {
+                    cr.style.display = 'none';
+                });
+                if (commentRow && commentRow.classList.contains('activity-details')) {
+                    commentRow.style.display = 'table-row';
                 }
             });
         });

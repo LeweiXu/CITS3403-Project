@@ -23,7 +23,7 @@ class AddEntryForm(FlaskForm):
 
 class EndActivityForm(FlaskForm):
     activity_id = HiddenField('Activity ID', validators=[DataRequired()])
-    rating = IntegerField('Rating (1.0-10.0)', validators=[Optional(), NumberRange(min=1, max=10)])
+    rating = IntegerField('Rating (1-10)', validators=[Optional(), NumberRange(min=1, max=10)])
     comment = TextAreaField('Comment', validators=[Optional()])
     submit = SubmitField('Submit')
 

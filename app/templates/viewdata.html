@@ -92,7 +92,7 @@
                     <td colspan="3">Comment: {{ entry.comment }}</td>
                     <td>
                         {% if current_user.username == username %}
-                        <form action="{{ url_for('main.delete_entry') }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this entry?');">
+                        <form action="{{ url_for('main.delete_entry') }}" method="POST">
                             {{ delete_entry_forms[entry.id].hidden_tag() }}
                             {{ delete_entry_forms[entry.id].entry_id() }}
                             {{ delete_entry_forms[entry.id].submit(class="btn btn-danger btn-sm") }}

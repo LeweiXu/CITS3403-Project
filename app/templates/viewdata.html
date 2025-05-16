@@ -40,6 +40,19 @@
                 </div>
             </div>
             <div class="row mt-3">
+                <div class="sort text-center">
+                    <!-- Sort Dropdowns integrated in the form -->
+                    <select name="sort_field" class="form-select d-inline-block w-auto ms-3" style="display:inline-block; width:auto;">
+                        <option value="date" {% if request.args.get('sort_field', 'date') == 'date' %}selected{% endif %}>Sort by Date</option>
+                        <option value="media_type" {% if request.args.get('sort_field') == 'media_type' %}selected{% endif %}>Sort by Media Type</option>
+                        <option value="media_name" {% if request.args.get('sort_field') == 'media_name' %}selected{% endif %}>Sort by Media Name</option>
+                        <option value="duration" {% if request.args.get('sort_field') == 'duration' %}selected{% endif %}>Sort by Duration</option>
+                    </select>
+                    <select name="sort_order" class="form-select d-inline-block w-auto" style="display:inline-block; width:auto;">
+                        <option value="desc" {% if request.args.get('sort_order', 'desc') == 'desc' %}selected{% endif %}>Descending</option>
+                        <option value="asc" {% if request.args.get('sort_order') == 'asc' %}selected{% endif %}>Ascending</option>
+                    </select>
+                </div>
                 <div class="col-md-12 text-center">
                     <button type="submit" class="btn btn-primary">Search</button>
                     <a href="{{ url_for('main.viewdata') }}" class="btn btn-secondary">Reset</a>
@@ -49,7 +62,7 @@
     </section>  
 
     <section class="table-section wow fadeIn" data-wow-duration="0.2s" data-wow-delay="0.1">
-        <table class="table">
+        <table class="table hover">
             <thead>
                 <tr>
                     <th class="wow fadeInUp" data-wow-duration="0.2s" data-wow-delay="0.1s">Date</th>
@@ -60,7 +73,7 @@
             </thead>
             <tbody>
                 {% for entry in entries %}
-                <tr class="entry-row">
+                <tr class="entry-row wow animate__animated" data-wow-duration="0.5s">
                     <td class="wow fadeInUp" data-wow-duration="0.2s" data-wow-delay="0.1s">{{ entry.date }}</td>
                     <td class="wow fadeInUp" data-wow-duration="0.2s" data-wow-delay="0.15s">{{ entry.activity.media_type }}</td>
                     <td class="wow fadeInUp" data-wow-duration="0.2s" data-wow-delay="0.2s">{{ entry.activity.media_name }}</td>
@@ -116,17 +129,24 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', () => {
-        // Ensure all comment rows are hidden by default
         document.querySelectorAll('.entry-comment').forEach(commentRow => {
             commentRow.style.display = 'none';
         });
 
-        // Toggle visibility of the comment section when an entry row is clicked
         document.querySelectorAll('.entry-row').forEach(row => {
             row.addEventListener('click', () => {
                 const commentRow = row.nextElementSibling;
+                // If already open, close it and return
+                if (commentRow && commentRow.classList.contains('entry-comment') && commentRow.style.display === 'table-row') {
+                    commentRow.style.display = 'none';
+                    return;
+                }
+                // Otherwise, close all and open the clicked one
+                document.querySelectorAll('.entry-comment').forEach(cr => {
+                    cr.style.display = 'none';
+                });
                 if (commentRow && commentRow.classList.contains('entry-comment')) {
-                    commentRow.style.display = commentRow.style.display === 'table-row' ? 'none' : 'table-row';
+                    commentRow.style.display = 'table-row';
                 }
             });
         });

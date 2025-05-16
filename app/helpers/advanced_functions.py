@@ -4,6 +4,7 @@ from flask import session, flash, redirect, url_for
 from app.models import Entries, Activities
 from app import db
 from datetime import datetime
+from flask_login import current_user
 
 def handle_upload(request, app):
     if 'csvFile' in request.files and request.files['csvFile'].filename != '':
@@ -21,7 +22,7 @@ def handle_upload(request, app):
                 for row in reader:
                     new_activity = Activities(
                         id=int(row['id']),
-                        username=session['username'],
+                        username=current_user.username,
                         media_type=row['media_type'],
                         media_subtype=row['media_subtype'] if row['media_subtype'] else None,
                         media_name=row['media_name'],
@@ -50,7 +51,7 @@ def handle_upload(request, app):
 
         db.session.commit()
         flash('CSV data uploaded successfully!', 'success')
-        return redirect(url_for('main.upload'))
+        return redirect(url_for('main.advanced'))
 
     elif 'mediaType' in request.form:
         # Handle individual media entry submission

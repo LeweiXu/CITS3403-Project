@@ -282,7 +282,7 @@
         const addEntryModal = document.getElementById('addEntryModal');
         addEntryModal.addEventListener('show.bs.modal', () => {
             const now = new Date();
-            now.setDate(now.getDate() + 1); // Add one day
+            now.setDate(now.getDate());
             const today = now.toISOString().split('T')[0];
             addEntryDateField.value = today;
         });
@@ -291,7 +291,7 @@
         const addActivityDateField = document.querySelector('#addActivityForm input[name="date"]');
         addActivityModal.addEventListener('show.bs.modal', () => {
             const now = new Date();
-            now.setDate(now.getDate() + 1); // Add one day
+            now.setDate(now.getDate());
             const today = now.toISOString().split('T')[0];
             addActivityDateField.value = today;
         });

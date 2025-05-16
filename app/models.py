@@ -53,4 +53,4 @@ class SharedUsers(db.Model):
 
 @login.user_loader
 def load_user(username):
-    return Users.query.get(username)
+    return db.session.get(Users, username)

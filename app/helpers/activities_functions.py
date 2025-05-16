@@ -1,13 +1,21 @@
-from app.models import Entries, Activities
+from app.models import Entries, Activities, SharedUsers
 from app import db
 from flask import flash, render_template, redirect, url_for
 from datetime import datetime
 from sqlalchemy import func, cast, Integer
 from app.forms import EndActivityForm, ReopenActivityForm, DeleteActivityForm
+
 def get_activities(username, request):
     """
     Fetch uncompleted and completed activities for the given user based on query parameters.
     """
+    # Check if the user is allowed to view the target user's data
+    target_user = request.args.get('username', username)
+    if target_user != username:
+        if not SharedUsers.query.filter_by(username=target_user, shared_username=username).first():
+            flash('You do not have permission to view this user’s data.', 'danger')
+            return redirect(url_for('main.sharedata'))
+
     # Get filter criteria from query parameters
     filters = {
         'start_date': request.args.get('start_date'),

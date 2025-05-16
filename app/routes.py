@@ -25,23 +25,21 @@ def index():
 @login_required
 def dashboard():
     result = get_dashboard_data(current_user.username)
-    if result: return result  # Render the dashboard with the data
-
+    if result: return result
+    
 @blueprint.route('/viewdata', methods=['GET'])
 @login_required
 def viewdata():
-    username = request.args.get('username', current_user.username)
-    result = get_entries(username, request)
+    result = get_entries(current_user.username, request)
     if result: return result
 
 @blueprint.route('/activities', methods=['GET'])
 @login_required
 def activities():
-    # Get the username from the query parameters or default to the current user
-    username = request.args.get('username', current_user.username)
-    result = get_activities(username, request)
+    result = get_activities(current_user.username, request)
     if result:
         return result
+    
 @blueprint.route('/analysis', methods=['GET'])
 @login_required
 def analysis():

@@ -12,6 +12,13 @@ class MediaTrackerTests(unittest.TestCase):
         self.client = testApp.test_client()
         return super().setUp()
 
+    # Clean up after each test
+    def tearDown(self):
+        db.session.remove()
+        db.drop_all()
+        self.app_ctx.pop()
+        return super().tearDown()
+
     def test_register_user(self):
         """Test user registration"""
         # Make test user, use POST request to /register
@@ -204,11 +211,3 @@ class MediaTrackerTests(unittest.TestCase):
         self.assertEqual(activity.rating, 8)
         self.assertEqual(activity.comment, 'Great movie!')
         self.assertEqual(activity.status, 'completed')
-
-    # Clean up after each test
-    def tearDown(self):
-        db.session.remove()
-        db.drop_all()
-        self.app_ctx.pop()
-        return super().tearDown()
-

@@ -83,7 +83,7 @@ def get_uncompleted_activities(username, filters=None):
     )
     if filters:
         query = apply_activity_filters(query, filters)
-    results = query.order_by(Activities.id.desc()).all()
+    results = query.order_by(Activities.start_date.desc()).all()
     return results
 
 
@@ -112,7 +112,7 @@ def get_completed_activities(username, filters):
 
     query = apply_activity_filters(query, filters)
     # Map media_type to main type
-    results = query.order_by(Activities.id.desc()).all()
+    results = query.order_by(Activities.start_date.desc()).all()
     return results
 
 def apply_activity_filters(query, filters):

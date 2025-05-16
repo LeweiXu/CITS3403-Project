@@ -143,7 +143,7 @@
                         </form>
                     </td>
                     <td>
-                        <form method="POST" action="{{ url_for('main.delete_activity') }}" onsubmit="return confirm('Are you sure you want to delete this activity?');">
+                        <form method="POST" action="{{ url_for('main.delete_activity') }}">
                             {{ delete_activity_forms[activity.id].hidden_tag() }}
                             {{ delete_activity_forms[activity.id].activity_id() }}
                             {{ delete_activity_forms[activity.id].submit(class="btn btn-danger btn-sm") }}

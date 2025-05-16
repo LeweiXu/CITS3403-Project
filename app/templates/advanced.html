@@ -8,6 +8,15 @@
     <!-- CSV Upload Section -->
     <section class="form-section mt-5">
         <h3>Upload CSV File</h3>
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                <div class="alert alert-primary" style="color: darkblue;">
+                    {% for message in messages %}
+                        <div>{{ message }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
         <form action="/upload" method="POST" enctype="multipart/form-data" id="csv-upload-form">
             <div class="form-group full">
                 <!-- CSV Drag and Drop Zone -->

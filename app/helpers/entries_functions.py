@@ -29,7 +29,7 @@ def get_entries(username, request):
     sort_order = request.args.get('sort_order', 'desc')
 
     # Get filtered entries
-    entries = get_filtered_entries(username, filters, sort_field, sort_order)
+    entries = get_filtered_entries(target_user, filters, sort_field, sort_order)
     ## 2) pagination parameters
     PER_PAGE    = 20
     page        = request.args.get('page', 1, type=int)
@@ -50,7 +50,7 @@ def get_entries(username, request):
         page=page,
         total_pages=total_pages,
         request_args=args,
-        username=username,
+        username=target_user,
         delete_entry_forms=delete_entry_forms
     )
 

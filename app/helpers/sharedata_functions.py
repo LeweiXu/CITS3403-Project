@@ -5,6 +5,7 @@ from app.helpers.entries_functions import get_entries
 from app.helpers.activities_functions import get_activities
 from app.helpers.analysis_functions import get_analysis_page
 from app.forms import ShareWithUserForm, DeleteSharedUserForm, ViewSharedDataForm
+from flask_login import current_user
 
 def share_data_handler(username):
     # Fetch users who shared their data with the current user
@@ -33,10 +34,13 @@ def share_data_handler(username):
 
 def search_users(request):
     """
-    Fetch users whose usernames match the query.
+    Fetch users whose usernames match the query, excluding the current user.
     """
     query = request.args.get('query', '')
-    matching_users = Users.query.filter(Users.username.ilike(f"%{query}%")).all()
+    matching_users = Users.query.filter(
+        Users.username.ilike(f"%{query}%"),
+        Users.username != current_user.username
+    ).all()
     if matching_users:
         return jsonify([user.username for user in matching_users])
     return jsonify([])
@@ -77,6 +81,9 @@ def delete_shared_user_handler(username, form):
 
 def share_with_user_handler(username, form):
     target_user = form.target_user.data
+    if target_user == current_user.username:
+        flash('You cannot share data with yourself.', 'danger')
+        return redirect(url_for('main.sharedata'))
     if target_user:
         # Check if the target user exists in the Users table
         user_exists = Users.query.filter_by(username=target_user).first()

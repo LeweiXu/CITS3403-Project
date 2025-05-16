@@ -55,6 +55,15 @@
         <div class="section-header" style="margin-bottom: 0;">
             <h2 class="section-title">Current Activities</h2>
         </div>
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                <div class="alert alert-primary" style="color: darkblue;">
+                    {% for message in messages %}
+                        <div>{{ message }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
         <div  class="table-container">
         <table>
             <thead>

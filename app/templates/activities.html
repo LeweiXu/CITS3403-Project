@@ -66,6 +66,15 @@
 
     <!-- Activities Table -->
     <section class="table-section">
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            <div class="alert alert-primary" style="color: darkblue;">
+                {% for message in messages %}
+                    <div>{{ message }}</div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
     <table class="table hover">
         <thead>
             <tr>

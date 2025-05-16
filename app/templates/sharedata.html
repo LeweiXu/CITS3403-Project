@@ -21,6 +21,17 @@
                 <div id="form-arrow" class="arrow-hard"> &#x25B2;</div>
             </div>
         </div>
+
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                <div class="alert alert-primary" style="color: darkblue;">
+                    {% for message in messages %}
+                        <div>{{ message }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
     </section>
     {% if shared_with|length == 0 and shared_with_me|length == 0 %}
     <!-- Empty state when no shares exist -->

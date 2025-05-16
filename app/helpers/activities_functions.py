@@ -29,8 +29,8 @@ def get_activities(username, request):
     sort_order = request.args.get('sort_order', 'desc')
 
     # Fetch uncompleted and completed activities
-    uncompleted_activities = get_uncompleted_activities(username, sort_field, sort_order, filters)
-    completed_activities = get_completed_activities(username, sort_field, sort_order, filters)
+    uncompleted_activities = get_uncompleted_activities(target_user, sort_field, sort_order, filters)
+    completed_activities = get_completed_activities(target_user, sort_field, sort_order, filters)
 
     # Combine for simple pagination
     combined    = uncompleted_activities + completed_activities
@@ -65,7 +65,7 @@ def get_activities(username, request):
         page=page,
         total_pages=total_pages,
         request_args=args,
-        username=username,
+        username=target_user,
         end_activity_form=end_activity_form,
         reopen_activity_forms=reopen_activity_forms,
         delete_activity_forms=delete_activity_forms

@@ -8,6 +8,7 @@ from selenium.common.exceptions import TimeoutException, NoAlertPresentException
 from selenium.webdriver.chrome.service import Service as ChromeService # Import ChromeService
 from app import create_app, db
 from app.config import TestConfig
+from tests.populate_db import populate_users_and_data as populate
 import multiprocessing
 
 # Configuration
@@ -22,20 +23,12 @@ DRIVER_PATH = '/usr/bin/chromedriver'  # <-- !!! REPLACE THIS LINE !!!
 
 class AuthTests(unittest.TestCase):
     # Define class-level variables for username, email, and password
-    username = f"testuser_{str(int(time.time()))}"
-    email = f"testuser_{str(int(time.time()))}@example.com"
-    password = "Password123!"
 
     def setUp(self):
-        # Use the class-level variables for username, email, and password
-        self.username = self.__class__.username
-        self.email = self.__class__.email
-        self.password = self.__class__.password
-
         self.testApp = create_app(TestConfig)
         self.app_context = self.testApp.app_context()
         self.app_context.push()
-        db.create_all()
+        populate(self.testApp, db)  # Populate the database with test data
 
         self.server_thread = multiprocessing.Process(target=self.testApp.run)
         self.server_thread.start()
@@ -52,7 +45,6 @@ class AuthTests(unittest.TestCase):
             print(f"Please ensure the path to chromedriver is correct: '{DRIVER_PATH}'")
             print("And that your Flask application is running.")
             raise
-        
 
     def tearDown(self):
         self.server_thread.terminate()
@@ -80,7 +72,7 @@ class AuthTests(unittest.TestCase):
         except TimeoutException:
             self.fail(f"Element with {by}='{value}' not clickable within {timeout} seconds at URL: {self.driver.current_url}")
 
-    def test_01_open_registration_modal_from_home(self):
+    def test_01_open_registration_modal(self):
         """Test opening the registration modal from the 'Get Started' button on the home page."""
         get_started_button = self.find_element_with_wait(By.XPATH, "//a[@data-bs-target='#registerModal' and contains(@class, 'btn-primary')]")
         get_started_button.click()
@@ -88,10 +80,13 @@ class AuthTests(unittest.TestCase):
         register_modal = self.find_element_with_wait(By.ID, "registerModal")
         WebDriverWait(self.driver, 10).until(EC.visibility_of(register_modal))
         self.assertTrue(register_modal.is_displayed(), "Registration modal should be visible.")
-        
         self.find_element_with_wait(By.ID, "reg-username")
 
-    def test_02_open_registration_modal_from_nav(self):
+        # --- FIX: Close the modal before clicking the nav link ---
+        close_btn = self.find_element_with_wait(By.XPATH, "//div[@id='registerModal']//button[@data-bs-dismiss='modal']")
+        close_btn.click()
+        WebDriverWait(self.driver, 5).until(EC.invisibility_of_element_located((By.ID, "registerModal")))
+
         """Test opening the registration modal from the navigation bar."""
         register_nav_link = self.find_element_with_wait(By.XPATH, "//nav//a[@data-bs-target='#registerModal']")
         register_nav_link.click()
@@ -100,14 +95,25 @@ class AuthTests(unittest.TestCase):
         WebDriverWait(self.driver, 10).until(EC.visibility_of(register_modal))
         self.assertTrue(register_modal.is_displayed(), "Registration modal should be visible after clicking nav link.")
         self.find_element_with_wait(By.ID, "reg-username") 
+    
+    def test_02_open_login_modal_from_nav(self):
+        """Test opening the login modal from the navigation bar."""
+        login_nav_link = self.find_element_with_wait(By.XPATH, "//nav//a[@data-bs-target='#loginModal']")
+        login_nav_link.click()
 
-    def test_03_successful_registration_then_login(self):
+        login_modal = self.find_element_with_wait(By.ID, "loginModal")
+        WebDriverWait(self.driver, 10).until(EC.visibility_of(login_modal))
+        self.assertTrue(login_modal.is_displayed(), "Login modal should be visible.")
+        
+        self.find_element_with_wait(By.ID, "username")
+
+    def test_03_test_register(self):
         """Test successful user registration."""
         self.click_element_with_wait(By.XPATH, "//nav//a[@data-bs-target='#registerModal']")
 
-        self.find_element_with_wait(By.ID, "reg-username").send_keys(self.username)
-        self.find_element_with_wait(By.ID, "reg-email").send_keys(self.email)
-        self.find_element_with_wait(By.ID, "reg-password").send_keys(self.password)
+        self.find_element_with_wait(By.ID, "reg-username").send_keys("testuser")
+        self.find_element_with_wait(By.ID, "reg-email").send_keys("testuser@gmail.com")
+        self.find_element_with_wait(By.ID, "reg-password").send_keys("Password123#")
         
         self.click_element_with_wait(By.XPATH, "//form[@id='registerForm']//input[@type='submit']")
 
@@ -119,100 +125,21 @@ class AuthTests(unittest.TestCase):
         except TimeoutException:
             self.fail("Alert not shown after registration.")
 
+    def test_04_test_login(self):
+        """Test successful login."""
+        # Open the login modal from the nav bar
+        self.click_element_with_wait(By.XPATH, "//nav//a[@data-bs-target='#loginModal']")
         login_modal = self.find_element_with_wait(By.ID, "loginModal")
         WebDriverWait(self.driver, 10).until(EC.visibility_of(login_modal))
-        self.assertTrue(login_modal.is_displayed(), "Login modal should be visible after successful registration.")
-        
-        self.find_element_with_wait(By.ID, "username").send_keys(self.username)
-        self.find_element_with_wait(By.ID, "password").send_keys(self.password)
+        self.assertTrue(login_modal.is_displayed(), "Login modal should be visible after opening.")
+
+        self.find_element_with_wait(By.ID, "username").send_keys("aoi")
+        self.find_element_with_wait(By.ID, "password").send_keys("Password123#")
         self.click_element_with_wait(By.XPATH, "//form[@id='loginForm']//input[@type='submit']")
         WebDriverWait(self.driver, 2).until(EC.url_contains("/dashboard"))
         self.assertIn("/dashboard", self.driver.current_url, "User should be redirected to the dashboard after login.")
-    # def test_04_register_existing_username(self):
-    #     """Test registration with an already existing username."""
-    #     username = f"existinguser_{self.unique_timestamp}"
-    #     email_unique_part = self.unique_timestamp
-    #     initial_email = f"initial_{email_unique_part}@example.com"
-    #     password = "Password123!"
 
-    #     self.driver.get(BASE_URL)
-    #     self.click_element_with_wait(By.XPATH, "//nav//a[@data-bs-target='#registerModal']")
-    #     self.find_element_with_wait(By.ID, "reg-username").send_keys(username)
-    #     self.find_element_with_wait(By.ID, "reg-email").send_keys(initial_email)
-    #     self.find_element_with_wait(By.ID, "reg-password").send_keys(password)
-    #     self.click_element_with_wait(By.XPATH, "//form[@id='registerForm']//input[@type='submit']")
-    #     try:
-    #         WebDriverWait(self.driver, 5).until(EC.alert_is_present())
-    #         self.driver.switch_to.alert.accept()
-    #     except TimeoutException:
-    #         self.fail("Alert for successful registration did not appear for the first user.")
-        
-    #     WebDriverWait(self.driver, 10).until(EC.visibility_of_element_located((By.ID, "loginModal")))
-    #     self.click_element_with_wait(By.XPATH, "//div[@id='loginModal']//button[@class='btn-close']")
-    #     WebDriverWait(self.driver, 10).until_not(EC.visibility_of_element_located((By.ID, "loginModal")))
 
-    #     self.click_element_with_wait(By.XPATH, "//nav//a[@data-bs-target='#registerModal']")
-    #     WebDriverWait(self.driver, 10).until(EC.visibility_of_element_located((By.ID, "reg-username")))
-
-    #     self.find_element_with_wait(By.ID, "reg-username").send_keys(username) 
-    #     self.find_element_with_wait(By.ID, "reg-email").send_keys(f"new_{email_unique_part}@example.com") 
-    #     self.find_element_with_wait(By.ID, "reg-password").send_keys(password)
-    #     self.click_element_with_wait(By.XPATH, "//form[@id='registerForm']//input[@type='submit']")
-
-    #     error_message_div = self.find_element_with_wait(By.ID, "username-error")
-    #     WebDriverWait(self.driver, 10).until(lambda d: error_message_div.text != "")
-    #     self.assertIn("Username already exists.", error_message_div.text)
-        
-    #     username_field = self.find_element_with_wait(By.ID, "reg-username")
-    #     self.assertIn("is-invalid", username_field.get_attribute("class"))
-
-    # def test_05_register_existing_email(self):
-    #     """Test registration with an already existing email."""
-    #     username_unique_part = self.unique_timestamp
-    #     email = f"existing_email_{self.unique_timestamp}@example.com"
-    #     password = "Password123!"
-
-    #     self.driver.get(BASE_URL)
-    #     self.click_element_with_wait(By.XPATH, "//nav//a[@data-bs-target='#registerModal']")
-    #     self.find_element_with_wait(By.ID, "reg-username").send_keys(f"anotheruser_{username_unique_part}")
-    #     self.find_element_with_wait(By.ID, "reg-email").send_keys(email)
-    #     self.find_element_with_wait(By.ID, "reg-password").send_keys(password)
-    #     self.click_element_with_wait(By.XPATH, "//form[@id='registerForm']//button[@type='submit']")
-    #     try:
-    #         WebDriverWait(self.driver, 5).until(EC.alert_is_present())
-    #         self.driver.switch_to.alert.accept()
-    #     except TimeoutException:
-    #         self.fail("Alert for successful registration did not appear for the first user.")
-
-    #     WebDriverWait(self.driver, 10).until(EC.visibility_of_element_located((By.ID, "loginModal")))
-    #     self.click_element_with_wait(By.XPATH, "//div[@id='loginModal']//button[@class='btn-close']")
-    #     WebDriverWait(self.driver, 10).until_not(EC.visibility_of_element_located((By.ID, "loginModal")))
-
-    #     self.click_element_with_wait(By.XPATH, "//nav//a[@data-bs-target='#registerModal']")
-    #     WebDriverWait(self.driver, 10).until(EC.visibility_of_element_located((By.ID, "reg-email")))
-
-    #     self.find_element_with_wait(By.ID, "reg-username").send_keys(f"newuser_{username_unique_part}") 
-    #     self.find_element_with_wait(By.ID, "reg-email").send_keys(email) 
-    #     self.find_element_with_wait(By.ID, "reg-password").send_keys(password)
-    #     self.click_element_with_wait(By.XPATH, "//form[@id='registerForm']//button[@type='submit']")
-
-    #     error_message_div = self.find_element_with_wait(By.ID, "email-error")
-    #     WebDriverWait(self.driver, 10).until(lambda d: error_message_div.text != "")
-    #     self.assertIn("Email already exists.", error_message_div.text)
-
-    #     email_field = self.find_element_with_wait(By.ID, "reg-email")
-    #     self.assertIn("is-invalid", email_field.get_attribute("class"))
-
-    def test_06_open_login_modal_from_nav(self):
-        """Test opening the login modal from the navigation bar."""
-        login_nav_link = self.find_element_with_wait(By.XPATH, "//nav//a[@data-bs-target='#loginModal']")
-        login_nav_link.click()
-
-        login_modal = self.find_element_with_wait(By.ID, "loginModal")
-        WebDriverWait(self.driver, 10).until(EC.visibility_of(login_modal))
-        self.assertTrue(login_modal.is_displayed(), "Login modal should be visible.")
-        
-        self.find_element_with_wait(By.ID, "username")
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)

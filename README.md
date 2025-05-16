@@ -6,6 +6,8 @@ The idea is, at the end of the day, the user can log (approximately) the time sp
 
 To log an activity, click on the `new activity` button on the dashboard and select a `media type`, an optional `media subtype`, and input a `media name`. Optionally, you can set a `start date` for that activity if you forgot to log the activity at an earlier date. The activity will now appear on the dashboard. To log time spent on that title, click on the `add entry` button and fill in the time spent (in minutes) on that activity. You can optionally set a date if you wish to log an entry for a different date. Finally, when you finish an activity, click on the `end activity` button to finish the activity. Here, you can optionally log a rating and comment/review on that activity (for your personal record or if you share your data with another user). Don't worry, if you accidentally end an activity or wish to take a break from that activity, you can always reopen the activity from the `Activities` page. 
 
+### **NOTE: test data includes activities/entries up to 19/05/2025 (date of presentation). Some stats in the analysis page calculate based on the current date (e.g. total duration in the past week), so if left for too long, these stats will not show any data.**
+
 ## Running the Application
 
 To run the web application, navigate to the project root and install the required dependencies:

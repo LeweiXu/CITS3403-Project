@@ -84,7 +84,6 @@ def add_activity():
     if add_activity_form.validate_on_submit():  # Check if the form is submitted and valid
         result = handle_add_activity(current_user.username, add_activity_form)
         if result: return result  # Redirect to dashboard if activity is added successfully
-        return redirect(url_for('main.dashboard'))  # Add fallback redirect
     return redirect(url_for('main.dashboard')) # Fallback redirect
 
 @blueprint.route('/end_activity', methods=['POST'])
@@ -94,7 +93,6 @@ def end_activity():
     if end_activity_form.validate_on_submit():  # Check if the form is submitted and valid
         result = handle_end_activity(current_user.username, end_activity_form)
         if result: return result
-        return redirect(url_for('main.dashboard'))  # Add fallback redirect
     return redirect(url_for('main.dashboard')) # Fallback redirect
 
 @blueprint.route('/add_entry', methods=['POST'])
@@ -104,7 +102,6 @@ def add_entry():
     if add_entry_form.validate_on_submit():  # Check if the form is submitted and valid
         result = handle_add_entry(current_user.username, add_entry_form)
         if result: return result  # Redirect to viewdata if entry is added successfully
-        return redirect(url_for('main.dashboard'))  # Add fallback redirect
     return redirect(url_for('main.dashboard')) # Fallback redirect
 
 @blueprint.route('/reopen_activity', methods=['POST'])
@@ -114,7 +111,6 @@ def reopen_activity():
     if reopen_activity_form.validate_on_submit():
         result = handle_reopen_activity(reopen_activity_form)
         if result: return result  # Redirect to viewdata if activity is reopened successfully
-        return redirect(url_for('main.dashboard'))  # Add fallback redirect
     return redirect(url_for('main.dashboard'))  # Add fallback redirect
 
 @blueprint.route('/delete_activity', methods=['POST'])
@@ -124,7 +120,6 @@ def delete_activity():
     if delete_activity_form.validate_on_submit():
         result = handle_delete_activity(delete_activity_form)
         if result: return result
-        return redirect(url_for('main.dashboard'))  # Add fallback redirect
     return redirect(url_for('main.dashboard'))  # Add fallback redirect
     
 @blueprint.route('/delete_entry', methods=['POST'])
@@ -134,7 +129,6 @@ def delete_entry():
     if delete_entry_form.validate_on_submit():
         result = handle_delete_entry(delete_entry_form)
         if result: return result 
-        return redirect(url_for('main.dashboard'))  # Add fallback redirect
     return redirect(url_for('main.dashboard'))  # Add fallback redirect
 
 @blueprint.route('/view_shared_data', methods=['POST'])
@@ -144,7 +138,6 @@ def view_shared_data():
     if view_shared_data_form.validate_on_submit():
         result = view_shared_data_handler(current_user.username, request, view_shared_data_form)
         if result: return result
-        return redirect(url_for('main.dashboard'))  # Add fallback redirect    
     return redirect(url_for('main.dashboard'))  # Add fallback redirect
 
 @blueprint.route('/delete_shared_user', methods=['POST'])
@@ -154,7 +147,6 @@ def delete_shared_user():
     if delete_shared_user_form.validate_on_submit():
         result = delete_shared_user_handler(current_user.username, delete_shared_user_form)
         if result: return result
-        return redirect(url_for('main.dashboard'))  # Add fallback redirect
     return redirect(url_for('main.dashboard'))  # Add fallback redirect
 
 @blueprint.route('/share_with_user', methods=['POST'])
@@ -164,7 +156,6 @@ def share_with_user():
     if share_with_user_form.validate_on_submit():
         result = share_with_user_handler(current_user.username, share_with_user_form)
         if result: return result
-        return redirect(url_for('main.dashboard'))  # Add fallback redirect
     return redirect(url_for('main.dashboard'))  # Add fallback redirect
 
 # <------------ BUTTON ROUTES ------------>

@@ -248,5 +248,75 @@ class AuthTests(unittest.TestCase):
         # Assert "The Matrix" appears on the dashboard page
         self.assertIn("The Matrix", self.driver.page_source, "'The Matrix' should appear on the Dashboard after reopening.")
 
+    def test_08_end_activity(self):
+        """Test ending an activity for 'Elden Ring' and check it is removed from the Dashboard."""
+        # Log in as 'aoi'
+        self.click_element_with_wait(By.XPATH, "//nav//a[@data-bs-target='#loginModal']")
+        login_modal = self.find_element_with_wait(By.ID, "loginModal")
+        WebDriverWait(self.driver, 10).until(EC.visibility_of(login_modal))
+        self.find_element_with_wait(By.ID, "username").send_keys("aoi")
+        self.find_element_with_wait(By.ID, "password").send_keys("Password123#")
+        self.click_element_with_wait(By.XPATH, "//form[@id='loginForm']//input[@type='submit']")
+        WebDriverWait(self.driver, 5).until(EC.url_contains("/dashboard"))
+        self.assertIn("/dashboard", self.driver.current_url)
+
+        # Find the row for "Elden Ring"
+        row_xpath = "//tr[td[contains(text(), 'Elden Ring')]]"
+        elden_row = self.find_element_with_wait(By.XPATH, row_xpath)
+        self.driver.execute_script("arguments[0].scrollIntoView(true);", elden_row)
+
+        # Click the End Activity button in that row
+        end_btn_xpath = ".//button[contains(@class, 'btn-danger') and contains(text(), 'End Activity')]"
+        end_btn = elden_row.find_element(By.XPATH, end_btn_xpath)
+        end_btn.click()
+
+        # Wait for the modal to appear
+        WebDriverWait(self.driver, 5).until(
+            EC.visibility_of_element_located((By.ID, "endActivityModal"))
+        )
+
+        # Click the submit button in the modal (or skip if you want to skip rating/comment)
+        submit_btn = self.find_element_with_wait(By.ID, "submitButton")
+        submit_btn.click()
+
+        # Wait for redirect to dashboard
+        WebDriverWait(self.driver, 10).until(EC.url_contains("/dashboard"))
+        self.assertIn("/dashboard", self.driver.current_url)
+
+        # Assert "Elden Ring" no longer appears on the dashboard page
+        self.assertNotIn("Elden Ring", self.driver.page_source, "'Elden Ring' should not appear on the Dashboard after ending the activity.")
+
+    def test_09_search_cyberpunk_activity(self):
+        """Test searching for 'cyberpunk' as Neko and assert only 'cyberpunk' appears in the media name column."""
+        # Log in as 'Neko'
+        self.click_element_with_wait(By.XPATH, "//nav//a[@data-bs-target='#loginModal']")
+        login_modal = self.find_element_with_wait(By.ID, "loginModal")
+        WebDriverWait(self.driver, 10).until(EC.visibility_of(login_modal))
+        self.find_element_with_wait(By.ID, "username").send_keys("neko")
+        self.find_element_with_wait(By.ID, "password").send_keys("Password123#")
+        self.click_element_with_wait(By.XPATH, "//form[@id='loginForm']//input[@type='submit']")
+        WebDriverWait(self.driver, 5).until(EC.url_contains("/dashboard"))
+        self.assertIn("/dashboard", self.driver.current_url)
+
+        # Go to Activities page (viewdata)
+        self.driver.get(BASE_URL.rstrip("/") + "/viewdata")
+        WebDriverWait(self.driver, 10).until(EC.url_contains("/viewdata"))
+
+        # Enter "cyberpunk" in the media name search field and submit
+        media_name_input = self.find_element_with_wait(By.ID, "media_name")
+        media_name_input.clear()
+        media_name_input.send_keys("cyberpunk")
+        search_btn = self.find_element_with_wait(By.XPATH, "//button[@type='submit' and contains(text(), 'Search')]")
+        search_btn.click()
+
+        WebDriverWait(self.driver, 10).until(EC.text_to_be_present_in_element((By.XPATH, "//tr[contains(@class, 'entry-row')]/td[3]"), "Cyberpunk"))
+
+        # Find all media name cells in the results table (3rd column of entry rows)
+        media_name_cells = self.driver.find_elements(By.XPATH, "//tr[contains(@class, 'entry-row')]/td[3]")
+        self.assertGreater(len(media_name_cells), 0, "No results found for 'cyberpunk'.")
+
+        for cell in media_name_cells:
+            self.assertEqual(cell.text.strip(), "Cyberpunk 2077", f"Unexpected media name found: {cell.text}")
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)

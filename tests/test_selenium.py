@@ -159,5 +159,94 @@ class AuthTests(unittest.TestCase):
             # Check if page loaded successfully by checking the HTTP status code via JavaScript
             status = self.driver.execute_script("return window.performance.getEntriesByType('navigation')[0].responseStart ? 200 : 0;")
             self.assertEqual(status, 200, f"Failed to load {link} (status code: {status})")
+
+    def test_06_add_new_activity(self):
+        """Test adding a new activity and verifying it appears on the Dashboard."""
+        # Log in as 'aoi'
+        self.click_element_with_wait(By.XPATH, "//nav//a[@data-bs-target='#loginModal']")
+        login_modal = self.find_element_with_wait(By.ID, "loginModal")
+        WebDriverWait(self.driver, 10).until(EC.visibility_of(login_modal))
+        self.find_element_with_wait(By.ID, "username").send_keys("aoi")
+        self.find_element_with_wait(By.ID, "password").send_keys("Password123#")
+        self.click_element_with_wait(By.XPATH, "//form[@id='loginForm']//input[@type='submit']")
+        WebDriverWait(self.driver, 5).until(EC.url_contains("/dashboard"))
+        self.assertIn("/dashboard", self.driver.current_url)
+
+        # Click the "Add New Activity" button
+        self.click_element_with_wait(By.XPATH, "//button[@data-bs-target='#addActivityModal']")
+
+        # Wait for the modal to appear
+        add_activity_modal = self.find_element_with_wait(By.ID, "addActivityModal")
+        WebDriverWait(self.driver, 10).until(EC.visibility_of(add_activity_modal))
+
+        # Fill in the form
+        # Select media type
+        media_type_select = self.find_element_with_wait(By.ID, "media_type")
+        media_type_select.click()
+        media_type_select.find_element(By.XPATH, ".//option[normalize-space()='Visual Media']").click()
+
+        # Wait for subtype to be enabled and select one
+        media_subtype_select = self.find_element_with_wait(By.ID, "media_subtype")
+        WebDriverWait(self.driver, 5).until(lambda d: not media_subtype_select.get_attribute("disabled"))
+        media_subtype_select.click()
+        media_subtype_select.find_element(By.XPATH, ".//option[normalize-space()='Movie']").click()
+
+        # Fill in media name
+        self.find_element_with_wait(By.ID, "media_name").send_keys("Test Movie")
+
+        # Submit the form
+        self.click_element_with_wait(By.XPATH, "//form[@id='addActivityForm']//input[@type='submit' or @class='btn btn-primary']")
+
+        # Wait for modal to close and dashboard to reload
+        WebDriverWait(self.driver, 10).until(EC.invisibility_of_element_located((By.ID, "addActivityModal")))
+        WebDriverWait(self.driver, 10).until(EC.url_contains("/dashboard"))
+
+        # Check if "Test Movie" appears anywhere on the current page
+        self.assertIn("Test Movie", self.driver.page_source, "Newly added activity should appear on the Dashboard.")
+
+    def test_07_reopen_activity(self):
+        """Test reopening an activity for 'The Matrix' and check it appears on the Dashboard."""
+        # Log in as 'aoi'
+        self.click_element_with_wait(By.XPATH, "//nav//a[@data-bs-target='#loginModal']")
+        login_modal = self.find_element_with_wait(By.ID, "loginModal")
+        WebDriverWait(self.driver, 10).until(EC.visibility_of(login_modal))
+        self.find_element_with_wait(By.ID, "username").send_keys("aoi")
+        self.find_element_with_wait(By.ID, "password").send_keys("Password123#")
+        self.click_element_with_wait(By.XPATH, "//form[@id='loginForm']//input[@type='submit']")
+        WebDriverWait(self.driver, 5).until(EC.url_contains("/dashboard"))
+        self.assertIn("/dashboard", self.driver.current_url)
+
+        # Go to Activities page
+        self.driver.get(BASE_URL.rstrip("/") + "/activities")
+        WebDriverWait(self.driver, 10).until(EC.url_contains("/activities"))
+
+        # Find the row for "The Matrix" and click to reveal the details (and the reopen button)
+        row_xpath = "//tr[contains(@class, 'activity-row')][td[contains(text(), 'The Matrix')]]"
+        matrix_row = self.find_element_with_wait(By.XPATH, row_xpath)
+        self.driver.execute_script("arguments[0].scrollIntoView(true);", matrix_row)
+        matrix_row.click()  # Reveal the details row with the reopen button
+
+        # Wait for the details row to be visible
+        details_row_xpath = "//tr[contains(@class, 'activity-details')][preceding-sibling::tr[1][td[contains(text(), 'The Matrix')]]]"
+        WebDriverWait(self.driver, 5).until(
+            EC.visibility_of_element_located((By.XPATH, details_row_xpath))
+        )
+
+        # Now find and click the reopen button in the revealed details row
+        reopen_btn_xpath = (
+            f"{details_row_xpath}//input[@type='submit' and contains(@class, 'btn-primary')]"
+        )
+        reopen_btn = self.find_element_with_wait(By.XPATH, reopen_btn_xpath)
+        self.driver.execute_script("arguments[0].scrollIntoView(true);", reopen_btn)
+        WebDriverWait(self.driver, 5).until(EC.element_to_be_clickable((By.XPATH, reopen_btn_xpath)))
+        reopen_btn.click()
+
+        # Wait for redirect to dashboard
+        WebDriverWait(self.driver, 10).until(EC.url_contains("/dashboard"))
+        self.assertIn("/dashboard", self.driver.current_url)
+
+        # Assert "The Matrix" appears on the dashboard page
+        self.assertIn("The Matrix", self.driver.page_source, "'The Matrix' should appear on the Dashboard after reopening.")
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)

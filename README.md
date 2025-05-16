@@ -33,13 +33,19 @@ Finally, to run the application, simply use `flask run`:
 ```
 flask run
 ```
+Altneratively, you can run the application using the `main file`:
+```
+python3 app.py
+```
 
 To run the selenium unit tests, chromium/chromedriver needs to be installed on your machine. To install:
 ```
 sudo apt update
 sudo apt install chromedriver
 ```
-You will then need to configure the selenium tester with the location of your chromedriver. On ubuntu/linux, this location is usually at `usr/bin/chromedriver` after running the above installation. On Mac/Windows, you can directly download the chromedriver from [chrome](https://developer.chrome.com/docs/chromedriver/downloads). The chromedriver will be located in the base directory of the downloaded folder.
+You may need to configure the `test_selenium.py` with the location of your chromedriver. On ubuntu/linux, this location is usually at `usr/bin/chromedriver` after running the above installation. This is also the default location set in `test_selenium.py`.
+
+On Mac/Windows, you can directly download the chromedriver from [chrome](https://developer.chrome.com/docs/chromedriver/downloads). The chromedriver will be located in the base directory of the downloaded folder.
 
 To run the unit tests and selenium tests:
 ```

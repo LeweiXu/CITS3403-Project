@@ -11,15 +11,15 @@ from app.config import TestConfig
 from tests.populate_db import populate_users_and_data as populate
 import multiprocessing
 
-# Configuration
 # --- IMPORTANT ---
 # Replace the placeholder path below with the ABSOLUTE path to your chromedriver executable.
 # Example for macOS if it's in your Downloads folder and then in 'chromedriver-mac-arm64':
 # driver_path = '/Users/your_username/Downloads/chromedriver-mac-arm64/chromedriver'
 # Example for Windows if it's in a 'drivers' folder on C drive:
 # driver_path = 'C:\\drivers\\chromedriver.exe'
-BASE_URL = "http://localhost:5000/" # Double check this IP, usually it's 127.0.0.1, may different in yours
+# currently set to the default location for chromedriver in Ubuntu
 DRIVER_PATH = '/usr/bin/chromedriver'  # <-- !!! REPLACE THIS LINE !!!
+BASE_URL = "http://localhost:5000/" # Double check this IP, usually it's 127.0.0.1, may different in yours
 
 class AuthTests(unittest.TestCase):
     # Define class-level variables for username, email, and password

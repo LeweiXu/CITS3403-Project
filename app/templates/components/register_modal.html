@@ -9,15 +9,6 @@
                 <div class="modal-body" style="padding: 0;">
                     <h2 class="text-center">Register</h2>
                     <p class="text-center">Create an account to start tracking your media consumption.</p>
-                        {% with messages = get_flashed_messages() %}
-                            {% if messages %}
-                                <div class="alert alert-primary" style="color: darkblue;">
-                                    {% for message in messages %}
-                                        <div>{{ message }}</div>
-                                    {% endfor %}
-                                </div>
-                            {% endif %}
-                        {% endwith %}
                     <form id="registerForm" method="POST" action="/register">
                         {{ register_form.hidden_tag() }}
                         <div class="mb-3">
@@ -129,19 +120,15 @@
                     // Open login modal
                     const loginModalElem = document.getElementById('loginModal');
                     const loginModal = new bootstrap.Modal(loginModalElem);
-                    // Set success message in login modal
-                    let msgDiv = loginModalElem.querySelector('#login-success-message');
-                    if (!msgDiv) {
-                        msgDiv = document.createElement('div');
-                        msgDiv.id = 'login-success-message';
-                        msgDiv.className = 'alert alert-success';
-                        msgDiv.style = 'color: green; margin-top: 10px;';
-                        loginModalElem.querySelector('.modal-body').prepend(msgDiv);
-                    }
-                    msgDiv.textContent = 'Registration successful! Please log in.';
                     loginModal.show();
                     // Clear the registration form
                     document.getElementById('registerForm').reset();
+                    const msgDiv = document.getElementById('login-success-message');
+                    if (msgDiv) {
+                        msgDiv.className = 'alert alert-success';
+                        msgDiv.style.display = 'block';
+                        msgDiv.textContent = result.message || 'Registration successful! Please log in.';}
+
                     break;
                 default:
                     alert('Registration failed. Please try again.');

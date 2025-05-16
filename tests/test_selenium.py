@@ -118,10 +118,9 @@ class AuthTests(unittest.TestCase):
         self.click_element_with_wait(By.XPATH, "//form[@id='registerForm']//input[@type='submit']")
 
         try:
-            WebDriverWait(self.driver, 5).until(EC.alert_is_present())
-            alert = self.driver.switch_to.alert
-            self.assertIn("Registration successful! Please log in.", alert.text)
-            alert.accept()
+            time.sleep(0.5)
+            msg_div = self.find_element_with_wait(By.ID, "login-success-message")
+            self.assertIn("Registration successful! Please log in.", msg_div.get_attribute("textContent"))
         except TimeoutException:
             self.fail("Alert not shown after registration.")
 

@@ -25,10 +25,12 @@ def get_activities(username, request):
         'min_duration': request.args.get('min_duration'),
         'max_duration': request.args.get('max_duration')
     }
+    sort_field = request.args.get('sort_field', 'date')
+    sort_order = request.args.get('sort_order', 'desc')
 
     # Fetch uncompleted and completed activities
-    uncompleted_activities = get_uncompleted_activities(username, filters)
-    completed_activities = get_completed_activities(username, filters)
+    uncompleted_activities = get_uncompleted_activities(username, sort_field, sort_order, filters)
+    completed_activities = get_completed_activities(username, sort_field, sort_order, filters)
 
     # Combine for simple pagination
     combined    = uncompleted_activities + completed_activities
@@ -69,14 +71,14 @@ def get_activities(username, request):
         delete_activity_forms=delete_activity_forms
     )
 
-def get_uncompleted_activities(username, filters=None):
+def get_uncompleted_activities(username, sort_field, sort_order, filters=None):
     """
     Fetch uncompleted activities (status = 'in_progress') for the given user.
     Include activities even if there are no corresponding entries.
     """
     # Query uncompleted activities
     query = (db.session.query(
-        Activities.id.label('id'),  # Ensure activity ID is passed to the HTML page
+        Activities.id.label('id'),
         Activities.media_type,
         Activities.media_subtype,
         Activities.media_name,
@@ -84,18 +86,35 @@ def get_uncompleted_activities(username, filters=None):
         func.coalesce(func.sum(cast(Entries.duration, Integer)), 0).label('total_duration'),
     ).outerjoin(Entries, Activities.id == Entries.activity_id).filter(
         Activities.username == username,
-        Activities.status == 'ongoing'  # Uncompleted activities
+        Activities.status == 'ongoing'
     ).group_by(
-        Activities.id, Activities.media_type, Activities.media_name
+        Activities.id, Activities.media_type, Activities.media_subtype, Activities.media_name, Activities.start_date
     )
     )
     if filters:
         query = apply_activity_filters(query, filters)
-    results = query.order_by(Activities.start_date.desc()).all()
+
+    # Sorting logic
+    sort_fields = {
+        'start_date': Activities.start_date,
+        'end_date': Activities.end_date,
+        'media_name': Activities.media_name,
+        'media_type': Activities.media_type,
+        'media_subtype': Activities.media_subtype,
+        'total_duration': func.coalesce(func.sum(cast(Entries.duration, Integer)), 0),
+        'rating': Activities.rating
+    }
+    sort_col = sort_fields.get(sort_field, Activities.start_date)
+    if sort_order == 'asc':
+        query = query.order_by(sort_col.asc(), Activities.id.asc())
+    else:
+        query = query.order_by(sort_col.desc(), Activities.id.desc())
+
+    results = query.all()
     return results
 
 
-def get_completed_activities(username, filters):
+def get_completed_activities(username, sort_field, sort_order, filters=None):
     """
     Fetch completed activities (status != 'ongoing') for the given user.
     """
@@ -112,15 +131,31 @@ def get_completed_activities(username, filters):
         Activities.comment
     ).join(Activities, Activities.id == Entries.activity_id).filter(
         Activities.username == username,
-        Activities.status != 'ongoing'  # Completed activities
+        Activities.status != 'ongoing'
     ).group_by(
-        Activities.id, Activities.media_type, Activities.media_name, Activities.end_date, Activities.rating, Activities.comment
+        Activities.id, Activities.media_type, Activities.media_subtype, Activities.media_name, Activities.start_date, Activities.end_date, Activities.rating, Activities.comment
     )
     )
 
     query = apply_activity_filters(query, filters)
-    # Map media_type to main type
-    results = query.order_by(Activities.start_date.desc()).all()
+
+    # Sorting logic
+    sort_fields = {
+        'start_date': Activities.start_date,
+        'end_date': Activities.end_date,
+        'media_name': Activities.media_name,
+        'media_type': Activities.media_type,
+        'media_subtype': Activities.media_subtype,
+        'total_duration': func.sum(cast(Entries.duration, Integer)),
+        'rating': Activities.rating
+    }
+    sort_col = sort_fields.get(sort_field, Activities.start_date)
+    if sort_order == 'asc':
+        query = query.order_by(sort_col.asc(), Activities.id.asc())
+    else:
+        query = query.order_by(sort_col.desc(), Activities.id.desc())
+
+    results = query.all()
     return results
 
 def apply_activity_filters(query, filters):

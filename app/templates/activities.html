@@ -39,6 +39,22 @@
                 <input type="number" id="max_duration" name="max_duration" class="form-control" placeholder="e.g., 120" value="{{ request.args.get('max_duration', '') }}">
             </div>
             <div class="row mt-3">
+                <div class="sort text-center">
+                    <!-- Sort Dropdowns integrated in the form -->
+                    <select name="sort_field" class="form-select d-inline-block w-auto ms-3" style="display:inline-block; width:auto;">
+                        <option value="start_date" {% if request.args.get('sort_field', 'start_date') == 'start_date' %}selected{% endif %}>Sort by Start Date</option>
+                        <option value="end_date" {% if request.args.get('sort_field') == 'end_date' %}selected{% endif %}>Sort by End Date</option>
+                        <option value="media_name" {% if request.args.get('sort_field') == 'media_name' %}selected{% endif %}>Sort by Media Name</option>
+                        <option value="media_type" {% if request.args.get('sort_field') == 'media_type' %}selected{% endif %}>Sort by Media Type</option>
+                        <option value="media_subtype" {% if request.args.get('sort_field') == 'media_subtype' %}selected{% endif %}>Sort by Media Subtype</option>
+                        <option value="total_duration" {% if request.args.get('sort_field') == 'total_duration' %}selected{% endif %}>Sort by Total Duration</option>
+                        <option value="rating" {% if request.args.get('sort_field') == 'rating' %}selected{% endif %}>Sort by Rating</option>
+                    </select>
+                    <select name="sort_order" class="form-select d-inline-block w-auto" style="display:inline-block; width:auto;">
+                        <option value="desc" {% if request.args.get('sort_order', 'desc') == 'desc' %}selected{% endif %}>Descending</option>
+                        <option value="asc" {% if request.args.get('sort_order') == 'asc' %}selected{% endif %}>Ascending</option>
+                    </select>
+                </div>
                 <div class="col-md-12 text-center">
                     <button type="submit" class="btn btn-primary">Search</button>
                     <a href="{{ url_for('main.activities') }}" class="btn btn-secondary">Reset</a>

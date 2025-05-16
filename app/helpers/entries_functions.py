@@ -25,9 +25,11 @@ def get_entries(username, request):
         'min_duration': request.args.get('min_duration'),
         'max_duration': request.args.get('max_duration')
     }
+    sort_field = request.args.get('sort_field', 'date')
+    sort_order = request.args.get('sort_order', 'desc')
 
     # Get filtered entries
-    entries = get_filtered_entries(username, filters)
+    entries = get_filtered_entries(username, filters, sort_field, sort_order)
     ## 2) pagination parameters
     PER_PAGE    = 20
     page        = request.args.get('page', 1, type=int)
@@ -52,7 +54,7 @@ def get_entries(username, request):
         delete_entry_forms=delete_entry_forms
     )
 
-def get_filtered_entries(username, filters):
+def get_filtered_entries(username, filters, sort_field, sort_order):
     """
     Fetch and filter media entries based on the provided filters.
     """
@@ -85,8 +87,20 @@ def get_filtered_entries(username, filters):
     if max_duration:
         query = query.filter(cast(Entries.duration, Integer) <= int(max_duration))
 
-    # Execute the query and return the results
-    return query.order_by(Entries.date.desc(),Entries.id.desc()).all()
+    # Sorting logic
+    sort_fields = {
+        'date': Entries.date,
+        'media_type': Activities.media_type,
+        'media_name': Activities.media_name,
+        'duration': Entries.duration
+    }
+    sort_col = sort_fields.get(sort_field, Entries.date)
+    if sort_order == 'asc':
+        query = query.order_by(sort_col.asc(), Entries.id.asc())
+    else:
+        query = query.order_by(sort_col.desc(), Entries.id.desc())
+
+    return query.all()
 
 def handle_delete_entry(form):
     entry_id = form.entry_id.data

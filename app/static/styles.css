@@ -708,12 +708,6 @@ margin-top: 0.5rem;
     background-color: #2980b9;
 }
 
-.entry-row:hover {
-    animation-name: pulse;
-    animation-duration: 0.5s;
-    animation-fill-mode: both;
-}
-
 .sort {
     padding-bottom: 15px;
 }

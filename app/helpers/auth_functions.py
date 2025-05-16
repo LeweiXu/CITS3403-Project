@@ -64,8 +64,6 @@ def handle_register(form):
         new_user = Users(username=username, email=email, password=hashed_password)
         db.session.add(new_user)
         db.session.commit()
-        login_user(new_user)
-        flash('Registration successful! Please log in.', 'success')
         return 'success'
     except Exception as e:
         print(f"Error: {e}")  # Debugging output

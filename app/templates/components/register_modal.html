@@ -123,15 +123,23 @@
                     document.getElementById('email-error').innerHTML = '<small>Email already exists.</small>';
                     break;
                 case 'success':
-
                     // Close register modal
                     const registerModal = bootstrap.Modal.getInstance(document.getElementById('registerModal'));
                     registerModal.hide();
-                    
                     // Open login modal
-                    const loginModal = new bootstrap.Modal(document.getElementById('loginModal'));
+                    const loginModalElem = document.getElementById('loginModal');
+                    const loginModal = new bootstrap.Modal(loginModalElem);
+                    // Set success message in login modal
+                    let msgDiv = loginModalElem.querySelector('#login-success-message');
+                    if (!msgDiv) {
+                        msgDiv = document.createElement('div');
+                        msgDiv.id = 'login-success-message';
+                        msgDiv.className = 'alert alert-success';
+                        msgDiv.style = 'color: green; margin-top: 10px;';
+                        loginModalElem.querySelector('.modal-body').prepend(msgDiv);
+                    }
+                    msgDiv.textContent = 'Registration successful! Please log in.';
                     loginModal.show();
-                    
                     // Clear the registration form
                     document.getElementById('registerForm').reset();
                     break;

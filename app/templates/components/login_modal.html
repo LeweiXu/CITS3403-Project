@@ -8,17 +8,9 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body" style="padding: 0;">
-                    {% with messages = get_flashed_messages() %}
-                        {% if messages %}
-                            <div class="alert alert-danger" style="color: red;">
-                                {% for message in messages %}
-                                    <div>{{ message }}</div>
-                                {% endfor %}
-                            </div>
-                        {% endif %}
-                    {% endwith %}
                     <h2 class="text-center">Login</h2>
                     <p class="text-center">Access your account to track your media consumption.</p>
+                    <div id="login-success-message" style="display:none;"></div>
                     <form method="POST" action="/login" id="loginForm">
                         {{ login_form.hidden_tag() }}
                         <div class="mb-3">
@@ -55,9 +47,21 @@
 
         const result = await response.json();
 
+        // Hide the success message on login attempt
+        const msgDiv = document.getElementById('login-success-message');
+        if (msgDiv) msgDiv.style.display = 'none';
+
         if (result.success) {
             // Redirect to the dashboard if login is successful
             window.location.href = result.redirect_url;
+        } else {
+            // Show a flash-style message if login fails
+            const msgDiv = document.getElementById('login-success-message');
+            if (msgDiv) {
+                msgDiv.className = 'alert alert-danger';
+                msgDiv.style.display = 'block';
+                msgDiv.textContent = result.message || 'Invalid username or password.';
+            }
         }
     });
 </script>

@@ -90,7 +90,7 @@ def get_filtered_entries(username, filters):
 
 def handle_delete_entry(form):
     entry_id = form.entry_id.data
-    entry = Entries.query.get(entry_id)
+    entry = db.session.get(Entries, entry_id)
     if entry:
         db.session.delete(entry)
         db.session.commit()

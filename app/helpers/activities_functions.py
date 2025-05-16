@@ -191,7 +191,7 @@ def handle_reopen_activity(form):
         flash('Missing data for reopen.', 'danger')
         return redirect(url_for('main.viewdata'))
 
-    activity = Activities.query.get(activity_id)
+    activity = db.session.get(Activities, activity_id)
     if not activity:
         flash('Activity not found.', 'danger')
         return redirect(url_for('main.viewdata'))
